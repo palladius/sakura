@@ -1,0 +1,4 @@
+#!/bin/sh
+
+NUMBER=${1:-5}
+ps aux | grep -v USER | awk '{print $3 "\t" $2 "\t" $11}' | sort -nr | head -n $NUMBER
