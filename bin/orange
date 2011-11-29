@@ -1,0 +1,4 @@
+#!/bin/bash
+# 256 colori grazie a cillian e allo script: \033[38;5;208m
+# fatto a tentoni: echo FF7700 | ./conv-rgb2xterm
+echo -en "\033[38;5;208m$*\033[0m\n"
