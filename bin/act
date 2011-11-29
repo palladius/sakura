@@ -1,0 +1,24 @@
+#!/usr/bin/perl
+	###########
+	# act.pl
+	#########
+	# scrambla i contenuti di un stdin, li rimescola a caso
+	# fisher_yates_shuffle( \@array ) : generate a random permutation
+	# of @array in place
+
+sub fisher_yates_shuffle {
+    my $array = shift;
+    my $i;
+    for ($i = @$array; --$i; ) {
+        my $j = int rand ($i+1);
+        next if $i == $j;
+        @$array[$i,$j] = @$array[$j,$i];
+    }
+   return $array;
+}
+
+my @Astdin = 0;
+my $i=0;
+while (<>) { $Astdin[$i++] = $_; }
+fisher_yates_shuffle(\@Astdin);
+print @Astdin; 
