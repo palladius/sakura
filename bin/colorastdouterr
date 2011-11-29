@@ -1,0 +1,37 @@
+#!/bin/bash
+
+VER=1.0
+
+# trasforma stdin in rosso o verde
+function fverde() {
+	 echo -en "\033[0;32m$*\033[0m\n"
+}
+function frosso() {
+	echo -en "\033[1;31m$*\033[0m\n"
+
+}
+
+function riscrivi() {
+	COLOR=$1
+	if echo $COLOR | egrep -q '^green'  ; then
+		while read LINE; do
+			fverde $LINE
+		done
+	fi
+	if echo $COLOR | egrep -q '^red'  ; then
+		while read LINE; do
+			frosso $LINE
+		done
+	fi
+	while read LINE; do
+		echo "???> $LINE"
+	done
+}
+
+bianco "# >$(whoami):$(pwd)\$ $*"
+(
+		# sono un GENIO!!!! era: '($* 2>&3 ...'
+	(eval "$@" 2>&3 |riscrivi green >&2) 3>&1 |riscrivi red 2>&1
+)2>&1
+# Non posso sapere come esce purtroppo poiche' passa per 'riscrivi'
+#bianco "# Uscita: $?"
