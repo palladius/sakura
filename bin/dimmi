@@ -1,8 +1,7 @@
 #!/bin/bash
 
-DIMMIPATH=$SAKURADIR/sounds/
+DIMMIPATH="$SAKURADIR/sounds/"
 SUONA=/usr/bin/ogg123
-
 
 function gestisci() {
 	PAROLA="$*"
@@ -22,7 +21,7 @@ function gestisci() {
 
 gestisci "$1"
 while shift; do
-	if test ! -z "$1" ; then
-		gestisci $1 
-	fi
+  if test ! -z "$1" ; then
+    gestisci $1 
+  fi
 done
