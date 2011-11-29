@@ -1,0 +1,12 @@
+
+_Common SQL: &COMMON_SQL_LABEL  # dev'essere prima degli altri ma funge!
+  select:   "SELECT * FROM clients WHERE id = 1 OR name LIKE '%riccardo%' ;"
+  INSERT: TODO
+  UPDATE: TODO
+  DELETE: TODO
+mysql: # &MYSQL_LABEL
+  explain:  EXPLAIN SELECT * from MYSQL_SOBENME ;
+  <<: *COMMON_SQL_LABEL
+postgres:
+  <<: *COMMON_SQL_LABEL
+  explain: "Like MySQL but this is PostGre!" 
