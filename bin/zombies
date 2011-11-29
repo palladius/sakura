@@ -1,0 +1,22 @@
+#!/bin/bash
+
+FUNNY_KILL_REGEX="machete|garlic|cross|bazooka"
+
+function kill_zombies {
+  kill -HUP `ps -A -ostat,ppid | grep -e '^[Zz]' | awk '{print $2}'`
+}
+function see_zombies() {
+  ps aux | awk '{ print $8 " " $2 }' | grep -w Z
+}
+
+if echo $1 | egrep -q "$FUNNY_KILL_REGEX"; then
+  echo "Killing all zombie process that should be these: $(see_zombies)"
+  kill_zombies
+else
+  echo "Showing zombies:"
+  see_zombies
+  echo "To kill them all, type: $0 [$FUNNY_KILL_REGEX] instead of '$1'"
+fi
+
+
+#exit 0
