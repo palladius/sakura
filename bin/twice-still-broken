@@ -1,0 +1,9 @@
+#!/usr/bin/ruby
+
+require "~/lib/ric.rb"
+
+(1..2).each {|i|
+	deb [ i, 'eseguo "' , ARGV , "\"\n" ].join('')
+	system ARGV.join(' ') 
+}
+  	
