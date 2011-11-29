@@ -1,6 +1,6 @@
 #!/bin/bash
 
-DIMMIPATH=~/svn/carlesso/suoni/
+DIMMIPATH=$SAKURADIR/sounds/
 SUONA=/usr/bin/ogg123
 
 
