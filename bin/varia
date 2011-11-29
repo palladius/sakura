@@ -1,0 +1,78 @@
+#!/bin/bash
+
+export PATH=$PATH:~/bin
+
+	#########################################################
+	# $Id$
+	#########################################################
+	# Author: Riccardo Carlesso, all rights reserved
+	# Email:  palladiusbonton@gmail.com
+	# Site:   www.palladius.it
+	#
+	# Questo programma e' cio' che ho sempre sognato, verifica se 
+	# cio' che segue cambia o meno. Se non cambia, non ha stdout, se no ce l'ha in formato mail...
+	# Quindi in sostanza fa la derivata di un output...
+	#########################################################
+	# 	TODO
+	#
+	# Come dice giustamente MB, la prima volta che avvii l'esecuzione,
+	# varia DEVE dare output nullo, se ci pensi e' semanticamente cosi'
+	# anche se poi non e' comodo implementativamente ;)
+	#########################################################
+
+VER="1.8"
+
+DEBUG=false
+
+# 2007 05 22   1.8  messo debug che se diff e' attiva catta anche i 2 out (ottenevo delle diff strane!)
+# 2007 01 17   1.7  messi copyright e messo indenta interno
+# 2007 01 03   1.6  la exit e' corretta (0 uguali, <>0 diversi)
+# 2006 07 04   1.5  aqggiunto supporto a utenti (carlo, riccardo, ...)
+# 2006 02 13   1.4	aggiunta roba, tolta parte verbosa con date (un giorno sara' nel -v)
+
+MD5=$(echo $*|md5sum|awk '{print $1}')
+PAZ="/tmp/varia/"
+UTENTE=$(whoami) # dovesse un giorno non bastare + in UTENET andra' l'ulteriore specificazione (chesso', utente+computer+dominio+cliente, ....
+OLD="$PAZ/$MD5.$UTENTE.old"
+ERR="$PAZ/$MD5.$UTENTE.err"
+NEW="$PAZ/$MD5.$UTENTE.new"
+OK="$PAZ/$MD5.$UTENTE.nochanges"   # da quanto non cambia
+CNT="$PAZ/$MD5.$UTENTE.count"       # storia dei cambiamenti
+OLDNEWGLOB="$PAZ/$MD5.$UTENTE.*"    # glob che becca tutti e soli i due file
+SEP="---------------------------------------------"
+INDENTSEP=" | "
+
+function indenta() {
+  while read LINEA ; do 
+	echo "$1$LINEA"
+  done
+}
+
+mkdir -p  $PAZ 2>/dev/null
+chmod 777 $PAZ 2>/dev/null
+touch $NEW	# cosi' al primo colpo va gia'
+
+mv $NEW $OLD
+eval "$@" 1>$NEW 2>$ERR
+if diff -q $NEW $OLD >/dev/null; then 
+	touch $OK
+	echo -n = >> $CNT
+	exit 0
+else 
+	echo "NUOVO($(date))" > $CNT
+	echo "Subject: [varia] '"$*"'"
+	echo 
+	echo "+ Differences on `date +"%Y%m%d-%H%M%S"`:"
+	diff $NEW $OLD | sed -e 's/^>/OLD /'|  sed -e 's/^</NEW /' | indenta "$INDENTSEP"
+	echo " --"
+	echo " $0, ver $VER"
+	if $DEBUG; then
+		echo " --"
+		echo "NEW:"
+		cat $NEW|indenta 'NEW> '
+		echo
+		echo OLD:
+		cat $OLD|indenta 'OLD> '
+	fi
+	exit 42
+fi 
