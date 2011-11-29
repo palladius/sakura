@@ -1,0 +1,25 @@
+#!/bin/bash
+
+FILE=`mktemp -t okidok`
+
+if [ "$1" = '-' ] ; then
+ echo 'Called ok with -, assuming STDIN!'	
+ cat | ricnotify yellow "OK from STDIN '$*'"
+ exit $?
+fi
+
+#if "$@" |tee /tmp/ok1 2>&1 ; then
+echo "`data` Start '$*'"
+if "$@"  2>&1 | tee "$FILE" ; then # |tee /tmp/ok1 ; then
+	verde "OK: $*"
+	#echo -20 "$FILE" | ricnotify green "OK '$*'"
+	tail -20 "$FILE" | growlnotify -t "OK '$*'"
+	echo "`data` End (OK)"
+	exit 0
+else
+	RET=$?
+	rosso "NO(ret=$RET): $*" 
+	echo "`data` End (ERR) '$*'"
+	echo "There were some errors which returned: $RET" | ricnotify red "Err with '$*'"
+	exit $RET
+fi
