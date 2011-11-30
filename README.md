@@ -1,8 +1,8 @@
 # Sakura
 
-Sakura stands for Swiss Army Knife U???? Repo A????
+Sakura stands for Swiss Army Knife Uncanny Repository and Awesome :)
 
- <img src='https://github.com/palladius/sakura/blob/master/images/sakura.jpg' height='200' />
+ <img src='https://github.com/palladius/sakura/raw/master/images/sakura.jpg' height='200' align='right' />
 
 ## Synopsis
 
