@@ -3,6 +3,10 @@
 Sakura stands for Swiss Army Knife Uncanny Repository and Awesome :)
 
  <img src='https://github.com/palladius/sakura/raw/master/images/sakura.jpg' height='200' align='right' />
+ 
+It's a very nice way to color your life, I guess. It also provides a lot of tools, aliases, .. that power 
+your shell experience. If you're not a shell guy, you shouldn't be using it. If you are, you can have your
+shell PS1 to be changed to have the Italian flag, or Irish, or Argentinian, for instance. :)
 
 ## Synopsis
 
@@ -33,8 +37,8 @@ Note. Any help is appreciated to make this changeable!
 See `doc/sakura-samples.txt` for some usage. 
 For instant gratification try the following:
 
-	ls | act # randomly
-	ps | rainbow 
+	ls | act       # randomly scrambles the lines! Taken from cat/cat ;)
+	ps | rainbow   # colors all lines differently
 
 ### BUGS
 
@@ -48,6 +52,6 @@ For instant gratification try the following:
 
 Many people contributed to it. Today for the first time Im contributing back!
 
- <img src='http://www.palladius.it/palladius.jpg' height='100' />
+ <img src='http://www.palladius.it/palladius.jpg' height='100' align='right' />
 
 - Riccardo Carlesso <riccardo.carlesso@gmail.com>
