@@ -1,0 +1,1 @@
+while read riga; do echo -en "\033[0;31m$riga\033[0m\n"; done   
