@@ -29,7 +29,9 @@ Note. Any help is appreciated to make this changeable!
 
 ## Usage
 
-See `doc/sakura-samples.txt` for some usage. For instant gratification try the following:
+ <img src='https://github.com/palladius/sakura/raw/master/images/color-sample.png' height='100' align='right' />
+See `doc/sakura-samples.txt` for some usage. 
+For instant gratification try the following:
 
 	ls | act # randomly
 	ps | rainbow 
