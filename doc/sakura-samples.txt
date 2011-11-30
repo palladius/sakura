@@ -1,0 +1,6 @@
+
+Some colorful examples:
+
+ ls -al | arcobaleno
+ who | sgialla
+

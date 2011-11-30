@@ -1,0 +1,7 @@
+
+   	# Add me to ~/.bashrc, this is inside the `bashrc.inject`
+	export SAKURADIR=~/git/sakura/
+	if [ -f "$SAKURADIR/.bashrc" ]; then
+	  . "$SAKURADIR/.bashrc"
+	fi 
+
