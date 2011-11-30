@@ -13,7 +13,8 @@ This is my famous SVN which is becoming opensource!
 	mkdir -p ~/git
 	cd ~/git
 	git clone git@github.com/palladius/sakura.git
-- Add this line to your ~/.bashrc ::
+
+- Add this line to your `~/.bashrc`::
 
 	if [ -f ~/git/sakura/.bashrc ]; then
 		. ~/git/sakura/.bashrc
@@ -33,5 +34,7 @@ Note. Any help is appreciated to make this changeable!
 ## Credits
 
 Many people contributed to it. Today for the first time Im contributing back!
+
+ <img src='http://www.palladius.it/palladius.jpg' height='100' />
 
 - Riccardo Carlesso <riccardo.carlesso@gmail.com>
