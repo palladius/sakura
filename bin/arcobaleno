@@ -1,10 +1,1 @@
-#!/bin/bash
-
-I=1
-# evito il nero che e' 30
-while read linea
- do 
-	I=$(($I+1));
-	N=$((31+$I%7))
-  echo -en "\033[1;${N}m$linea\033[0m\n"
-done
+rainbow
