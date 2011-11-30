@@ -18,16 +18,17 @@ Download the repo:
 
 Then add this line to your `~/.bashrc` to get it sourced:
 
-	if [ -f ~/git/sakura/.bashrc ]; then
-	  . ~/git/sakura/.bashrc
+	# Add me to ~/.bashrc
+	export SAKURADIR=~/git/sakura/
+	if [ -f "$SAKURADIR/.bashrc" ]; then
+	  . "$SAKURADIR/.bashrc"
 	fi 
 
 Note. Any help is appreciated to make this changeable!
 
 ### BUGS
 
-- Search engine is still broken (see search addon!)
-- Add DONE Ajax button... (add 3 routes to todos: toggle, resolve, unr-esolve )
+- None (yet!)
     
 ### TODO 
 

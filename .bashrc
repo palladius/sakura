@@ -1,5 +1,7 @@
 
 
+# TODO: verify that $SAKURADIR is set otherwise exit saying:
+# Sorry, inject 'bashrc.inject' THIS into .bashrc
 export SAKURA=true
 export SAKURADIR=~/git/sakura
 export SAKURABIN=$SAKURADIR/bin
