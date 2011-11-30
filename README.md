@@ -10,14 +10,16 @@ This is my famous SVN which is becoming opensource!
 
 ## Install
 
+Download the repo:
+
 	mkdir -p ~/git
 	cd ~/git
 	git clone git@github.com/palladius/sakura.git
 
-- Add this line to your `~/.bashrc`::
+Then add this line to your `~/.bashrc` to get it sourced:
 
 	if [ -f ~/git/sakura/.bashrc ]; then
-		. ~/git/sakura/.bashrc
+	  . ~/git/sakura/.bashrc
 	fi 
 
 Note. Any help is appreciated to make this changeable!
