@@ -26,6 +26,14 @@ Then add this line to your `~/.bashrc` to get it sourced:
 
 Note. Any help is appreciated to make this changeable!
 
+
+## Usage
+
+See `sakura-samples.txt` for some usage. For instant gratification try the following:
+
+	ls | act # randomly
+	ps | rainbow 
+
 ### BUGS
 
 - None (yet!)
