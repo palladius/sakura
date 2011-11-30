@@ -10,10 +10,11 @@ This is my famous SVN which is becoming opensource!
 
 ## Install
 
-- mkdir -p ~/git
-- cd ~/git
-- git clone git@github.com/palladius/sakura.git
-- Add this line to your ~/.bashrc : 
+	mkdir -p ~/git
+	cd ~/git
+	git clone git@github.com/palladius/sakura.git
+- Add this line to your ~/.bashrc ::
+
 	if [ -f ~/git/sakura/.bashrc ]; then
 		. ~/git/sakura/.bashrc
 	fi 
@@ -33,5 +34,4 @@ Note. Any help is appreciated to make this changeable!
 
 Many people contributed to it. Today for the first time Im contributing back!
 
-- Riccardo Carlesso
-- TODO
+- Riccardo Carlesso <riccardo.carlesso@gmail.com>
