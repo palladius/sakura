@@ -58,7 +58,7 @@ def reload_doesnt_work_properly!(first_time=false,enable_debug=false)
   $RELOADED_ONCE += 1
   npass = $RICLIB['nreloaded']
 	if npass > 3
-		deb "More than first pass: quitting checcacchio!"
+		puts "[ERR] More than first pass: quitting checcacchio!"
 		#return 
 	end
   debug_on("reload_doesnt_work_properly called with debug enabled!") if enable_debug
@@ -82,24 +82,15 @@ def _init(explaination='no explaination given')
   #debug_off
  $RELOAD_DEBUG = false # 
  deb "pre init '#{explaination}'" if $RELOAD_DEBUG
- $SCRIP_BEGUN = Time.now
+ $SCRIPT_BEGUN = Time.now
  $SVN_ID = "$Id$".split[3] # .quote non ancora def azz!
- $USER = 'riccardo'
+ $USER   = 'riccardo'
  $INIT_DEBUG = false   # dice se debuggare la mia intera infrastruttura o no...
  $RELOADED_ONCE = 0    # aiuta a capuire quante volte includo sta cazo di lib! Sempre 2!!!
- $RIC_LIB_MODULES = %w{ debug_ric 
-  arrays hashes strings 
-  network architecture nil 
-  assertions configurator  
-  ricconf heanet files twitter ricldap riccache console util ricsvn
- } # unless defined?($RIC_LIB_MODULES)
- # Removed:
- # - rails/riclife_ar 
- # - ric_colors
-
- $HOME = File.expand_path('~')
+ $RIC_LIB_MODULES = %w{ } # to be explicitly included in this order.
+ $HOME  = File.expand_path('~')
  $DEBUG ||= false 
- $PROG = File.basename($0)
+ $PROG  = File.basename($0)
 
   ################################################################################
   # fake data for some tests :)
