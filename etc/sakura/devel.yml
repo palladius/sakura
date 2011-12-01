@@ -1,0 +1,36 @@
+--- 
+hooks:
+  after_all: 
+  - echo ciao
+  before_all:
+  - echo 
+templates: # TODO link me from programs
+  rtcommon: #&rtcommon
+  - pink "This is a common task for RT"
+# This is the REAL configuration, per label.
+sviluppanda: # here are the real confs!
+  ric: 
+  - mate ~/svn/carlesso/.bashrc ~/svn/carlesso/.bashrc.hansel ~/svn/carlesso/.bashrc.slartibartfast.heanet.ie  ~/svn/carlesso/.bashrc.`hostname`   ~/svn/carlesso/.profile  ~/svn/carlesso/bookmarks/ ~/svn/carlesso/.profile.`hostname` ~/svn/carlesso/.bashrc_*  ~/svn/carlesso/lib/ ~/svn/carlesso/hosts/ ~/svn/carlesso/bin/ ~/svn/carlesso/doc/ ~/svn/carlesso/templates/ ~/svn/carlesso/etc/
+  - "iterm-session.scpt eccentrica"
+  riclife: 
+  - mate ~/riclife
+  rt: *rtcommon
+  - iterma -- 'ssh lasagna tail -f /var/log/apache2/*.log'
+  - hwiki Ticketing Install
+  - open ~/Desktop/doc1.rtf 
+  - open /Users/riccardo/Desktop/doc2.rtf
+  - h -m rt
+  - open ~/Dropbox/lavoro/
+  snippets:
+   AddressBookListPeople: echo osascript -e 'tell app "Address Book" to get the name of every person' | perl -pe 's/, /\n/g' 
+  swdev: 
+  - mate ~/swdev/lib/ ~/swdev/bin/
+  - open /Users/riccardo/Desktop/sysadmin.rtf
+  - "iterm-session.scpt devotchka"
+  - "iterm-session.scpt eccentrica"
+  test:
+    - verde ciao test devel
+    - ls -al
+  sakura:
+    - mate ~/git/sakura
+    - echo Please extend this yml in $SAKURADIR/etc/sakura/devel.yml
