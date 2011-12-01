@@ -33,17 +33,16 @@ end
 
 	################################################################################
 	# Riccardo Ruby LIBRARY
-	# $Id$
 	# 
 	# TO INCLUDE THIS FILE, just paste this:
 	#
-	#      require "~/lib/ric.rb"
+	#      require "$SAKURADIR/lib/ric.rb"
 	#
 	################################################################################
   
 #module Carlesso
  ################################################################################
- # Configurazione... vedi _init
+ # Configuratione... see _init
  # @tags: obsolete, ric, r, lib, gem, init, loader
  # @description: try instead
  ################################################################################
@@ -54,15 +53,15 @@ end
     Dir.new(absolute_dir).select{|f| f.match( /\.rb$/ )}.map{|x| subdir + File.basename(x,'.rb') }
   end
 
-def rreload_non_funziona!(first_time=false,enable_debug=false)
-  puts "[#{$$}] rreload_non_funziona!(#{$0},#{first_time},#{enable_debug},#{$RELOADED_ONCE}) being called" if $RELOAD_DEBUG
+def reload_doesnt_work_properly!(first_time=false,enable_debug=false)
+  puts "[#{$$}] reload_doesnt_work_properly!(#{$0},#{first_time},#{enable_debug},#{$RELOADED_ONCE}) being called" if $RELOAD_DEBUG
   $RELOADED_ONCE += 1
   npass = $RICLIB['nreloaded']
 	if npass > 3
 		deb "More than first pass: quitting checcacchio!"
 		#return 
 	end
-  debug_on("rreload_non_funziona called with debug enabled!") if enable_debug
+  debug_on("reload_doesnt_work_properly called with debug enabled!") if enable_debug
   str = "Reloaded Riclibs v#{$RICLIB_VERSION} -- per la #{$RICLIB['nreloaded']} a volta"
   first_time = false if $RICLIB['nreloaded'] > 1 
   modules_to_be_included = $RIC_LIB_MODULES + _get_auto_files("auto/") + _get_auto_files("classes/") 
@@ -122,7 +121,7 @@ $LOAD_PATH << "#{$SAKURADIR}/lib/"
     Questa libreria contiene tutto il mio sapere enciclopedico, ovvero nozionistico. :P
     ho finalmente risolto il baco della doppia inclusion (cribsio, files includeva questo!)
   BURIDONE
-  rreload_non_funziona!(true) 
+  reload_doesnt_work_properly!(true) 
   $CONF = RicConf.new
   $SVN_ID="$Id$".split[3].quote rescue "No SVN Id causa migrazione!"
   pyellow( riclib_info ) if debug?
