@@ -9,7 +9,7 @@
 
 $RIC_SVNUSER ||= 'riccardo'
 # TODO9 questa variabile a tendere dovrebbe essere distrutta e sostituita da $prog_conf nel programma devel..
-$devel_conf = YAML.load(File.read("#{$SAKURADIR}/etc/ricsvn/devel.yml")) # dato che ci accedo da devel.rb
+$devel_conf = YAML.load(File.read("#{$SAKURADIR}/etc/sakura/devel.yml")) # dato che ci accedo da devel.rb
 
 def ric_services
   sane_service_regex = /^[a-z_\.-]+$/
