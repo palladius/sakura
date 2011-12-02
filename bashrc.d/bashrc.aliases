@@ -1,0 +1,3 @@
+
+alias 'cdsak=cd $SAKURADIR'
+alias sak="giallo With sakura everything is easier and more verbose..; . $SAKURADIR/.bashrc"

@@ -1,4 +1,5 @@
 .project
+bashrc.local
 rake_test.*
 logdo.log
 *.err

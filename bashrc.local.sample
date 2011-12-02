@@ -1,9 +1,9 @@
 
-echo sourceing bashrc on Sakura: DEBUG
-set -x
+
 # TODO: verify that $SAKURADIR is set otherwise exit saying:
 # Sorry, inject 'bashrc.inject' THIS into .bashrc
 # This should be changed by the user
-export SAKURA_BASHRC_PARSED=true
-
-. bashrc.d/*
+export SAKURA_CONF_VER=0.9.1
+export SAKURARIC=true
+export SAKURADIR=~/path/to/your/sakura/repo/
+export SAKURA_USER=YOUR_USERNAME
