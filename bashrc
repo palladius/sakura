@@ -1,6 +1,6 @@
 
 echo sourceing bashrc on Sakura: DEBUG
-set -x
+#set -x
 # TODO: verify that $SAKURADIR is set otherwise exit saying:
 # Sorry, inject 'bashrc.inject' THIS into .bashrc
 # This should be changed by the user
