@@ -1,3 +1,5 @@
 
 - Add 'figata.mp3' as asked by PCormack
+- make this a ruby gem
+- copy the lib/ structure from Rails (sittin gon shoulders of giants)
 
