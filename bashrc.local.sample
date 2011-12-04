@@ -1,5 +1,5 @@
 # TODO: verify that $SAKURADIR is set otherwise exit saying:
-# Sorry, inject 'bashrc.inject' THIS into .bashrc
+# Sorry, inject 'templates/bashrc.inject' THIS into .bashrc
 # This should be changed by the user
 export SAKURA_CONF_VER=0.9.2
 
