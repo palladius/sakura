@@ -1,11 +1,17 @@
 
-echo SAKDEB sourceing bashrc on Sakura: DEBUG >&2
-#set -x
-# TODO: verify that $SAKURADIR is set otherwise exit saying:
-# Sorry, inject 'bashrc.inject' THIS into .bashrc
-# This should be changed by the user
-export SAKURA_BASHRC_PARSED=true
+VER=0.9.1a
+export DEBUG=true
+
+. $SAKURADIR/bashrc.d/00-functions
+. $SAKURADIR/bashrc.d/01-sakura_checks
+
+if [ -f $SAKURADIR/bashrc.local ] ; then
+	. $SAKURADIR/bashrc.local
+else
+   	red "Attention, bashrc.local doesnt exist. Copy it and adapt it to your situation:"
+	echo " cp $SAKURADIR/bashrc.local.sample $SAKURADIR/bashrc.local"
+fi
 
 #. bashrc.d/*
-. $SAKURADIR/bashrc.d/bashrc.common
-. $SAKURADIR/bashrc.d/bashrc.aliases
+. $SAKURADIR/bashrc.d/all/_common
+. $SAKURADIR/bashrc.d/all/aliases

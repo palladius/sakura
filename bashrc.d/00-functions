@@ -1,0 +1,7 @@
+
+
+# this works on Mac OSX
+deb() {
+        echo "[SAKDEB] $*" >&2
+}
+

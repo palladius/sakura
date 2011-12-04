@@ -20,13 +20,9 @@ Download the repo:
 	cd ~/git
 	git clone git@github.com/palladius/sakura.git
 
-Then add this line to your `~/.bashrc` to get it sourced:
+Then add this lines to your `~/bashrc` to get it sourced:
 
-	# Add me to ~/.bashrc
-	export SAKURADIR=~/git/sakura/
-	if [ -f "$SAKURADIR/.bashrc" ]; then
-	  . "$SAKURADIR/.bashrc"
-	fi 
+	take it from ~bashrc.inject~
 
 Note. Any help is appreciated to make this changeable!
 
