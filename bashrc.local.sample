@@ -1,7 +1,7 @@
 # TODO: verify that $SAKURADIR is set otherwise exit saying:
 # Sorry, inject 'templates/bashrc.inject' THIS into .bashrc
 # This should be changed by the user
-export SAKURA_CONF_VER=0.9.2
+export SAKURA_BASHRC_LOCAL_CONF_VER=1.0.1
 
 # This should be in the ~/.bashrc !
 #export SAKURADIR=~/path/to/your/sakura/repo/
