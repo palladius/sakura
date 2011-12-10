@@ -1,5 +1,5 @@
 
-VER=`cat VERSION`
+VER=`cat "$SAKURADIR/VERSION"`
 export SAKURA_VER=$VERSION
 
 ## enable/disable DEBUG 
