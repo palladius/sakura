@@ -26,6 +26,8 @@ showHelp () {
     echo " vol #    = Set iTunes' volume to # [0-100]";
     echo " stop     = Stop iTunes.";
     echo " playlist = Show playlists saved in iTunes.";
+    echo " shuf = Shuffle current playlist"; 
+    echo " nosh = Do not shuffle current playlist";
     echo " quit     = Quit iTunes.";
 }
 
@@ -89,7 +91,7 @@ while [ $# -gt 0 ]; do
             osascript -e 'tell application "iTunes" to stop';
             break ;;
             
-        "quit"    ) echo "Quitting iTunes.";
+        "quit" ) echo "Quitting iTunes.";
             osascript -e 'tell application "iTunes" to quit';
             exit 1 ;;
             
@@ -108,6 +110,14 @@ while [ $# -gt 0 ]; do
             break;
             fi
             break;;
+
+         "shuf" ) echo "Shuffle is ON."; 
+           osascript -e 'tell application "iTunes" to set shuffle of current playlist to 1'; 
+           break ;;
+         
+         "nosh" ) echo "Shuffle is OFF."; 
+           osascript -e 'tell application "iTunes" to set shuffle of current playlist to 0'; 
+           break ;;
 
         "help" | * ) echo "help:";
             showHelp;
