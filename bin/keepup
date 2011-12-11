@@ -1,0 +1,12 @@
+
+SLEEPTIME=${1:-5}
+FRASE="ciao "
+
+echo "Un puntino ogni $SLEEPTIME secondi..."
+echo -en "$FRASE"
+while true; do 
+	sleep $SLEEPTIME; 
+ echo -en .
+done
+
+echo ciao da carlesso should never see this
