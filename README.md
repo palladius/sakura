@@ -33,9 +33,11 @@ Note. Any help is appreciated to make this changeable!
 See `doc/sakura-samples.txt` for some usage. 
 For instant gratification try the following:
 
-	ls | act       # randomly scrambles the lines! Taken from cat/cat ;)
-	ps | rainbow   # colors all lines differently
-
+	ls | act                          # randomly scrambles the lines! Taken from cat/cat ;)
+	ps | rainbow                      # colors all lines differently
+	twice itunes -                    # lowers volume of iTunes... twice :)
+	10 echo Bart Simpson likes it DRY # tells you this 10 times. Very sarcastic script!
+	
 ### BUGS
 
 - None (yet!)
