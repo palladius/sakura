@@ -1,12 +1,12 @@
 
 SLEEPTIME=${1:-5}
-FRASE="ciao "
+SENTENCE="Whatsthecraic "
 
-echo "Un puntino ogni $SLEEPTIME secondi..."
-echo -en "$FRASE"
+echo "One dot every $SLEEPTIME seconds... Useful on lame ssh connections to keep them up"
+echo -en "$SENTENCE"
 while true; do 
 	sleep $SLEEPTIME; 
- echo -en .
+	echo -en .
 done
 
-echo ciao da carlesso should never see this
+echo Ciao by carlesso. You should never see this
