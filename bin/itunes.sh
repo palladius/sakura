@@ -25,6 +25,7 @@ showHelp () {
     echo " vol down = Increase iTunes' volume by 10%";
     echo " vol #    = Set iTunes' volume to # [0-100]";
     echo " stop     = Stop iTunes.";
+    echo " playlist = Show playlists saved in iTunes.";
     echo " quit     = Quit iTunes.";
 }
 
@@ -91,6 +92,22 @@ while [ $# -gt 0 ]; do
         "quit"    ) echo "Quitting iTunes.";
             osascript -e 'tell application "iTunes" to quit';
             exit 1 ;;
+            
+            #And the code for showing available playlists, if there is no parameter given.
+            
+            ## addition playlist of choice
+            "playlist" )
+            if [ -n "$2" ]; then
+            echo "Changing iTunes playlists to '$2'.";
+            osascript -e 'tell application "iTunes"' -e "set new_playlist to \"$2\" as string" -e "play playlist new_playlist" -e "end tell"; 
+            break ;
+            else
+            # Show available iTunes playlists.
+            echo "Playlists:";
+            osascript -e 'tell application "iTunes"' -e "set allPlaylists to (get name of every playlist)" -e "end tell";
+            break;
+            fi
+            break;;
 
         "help" | * ) echo "help:";
             showHelp;
