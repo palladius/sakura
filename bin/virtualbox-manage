@@ -1,0 +1,41 @@
+#!/bin/bash
+# Copied from thig gist:
+# https://gist.github.com/1325354
+
+VER=1.1
+
+action="$1"
+vm="$2"
+
+vbcontrol() {
+  VBoxManage controlvm ${vm} $@
+}
+
+oscontrol() {
+  ssh ${vm} sudo $@
+}
+
+
+usage() {
+  echo "$0 v$VER"
+  echo "Usage: $(basename $0) [ACTION]"
+  echo " Actions: up,down,create,hdds,info,list,modify,..."
+}
+
+case "$action" in
+"up") VBoxHeadless --startvm ${vm} -v off & ;;
+"down") vbcontrol poweroff ;;
+"create") VBoxManage createvm --name ${vm} --ostype $3 --register; defaults;;
+"hdds") VBoxManage list hdds ;;
+"info") VBoxManage showvminfo ${vm} --machinereadable ;;
+"list") VBoxManage list runningvms ;;
+"modify") VBoxManage modifyvm ${vm} --$3 $4 ;;
+"pause") vbcontrol pause ;;
+"restart") oscontrol "shutdown -r now" ;;
+"resume") vbcontrol resume ;;
+"sendenter") vbcontrol "keyboardputscancode 1c" ;;
+"shutdown") oscontrol "shutdown -h now" ;;
+"suspend") vbcontrol savestate ;;
+help) usage ;;
+*) usage ;;
+esac
