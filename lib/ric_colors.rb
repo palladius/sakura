@@ -102,6 +102,10 @@ def rainbow(str)
 end
 alias  :arcobaleno :rainbow
 
+
+#########################################
+# Dynamic functions
+#########################################
 #assert(color_db[0].length == color_db[1].length,"English and italian colors must be the same cardinality!!!")
 # TODO ripeti con , $color_db[1] 
 ( $color_db[0] + $color_db[1] ).each { |colorname|
