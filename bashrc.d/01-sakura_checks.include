@@ -10,6 +10,6 @@ export SAKURA_BASHRC_PARSED=true
 if [ -f $SAKURADIR/bashrc.local ] ; then
         . $SAKURADIR/bashrc.local
 else
-        red "Attention, bashrc.local doesnt exist. Copy it and adapt it to your situation:"
+        echo "Attention, bashrc.local doesnt exist. Copy it and adapt it to your situation"
         echo " cp $SAKURADIR/bashrc.local.sample $SAKURADIR/bashrc.local"
 fi

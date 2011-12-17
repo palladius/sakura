@@ -24,7 +24,7 @@ fi
 for INCLUDE_FILE in $SAKURADIR/bashrc.d/*.include ; do
   source "$INCLUDE_FILE"
 done
-
-
-
-
+#. $SAKURADIR/bashrc.d/00-functions
+#. $SAKURADIR/bashrc.d/01-sakura_checks
+#. $SAKURADIR/bashrc.d/all/_common
+#. $SAKURADIR/bashrc.d/all/aliases
