@@ -1,6 +1,6 @@
-#!/bin/sh
+#!/bin/bash
 
-VER=0.9
+VER=0.9.4
 REPO=${1:-MISSING_REPO_NAME}
 # With the basename you lose the directory (etc/) :(
 #REPO=$(basename $REPO .git)   # eliminates .git in the end, if such
