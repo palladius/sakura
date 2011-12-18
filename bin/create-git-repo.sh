@@ -12,13 +12,13 @@ usage() {
 }
 if echo $REPODIR |egrep -v "\.git$" ; then
         usage
+ll
+
 fi
 
 echo "Creating repo called '$REPODIR'"
 mkdir "$REPODIR" && 
 	cd "$REPODIR" && 
-	git init --bare && 
-	vim $REPODIR/description && 
-	echo Tudo beim
+	git init --bare 
 
-#echo "Now please edit the file: vim $REPODIR/description"
+echo -en "Tudo bem. Now please edit the file: \n    vim $REPODIR/description\n"
