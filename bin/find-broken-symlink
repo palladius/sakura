@@ -1,0 +1,26 @@
+#!/bin/bash
+
+# This finds everything which is in the current dir (and below) and looks for broken links. 
+
+WHERE=${1:-.}
+CANCELLA=${2:-noncancellare}
+
+usage() {
+	echo "Usage: $(basename $0) [<DIRECTORY>] [--delete]"
+  echo ""
+	echo "  This scripts finds the symlinks in the specified DIR tree."
+	echo "  If directory is not specified, current dir ('.') is assumed."
+	echo "  With --delete option, it'll also delete them"
+}
+
+if echo $2 | egrep -q '^--delete$' ; then
+	blue "# I DELETE symlinks from '$WHERE' in giu:" >&2
+	find $WHERE -type l ! -exec test -r {} \; -print0 | xargs -0 rm
+	green "Done"
+else
+	yellow "# I look for symlinks from '$WHERE' downwards:" >&2
+	find $WHERE -type l ! -exec test -r {} \; -print 
+	usage
+#	echo "+ If you want to delete em, please type: '$0 $WHERE --delete'"
+fi
+
