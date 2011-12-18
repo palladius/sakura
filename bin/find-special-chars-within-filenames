@@ -1,0 +1,12 @@
+#!/bin/bash
+
+DIR=${1:-.}
+
+#echo "# Mancano ancora le parentesi tonde e quadre)"
+echo "#Looking for filenames with special characters for dir: '$DIR'..." >&2
+find "$DIR" | while read x; do 
+	y=$( echo $x | sed -e 's/[a-zA-Z0-9@ ()./_-]//g' ) 
+	if echo $y | egrep -qv '^$' ; then 
+		yellow "'$x' --> '$y'"; 
+	fi
+done
