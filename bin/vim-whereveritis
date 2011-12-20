@@ -1,0 +1,5 @@
+#!/bin/bash
+ # edits a sxcript whereveri it is! :)
+SCRIPT=${1:-dunno}
+
+which "$SCRIPT" |xargs vim
