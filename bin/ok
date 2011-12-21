@@ -1,26 +1,43 @@
 #!/bin/bash
 
-FILE=`mktemp -t okidok`
+FILE=`mktemp -t okidok.XXXXX`
+LOGFILE=/var/log/riccardo/ok.log
+touch "$LOGFILE"
+
+# logs and prints output!
+oklogga() {
+  MSG="$1"
+	logger -f "$LOGFILE" -p info -t ok "$MSG"
+}
+
+oklogga "Started with args: '$*'"
 
 if [ "$1" = '-' ] ; then
- echo 'Called ok with -, assuming STDIN!'	
+ echo 'Called ok with -, assuming STDIN!'	>&2
+ oklogga "called from stdin"
  cat | ricnotify yellow "OK from STDIN '$*'"
- exit $?
+ RET=$?
+ oklogga "End STDIN RET=$RET for: '$*'" 
+ exit $RET
 fi
 
-#if "$@" |tee /tmp/ok1 2>&1 ; then
 echo "`data` Start '$*'"
-if "$@"  2>&1 | tee "$FILE" ; then # |tee /tmp/ok1 ; then
-	RET="$?"
+
+# The 2 followign must NOT be separated!!!
+"$@" 2>&1 | tee "$FILE"
+RET=$PIPESTATUS
+
+#echo "DEBUG $?=$? ~RET=$RET PIPESTATUS=$PIPESTATUS"
+MSG=_NONE_
+
+if [ 0 = $RET ] ; then 
 	verde "OK: $*"
-	#echo -20 "$FILE" | ricnotify green "OK '$*'"
-	tail -20 "$FILE" | growlnotify -t "OK '$*'"
-	echo "`data` End (OK=$RET)"
-	exit 0
+	tail -20 "$FILE" | ricnotify green "OK '$*'"
+	echo "`data` End OK"
 else
-	RET=$?
 	rosso "NO(ret=$RET): $*" 
 	echo "`data` End (ERR) '$*'"
 	echo "There were some errors which returned: $RET" | ricnotify red "Err with '$*'"
-	exit $RET
 fi
+oklogga "End $MSG($RET): '$*'"
+exit $RET
