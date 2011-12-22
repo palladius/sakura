@@ -1,12 +1,13 @@
+#!/bin/bash
 
 SLEEPTIME=${1:-5}
-SENTENCE="Whatsthecraic "
+SENTENCE="keepup{$HOSTNAME} "
 
 echo "One dot every $SLEEPTIME seconds... Useful on lame ssh connections to keep them up"
 echo -en "$SENTENCE"
 while true; do 
-	sleep $SLEEPTIME; 
 	echo -en .
+	sleep $SLEEPTIME; 
 done
 
 echo Ciao by carlesso. You should never see this
