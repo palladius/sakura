@@ -1,9 +1,7 @@
 #!/bin/bash
 
-export PATH=$PATH:~/bin
+export PATH=$PATH:$SVNHOME/bin
 
-	#########################################################
-	# $Id$
 	#########################################################
 	# Author: Riccardo Carlesso, all rights reserved
 	# Email:  palladiusbonton@gmail.com
@@ -20,10 +18,11 @@ export PATH=$PATH:~/bin
 	# anche se poi non e' comodo implementativamente ;)
 	#########################################################
 
-VER="1.8"
+VER="2.0"
 
 DEBUG=false
 
+# 2011 12 23   2.0  Moved to sakura (open source and in English for my international fans!)
 # 2007 05 22   1.8  messo debug che se diff e' attiva catta anche i 2 out (ottenevo delle diff strane!)
 # 2007 01 17   1.7  messi copyright e messo indenta interno
 # 2007 01 03   1.6  la exit e' corretta (0 uguali, <>0 diversi)
@@ -32,36 +31,48 @@ DEBUG=false
 
 MD5=$(echo $*|md5sum|awk '{print $1}')
 PAZ="/tmp/varia/"
-UTENTE=$(whoami) # dovesse un giorno non bastare + in UTENET andra' l'ulteriore specificazione (chesso', utente+computer+dominio+cliente, ....
-OLD="$PAZ/$MD5.$UTENTE.old"
-ERR="$PAZ/$MD5.$UTENTE.err"
-NEW="$PAZ/$MD5.$UTENTE.new"
-OK="$PAZ/$MD5.$UTENTE.nochanges"   # da quanto non cambia
-CNT="$PAZ/$MD5.$UTENTE.count"       # storia dei cambiamenti
-OLDNEWGLOB="$PAZ/$MD5.$UTENTE.*"    # glob che becca tutti e soli i due file
+MYUSER=$(whoami) # dovesse un giorno non bastare + in UTENET andra' l'ulteriore specificazione (chesso', utente+computer+dominio+cliente, ....
+OLD="$PAZ/$MD5.$MYUSER.old"
+ERR="$PAZ/$MD5.$MYUSER.err"
+NEW="$PAZ/$MD5.$MYUSER.new"
+OK="$PAZ/$MD5.$MYUSER.nochanges"    # how long its been like this
+CNT="$PAZ/$MD5.$MYUSER.count"       # change history
+OLDNEWGLOB="$PAZ/$MD5.$MYUSER.*"    # glob to catch all and only these (two?) files
 SEP="---------------------------------------------"
 INDENTSEP=" | "
 
 function indenta() {
-  while read LINEA ; do 
-	echo "$1$LINEA"
+  while read LINE ; do 
+    echo "$1$LINE"
   done
+}
+
+write_infos() {
+	echo "pwd:    `pwd`"
+	echo "date:   `date`"
+	echo "Who:    '$MYUSER'"
+	echo 'COUNT:  (Count the chars over this line:)' # will be populated by plus
+	echo
 }
 
 mkdir -p  $PAZ 2>/dev/null
 chmod 777 $PAZ 2>/dev/null
 touch $NEW	# cosi' al primo colpo va gia'
 
+# guarantees that now files get created with "rw-------"
+umask 066 
+
 mv $NEW $OLD
 eval "$@" 1>$NEW 2>$ERR
 if diff -q $NEW $OLD >/dev/null; then 
 	touch $OK
-	echo -n = >> $CNT
+	echo -n + >> $CNT
 	exit 0
 else 
-	echo "NUOVO($(date))" > $CNT
-	echo "Subject: [varia] '"$*"'"
-	echo 
+	#echo "NUOVO($(date))"
+	write_infos > $CNT
+	#echo "Subject: [varia] '"$*"'"
+	#echo 
 	echo "+ Differences on `date +"%Y%m%d-%H%M%S"`:"
 	diff $NEW $OLD | sed -e 's/^>/OLD /'|  sed -e 's/^</NEW /' | indenta "$INDENTSEP"
 	echo " --"
@@ -74,5 +85,6 @@ else
 		echo OLD:
 		cat $OLD|indenta 'OLD> '
 	fi
+	echo "# More info here: $CNT"
 	exit 42
 fi 
