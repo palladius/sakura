@@ -12,6 +12,13 @@ if [ "nope$SAKURADIR" = "nope" ] ; then
   echo "Or you might try the following: cat templates/bashrc.inject" >&2
 fi
 
+if [ ! -f $SAKURADIR/bashrc.local ] ; then
+  echo "File  $SAKURADIR/bashrc.local not found, copying  $SAKURADIR/bashrc.local. this may take a while..."
+	cp $SAKURADIR/bashrc.local.sample $SAKURADIR/bashrc.local
+  sleep 1
+  echo Done.
+fi
+
 
 # TODO change to run-all or source-all :)
 . $SAKURADIR/bashrc.d/00-functions
