@@ -26,7 +26,6 @@ Then add this lines to your `~/bashrc` to get it sourced:
 
 Note. Any help is appreciated to make this changeable!
 
-
 ## Usage
 
  <img src='https://github.com/palladius/sakura/raw/master/images/color-sample.png' height='100' align='right' />
@@ -43,10 +42,6 @@ For instant gratification try the following:
 ### BUGS
 
 - None (yet!)
-    
-### TODO 
-
-- make it to work in whichever dir it is (atm it requires it to be in ~/git/sakura/
 
 ## Credits
 
@@ -55,3 +50,9 @@ Many people contributed to it. Today for the first time Im contributing back!
  <img src='http://www.palladius.it/palladius.jpg' height='100' align='right' />
 
 - Riccardo Carlesso <riccardo.carlesso@gmail.com>
+
+Thanks for who believed in me:
+
+- Enrico "Vector field" Biondini
+- Chris "Awesome" Glass
+- Lucilla "Mum" Gennari
