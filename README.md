@@ -38,6 +38,7 @@ For instant gratification try the following:
 	twice itunes -                    # lowers volume of iTunes... twice :)
 	10 echo Bart Simpson likes it DRY # tells you this 10 times. Very sarcastic script!
 	seq 100 | 1suN 7                  # prints every 7th element of the list
+	zombies                           # prints processes that show zombies (plus funny options to kill them)
 
 ### BUGS
 
