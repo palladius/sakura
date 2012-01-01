@@ -1,0 +1,17 @@
+#!/bin/bash
+
+usage() {
+	echo "Usage: $(basename $0) [command to be executes not as root]"
+	exit 1
+}
+if [ $# = 1 ]; then
+	usage
+fi
+
+if  id |grep -q root ; then
+  echo "$(basename $0): Refusing to exec: '$*'"
+  exit 2
+fi
+
+$@
+
