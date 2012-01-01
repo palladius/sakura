@@ -1,0 +1,37 @@
+#!/bin/bash
+
+  ############################################################
+	# $Id: script.rb 5961 2011-03-30 16:04:21Z rcarlesso $
+VER=1.0
+FILES=""
+
+# check ARGV
+#echo DEBUG mvto v$VER: NARGS=$#
+
+if [ $# -lt 2 ]; then
+	echo "Usage: echo $0 <DIR_DEST> [FILE1] [FILE2] .. [FILE_N]"
+	exit 1
+fi
+
+DESTDIR="$1"
+shift
+
+echo "# Moving files: $(blue "$*") to dir: $(green "$DESTDIR")"
+
+if [ ! -d "$DESTDIR" ] ; then
+	echo "Sorry, I need a directory and '$DESTDIR' doesnt seem one"
+	exit 2
+fi
+
+FILES="$*"
+mv -nv $FILES "$DESTDIR"
+#	FILES="$FILES \"$FILENAME\""
+#	echo "Moving single file '$FILENAME' to $1.. ($(ls -alh "$FILENAME"|awk '{print $5}'|sgialla))"
+#	mv -nv "$FILENAME" "$1" # doesnt overwrite and is verbose..
+
+#echo "DEBUG: mvto ''$FILES'' => ''$1''"
+#echo mv $FILES "$1"
+PWD=$(pwd)
+echo "To reverse:"
+echo " cd $DESTDIR"
+echo " mvto $FILES \"$PWD\""
