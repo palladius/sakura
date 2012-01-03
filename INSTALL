@@ -1,0 +1,5 @@
+
+Do the following:
+
+  cat templates/bashrc.inject  >> ~/.bashrc
+
