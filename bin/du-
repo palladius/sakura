@@ -1,0 +1,9 @@
+#!/bin/sh
+
+# does the du from files in stdin
+# Usage: 
+#  find . -name *.MOV | du-
+#
+while read FILE ; do
+ du -sh "$FILE"
+done
