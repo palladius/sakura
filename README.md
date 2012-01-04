@@ -32,14 +32,16 @@ Note. Any help is appreciated to make this changeable!
 See `doc/sakura-samples.txt` for some usage. 
 For instant gratification try the following:
 
-	ls | act                                         # randomly scrambles the lines! Taken from cat/cat ;)
-	ps | rainbow                                     # colors all lines differently
-	twice itunes -                                   # lowers volume of iTunes... twice :)
-	10 echo Bart Simpson likes it DRY                # tells you this 10 times. Very sarcastic script!
-	seq 100 | 1suN 7                                 # prints every 7th element of the list
-	zombies                                          # prints processes that show zombies (plus funny options to kill them)
-	find . -size +300M | xargs mvto /tmp/bigfiles/   # moves big files to that directory
-  alias gp='never_as_root git pull'                # only if u r not root it runs!
+    ls | act                                         # randomly scrambles the lines! Taken from cat/cat ;)
+    ps | rainbow                                     # colors all lines differently
+    twice itunes -                                   # lowers volume of iTunes... twice :)
+    10 echo Bart Simpson likes it DRY                # tells you this 10 times. Very sarcastic script!
+    seq 100 | 1suN 7                                 # prints every 7th element of the list
+    zombies                                          # prints processes that show zombies (plus funny options to kill them)
+    find . -size +300M | xargs mvto /tmp/bigfiles/   # moves big files to that directory
+    alias gp='never_as_root git pull'                # only if u r not root it runs!
+    dimmiora                                         # Tells you the time with Riccardo voice in Italian. Brilliant!
+
 ### BUGS
 
 - None (yet!)
