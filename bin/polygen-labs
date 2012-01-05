@@ -1,0 +1,4 @@
+#!/bin/sh
+
+NARG=${1:-4}
+polygen $SAKURADIR/doc/polygen/frati.grm -X $NARG | uniq

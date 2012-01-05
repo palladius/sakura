@@ -1,0 +1,85 @@
+I ::= "title:    Frati!\n"
+    ^ "author:   er Carlesso &lt;riccardo@labs.it&gt;\n"
+    ^ "language: italian\n"
+    ^ "status:   beta\n"
+    ^ "topic:    poesia, fantascienza\n"
+    ^ "audience: tutti i labbisti\n"
+    ^ "disclaim: dedicato a guarino \n"
+    ^ "created:  01/12/2005"
+	;
+
+S ::=
+	 (MAX|-BOB|+BENASSI|FROLLO|FERO|--BERGONZ|DICUBO|--CARLESSO|-CPENTI | -CAPA );
+
+MAX 	   ::= " Max:       " 	(FRATRESE | MAXESE | --MAMMAMOIA | ++MAXSERIO );
+FROLLO 	   ::= " Frollo:    " 	(FRATRESE | --NOFRATINO | -ANPENZ);
+FERO 	   ::= " Fero:      " 	(FRATRESE | REGOLATA  | -ANPENZ);
+DICUBO 	   ::= " Dicubo:    " 	(FRATRESE | ++EHOH);
+BERGONZ    ::= " Bergonz:   "    BERGONZESE ;
+BOB 	   ::= " Bob:       " 	BOBBESE ;
+BENASSI    ::= " Benassi:   " 	(+BENASSESE | --MAMMAMOIA | ANPENZ) ;
+CARLESSO   ::= " Carlesso:  "	CARLESSESE ;
+CPENTI 	   ::= " Pentimalli:"   (+ CPENTESE | --MAMMAMOIA | ANPENZ);
+CAPA       ::= " Capa:      "  	( CAPESE );
+
+BENASSESE ::=  "Aahhh" | "gra" | "Comodo frati, comodo ..." | --"Qualcuno ha una scopa? Ho ancora un posticino qui nel culo.." | "Chi e'!!" | "di'!" | "Aaaaahhhhh!" | "Se ti avvicini un attimo..." |--"funzica" | "Aaahh" (buongiorno|buonasera) ESCL | "Non credo!" | ATE | ++"cia'!" | +VABON | +TERZAPERSONA | ["cioe'"] "Hai" capito un "po'" [come] "?" |  "Non so se mi sono capito" ;
+
+BOBBESE ::= ("Avanti tutta!" | "No ma veramente?!?" | +"Evviva!" | "Senti tu come sei messo...?" | +"Buongiorno a lei" | ++"Il tema e' questo..." |  "Il tema qual e'..." | "Nella fossa dei leoni!" ) | AZIENDALE;
+
+CPENTESE ::= "Lo so!" | "Occhio!" | "La pioggia vende il tevveno.. sdvucciolevole" | "Il mio amove pev te e'.. sdvucciolevole" | "Ma senti una cosa..." |"Mannoooooo'!" | "Fahollo" | --"Fhhhhaaaathhhho!!!" | "Te" ne do atto (FRATI) | FRATI | "Guardate qua: http://www.snipurl.com/frati " | "Mi sei piaciuto" | "Te lo concedo" | +"Cane sei cane!" ;
+
+TERZAPERSONA ::= "Va e torna" | "Aggiungerebbe una cosina.." |  "Puo' dare" | "Si puo' dare" ;
+
+ANPENZ ::= "An penz!" ;
+
+AZIENDALE ::= "Siamo andati?" | "di' di' di'" | VABON | "STUPENDO!";
+
+FRATRESE ::= (SALUTO FRATI|mi capisci [PERSONA|FRATI] "?" )AZIONE [VIRGOLA] |---NOFRATINO | "Non" (ti|vi) capisco ESCL | MIFAIRIDE | +CELCESE | +"Sbotro" ESCL | +"Godo" | "GODO!!!" | "Ho goduto!" | +"Tu chiamalo se vuoi..." PERSONA ESCL | "Senti quell'altro!" | +QUESTIONFRATRESE ;
+
+QUESTIONFRATRESE ::= "Da farne?!?" | "Sei impazzito ?!?" ;
+
+NOFRATINO ::= "No" frati nooo "!" ;
+
+MIFAIRIDE ::=  quanto me (fai|fate) ride ["," ma MIFAIRIDE] | "Le ghignate!" | "Sai le ghignate!" ;
+
+BERGONZESE ::= VABON | +"As vidaggna!"|  --"Ti mando una maiala!" | +"Adios!";
+
+VABON ::= +++"Va BON!" | --"Va ben!" | ---"Va bin!" | ---"Va ben va bin va bon!"  | "QUELLO e' vero!" ;
+
+SALUTO ::= salutamelo | accipenti | ciao | --ave | "Addio!" | bella li | bona | ++([ahh] povero (me|te|"Benni") ESCL ) | adios ESCL | "Cia'!" ;
+
+PERSONA ::= "Gaurino" | "Frollo" | "DICUBBO!" | "il Fero" | "Pentimalli" | +"Cielcio" | "il Gherry" | +"Ferroni" ;
+
+FRATI ::= frati | fratro | fraTRO ;
+
+AZIONE ::= "Bbbono!" | ( mi preoccupi | (mi fai|"m'hai" fatto) paura | ("Lascia, " ) lascia perdere (te) |sfrucugliamelo | sfreddate| ATE | ++REGOLATA |sei impazzito "?!?") [FRATI] ;
+
+REGOLATA ::= [eh "pero'" ] (++datte|datti) (++una|"'na") (sfreddat|sfrucugliat|calmat|regolat)^(a|ina) ;
+
+MAXESE ::= "E non m'annoio, io no che non m'annoio non m'annoio" | "La" (signorina|dottoressa) ("Ferroni" | "Dicubo" | "Fraulini" ) ESCL | "Nel qual caso nel qual Cielcio" | "Chiedete alla Giommi!" | "Difendimi frati" | "Aaaaaaa'nnamo bene!" ;
+
+ATE ::= "A teee!" | EHOH | "a VOI!";
+
+EHOH ::= "Eh oh" ;
+
+VIRGOLA ::= "," [++virgola] frati;
+
+COMMABRO ::= ", comma bro'" ;
+
+CARLESSESE ::= --FRATI | MATEMATICO | MATEMATICO COMMABRO ;
+
+MATEMATICO ::= "7^3=3^5+10^2" | "5^2+5+2=2^5" | "12^3+1^3=10^3+9^3 (ma non e' mia)" | "3*3=10, x alti valori di 3" | "41 e' primo" | con 1 euro e 11 ci compri 3 "caffe'" | "con 10 euro ci compri 27 caffe' e ti resta un penny (37*3=1.11 * 9 = 9.99)";
+
+MAXSERIO ::= "Piove dentro di me" | "Ci sono stati dei microcontatti" | "Abbiamo condiviso dei bei momenti" | "Cerchiamo di ritagliarci un nostro spazio in questo grigio mondo" | "Chiediamolo a Pentimalli" | "La vita e' come " (un albero di natale|un giorno "d'autunno")| le donne sono tutte zoccole | "lasciatemi rintanare dentro me stesso" | "Sentiamoci piu' tardi" | "Teniamoci in contatto" | "e cio'-e cioe'?!?";
+
+MAMMAMOIA ::= "Mammamoia!" ;
+
+CELCESE ::= "tutta colpa di" CLC | ah povero CLC | secondo me "c'entra" CLC | quel cane di CLC | -"Come puo' uno scoglio arginare un " CLC | "come puo' un" CLC arginare il mare | "Che" brutta fine che ha fatto CLC | "Che brutta fine!" ;
+
+CAPESE ::= --"Donna  / selvaggia donna / mi piace tanto tutto quel che fai!"  | VABON | "Tirale due mine!" ;
+
+CLC ::=  ++"Cielcio" | -"Dicubo" | "Benni" | il "Gherry" | -"Spifferi";
+
+ESCL ::= "!" ;
+
+PUNTO  ::= "." ;
