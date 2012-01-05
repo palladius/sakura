@@ -1,0 +1,54 @@
+I ::= "title:    HEAnet Polygen!\n"
+    ^ "author:   Riccardo Carlesso <riccardo.carlesso@gmail.com>\n"
+    ^ "language: Oirish\n"
+    ^ "status:   beta\n"
+    ^ "topic:    Vogon poetry, rocket science\n"
+    ^ "audience: all HEAnet tech staff\n"
+    ^ "disclaim: dedicated to Tony G \n"
+    ^ "Version:  1.0.1\n"
+    ^ "created:  21/04/2011"
+	;
+
+S ::= (CILLIAN|BNISBET|GEASON|PAULMCD|PCORMACK|-CARLESSO|++FATHERJACK|CORMACOC|+TGRAY);
+
+CILLIAN 	 ::= " csharkey:    " (-MNSESE    | --IRCESE | ++CILLIANESE );
+BNISBET	   ::= " briann:      " (-NETOPSESE | --IRCESE | ++BNISBETESE );
+GEASON 	   ::= " geason:      " (-NETOPSESE | --IRCESE | ++GEASONESE );
+CARLESSO   ::= " riccardo:    " (-SWDEVESE  | --IRCESE | ++CARLESSESE ) ;
+PCORMACK   ::= " pcormack:    " (-SWDEVESE  | --IRCESE | ++PCORMACESE ) ;
+PAULMCD    ::= " paulmcd:     " (-NETOPSESE | --IRCESE | ++PAULMCDESE );
+CORMACOC   ::= " cormacoc:    " (-NETOPSESE | --IRCESE | ++CORMACOCESE );
+TGRAY      ::= " tonyg:       " (-NETOPSESE | --IRCESE | ++TGRAYESE );
+FATHERJACK ::= " Father Jack: " (JACKESE ) ;
+
+JACKESE ::= "Feck!" | "Girls!" | "Drink!" | --"That would be an ecumenical matter!" ;
+
+CILLIANESE  ::= -"Ooooh" | "Ooohhh roight" | "Likewise" | "I see what you mean" | "You meant YE" | "Pub?" ; 
+PAULMCDESE  ::= "Good luck" | "I see" | "Well" | "What can you do.." | "What can u say?" | ++"There you go!" ;
+BNISBETESE  ::= ++"Well this is the thing" | "This is the thing" | "Ooohh... roisch" ;
+GEASONESE   ::= "I prefer MySQL to Postgres" | "You have to ask Rachel, actually" | "Sweet" | "You should see openstreetmap" ;
+PCORMACESE  ::= "Coffee?" | "Hey dude" | "That chap.." | "Whazzup?" | "Good man!" ;
+CARLESSESE  ::= SWDEVESE | --MATEMATICO | "Look at her legs" ;
+TGRAYESE    ::= "Sound" ESCL | "Deadly" ESCL | "Rapid" | "Deadly rapid" ESCL | "Hey whats the craic man?" | OIRISH ;
+CORMACOCESE ::= "Legend" | OIRISH ;
+
+NETOPSESE ::= --"telnet janitor @ foo-sw1" | NOCCESE ;
+MNSESE    ::= "I dunno, ask Brian Boyle" ;
+SWDEVESE  ::= "noc: restarting ClientDB" | "New RT version available" ;
+
+NOCCESE ::= "noc: Reloading Nagios" | "noc: I take the Ubuntu updates" | "noc: Nagios is stalled" |
+	++"noc: ignore alarms from" HEANETHOSTS ;
+
+IRCESE ::= 
+	-"Tony Soprano at Copperface: http://www.youtube.com/watch?v=IucKcSVphrQ" |
+	"Pizza today?" | "Burrito?" | "Windows sucks" ;
+
+MATEMATICO ::= "7^3=3^5+10^2" | "5^2+5+2=2^5" | "12^3+1^3=10^3+9^3 (ma non e' mia)" | "3*3=10, x alti valori di 3" | "41 e' primo" | con 1 euro e 11 ci compri 3 "caffe'" | "con 10 euro ci compri 27 caffe' e ti resta un penny (37*3=1.11 * 9 = 9.99)";
+
+HEANETHOSTS ::= "saratoga" | "dusk" | "crue" | "marvin" | "tia" | "holden" | "cdb-staging1" | "paglia" ;
+
+OIRISH ::= "Happy days!" ;
+
+ESCL ::= "!" ;
+
+PUNTO  ::= "." ;

@@ -1,0 +1,100 @@
+I ::= "title:    Dell Polygen!\n"
+    ^ "author:   Riccardo Carlesso <riccardo.carlesso@gmail.com>\n"
+    ^ "language: Oirish and Italian\n"
+    ^ "status:   beta\n"
+    ^ "topic:    Vogon poetry, rocket science\n"
+    ^ "audience: all HEAnet tech staff\n"
+    ^ "disclaim: dedicated to my grand mother \n"
+    ^ "Version:  1.0.1\n"
+    ^ "created:  21/04/2011"
+	;
+
+S ::= (CARLESSO|-ANDREA|DANIEL|+CHRIS|+FRANCESCO|+BART|PIOTR|AGUS|SHENJEI|DAVIDB|++KEITH|SERGIO|-CLOVIS);
+CARLESSO   ::= " Riccardo:  " (-CALCETTESE | -SWDEVESE | CARLESSESE  ) ;
+ANDREA     ::= " Andrea:    " (-CALCETTESE | -SWDEVESE | ANDREESE  );
+FRANCESCO  ::= " Francesco: " (-CALCETTESE | -SWDEVESE | FRANCESCHESE ) ;
+CHRIS      ::= " Chris:     " (-CALCETTESE | -SWDEVESE | +CHRISSESE ) ;
+PIOTR      ::= " Piotr:     " (-CALCETTESE | -SWDEVESE | PIOTRESE  ) ;
+BART       ::= " Bart:      " (-CALCETTESE | -SWDEVESE | BARTESE   ) ;
+CLOVIS     ::= " Clovis:    " (-CALCETTESE | -SWDEVESE | CLOVISSESE ) ;
+DAVIDB     ::= " DavidB:    " (-CALCETTESE | -SWDEVESE | BEAURPERESE | EXTROPESE) ;
+SERGIO     ::= " Sergio:    " (-CALCETTESE | -SWDEVESE | SERGESE ) ;
+DANIEL     ::= " Daniel:    " ( DANIELESE  | -SWDEVESE | EXTROPESE );
+AGUS       ::= " Agus:      " ( AGUSSESE   | -SWDEVESE ) ;
+SHENJEI    ::= " Shengjei:  " ( SHENJEIESE | -SWDEVESE ) ;
+KEITH      ::= " Keith:     " ( KEITHESE | KEITHESE KEITHESE ) ;
+
+FRANCESCHESE ::= ++BESTEMMIESE | ITALIANO | "Incargadura!" 
+	| "Eventually.." 
+	| "Since we dont want to reinvent the wheel..." ;
+SERGESE     ::= "Coffee guys?" | "Fuzzball?" | "Cmon?" | "Food?" | "Ma che caaazzo diiishi?" | "Ma che cazzo stai a dire?" ;
+CARLESSESE  ::= "Look at her legs" | ++"Grande!" | ITALIANO | "You wish!" 
+	| +"Your grandmother!" | "Cmon, cmon, do it again!" 
+  | "Whenever you want!"
+  | -"Vai tranquillo" | "Vai sereno" 
+  | "Guarda che puppe!"
+  | +"Che figata!" | "Figo!"
+	| "Ma fatti dare nel c**o!" | "Che ti scoppiasse un dente!"
+	| "Cat jena un azidaint!" | "Soccmel!" 
+  | "Lets do it in Ruby!" | "I love Ruby on Rails" ;
+ANDREESE    ::= "Alimorticci tua!" | "Sto'mpicciato!" | ITALIANO | "Ma che palle!" | "Riccardo, chi si loda si imbroda.." | --'Scialla' ESCL ;
+DANIELESE   ::= +"Totally appreciate that" 
+	| +"Potentially... yes!" 
+	| +"P'ossibly.." 
+	| "Dee Eich Cee Peeee..." | -"Soooooo.." 
+	| "However..";
+CHRISSESE   ::= "Seriously man?!" | "Seriously.." | "You're awesome!" | -"Seriously?" | "Youre a psycho, in a good sense"
+	| "Sorry man"
+  | -"Check Ubuntu Mirror on Miranda"
+	| --"You should add to your polygen script the following: Youre a psycho, in a good sense";
+PIOTRESE    ::= "LDAP is broken" | "The Authentication module is very well implemented" | POLACCO | "Whazzup?" | "Lets do it in Java" 
+	| "How's it going?"  ;
+BARTESE     ::= NAZIONALITA "maledetto!"  | POLACCO | +"Uncle Nerdo!" | +"Piczon" 
+	| "Ahahah!" 
+	| "Ahhh, Im too sleepy" 
+	| "Believe me" 
+	| +"Snapshotino!" ;
+CLOVISSESE  ::= -FRANCESE | "Okkei.." | "Actually.." | "Actually.." SWDEVESE  ;
+AGUSSESE    ::= "Puta madre!" ;
+BEAURPERESE ::= "Cmon!" | FRANCESE ;
+SHENJEIESE  ::= "heng ta bobo!" 
+	| "fay chan she she" | "hen hao" 
+	| +"Seriously.."
+	| "When you look at the Caringo API..." ;
+KEITHESE    ::= "I knoooooow what you mean!" 
+	| ++"I knoooow!" | "Put you like this.." | ++"Got-CHA!" 
+	| "Ohhh, here's another uone!" 
+  | "Hold on!" 
+	| "Wowwowowwow.." ;
+
+FRANCESE     ::= "Merde!" | "Putaine!" ;
+CALCETTESE   ::= +"Bucio di culo!" 
+	| "Gollonzo!" 
+	| -"che culone!" ;
+SWDEVESE     ::= DELLHOST "is broken" 
+	| "You have to check out Develop" 
+	| " $ git checkout" BRANCH
+	| " $ git branch " BRANCH
+	| "Please see the code review on Gerrit" ;
+EXTROPESE   ::= "Checkout the repo from Extropy!" | "Push the code to Piggy" | "Get it from the MCP" ;
+ITALIANO     ::= "A cazzo di cane!" | ++"Ma vaffanculo!" 
+	| "Ho fatto una cagata che me pare una gioconda!" 
+	| "Ma vaffanculo!" 
+	| "Che ti venisse.." 
+	| "Tua nonna!" | "But seconds you!" 
+  | -"When there wants there wants" ;
+POLACCO      ::= "Currrva!" | "Curva nje pjerdol" ;
+SERGESE      ::= "You use git squesh" ;
+
+DELLHOST     ::= gilda | pamela | wiki | piggy | denise ;
+NAZIONALITA  ::= italiano | polacco | brasiliano ;
+
+BESTEMMIESEOLD  ::= ("Ma") TRINITA AGGETTIVO ESCL ;
+BESTEMMIESE  ::= ("Ma") ("D*o" AGGETTIVO | "Cr**o" AGGETTIVO | "Mad**a" AGGETTIVA ) ESCL ;
+TRINITA      ::= "D*o" | "Mad***a" | "Cr***o" ;
+AGGETTIVO    ::= ladro | impestato | boia | maiale | rottinculo ;
+AGGETTIVA    ::= ladra | impestata | boia | maiala | puttana ;
+BRANCH       ::= develop | master | feature1234 ;
+
+ESCL ::= "!" ;
+PUNTO  ::= "." ;

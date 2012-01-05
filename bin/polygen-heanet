@@ -1,0 +1,6 @@
+#!/bin/sh
+
+# To install: sudo apt-get install polygen polygen-data
+
+NARG=${1:-10}
+polygen $SAKURADIR/doc/polygen/heanet.grm -X $NARG | uniq
