@@ -1,3 +1,5 @@
 # This file tries to keep the changelog in a YMLtastic way! :)
+0.9.7:
+  - Silented the debug phrase
 0.9.3:
   - Changed heavily the bashrc!

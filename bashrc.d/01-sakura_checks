@@ -1,5 +1,5 @@
 
-deb SAKDEB sourceing $0 v$VER bashrc on Sakura
+#deb SAKDEB sourceing $0 v$VER bashrc on Sakura
 
 #set -x
 # TODO: verify that $SAKURADIR is set otherwise exit saying:
