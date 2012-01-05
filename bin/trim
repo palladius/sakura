@@ -1,0 +1,4 @@
+#!/bin/sh
+
+# trims left and right parts of every line :)
+sed -e 's/^[ \t]*//g' | sed -e 's/[ \t]*$//g'  
