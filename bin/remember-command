@@ -55,6 +55,7 @@
     debug_on 'Just created script, presuming u need some debug. TODO REMOVE ME when everything works!' if $DEBUG
       # Maybe you may want to check on ARGV
     path = File.expand_path($myconf[:remember_dir])
+    path = File.expand_path(ENV['SVNHOME'] + "/var/remember/" ) if ENV['SVNHOME']
     logfile =path +"/"+Socket.gethostname
     unless ARGV.size > 0
       usage "Give me at least 1 argument!"
