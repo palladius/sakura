@@ -15,8 +15,5 @@ if echo $1 | egrep -q "$FUNNY_KILL_REGEX"; then
 else
   echo "Showing zombies:"
   see_zombies
-  echo "To kill them all, type: $0 [$FUNNY_KILL_REGEX] instead of '$1'"
+  echo "To kill them all, type: $0 [$FUNNY_KILL_REGEX]"
 fi
-
-
-#exit 0
