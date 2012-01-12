@@ -14,13 +14,10 @@ This is my famous SVN which is becoming opensource!
 
 ## Install
 
-Download the repo:
+Go to the directory where you want to 'install' this software. Then download the repo:
 
-	mkdir -p ~/git
-	cd ~/git
 	git clone git@github.com/palladius/sakura.git
-	# This adds lines to your `~/bashrc` to get it sourced:
-	cd sakura && cat templates/bashrc.inject >> ~.bashrc
+	cat sakura/templates/bashrc.inject >> ~.bashrc
 
 Note. Any help is appreciated to make this changeable!
 
