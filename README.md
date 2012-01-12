@@ -19,8 +19,8 @@ Download the repo:
 	mkdir -p ~/git
 	cd ~/git
 	git clone git@github.com/palladius/sakura.git
-  # This adds lines to your `~/bashrc` to get it sourced:
-  cd sakura && cat templates/bashrc.inject >> ~.bashrc
+	# This adds lines to your `~/bashrc` to get it sourced:
+	cd sakura && cat templates/bashrc.inject >> ~.bashrc
 
 Note. Any help is appreciated to make this changeable!
 
