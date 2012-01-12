@@ -26,6 +26,10 @@ Then add this lines to your `~/bashrc` to get it sourced:
 
 Note. Any help is appreciated to make this changeable!
 
+## License
+
+Everything in this repo is under the Creative Commons license, except where otherwise stated.
+
 ## Usage
 
  <img src='https://github.com/palladius/sakura/raw/master/images/color-sample.png' height='100' align='right' />
@@ -57,5 +61,5 @@ Many people contributed to it. Today for the first time Im contributing back!
 Thanks for who believed in me:
 
 - Enrico "Vector field" Biondini
-- Chris "Awesome" Glass
+- Chris "Awesome" Glass (Notice Awesome.m4a sound, under Creative Commons)
 - Lucilla "Mum" Gennari
