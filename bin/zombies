@@ -1,6 +1,6 @@
 #!/bin/bash
 
-FUNNY_KILL_REGEX="machete|garlic|cross|bazooka"
+FUNNY_KILL_REGEX="machete|garlic|cross|bazooka|shaunofthedead"
 
 function kill_zombies {
   kill -HUP `ps -A -ostat,ppid | grep -e '^[Zz]' | awk '{print $2}'`
@@ -15,5 +15,6 @@ if echo $1 | egrep -q "$FUNNY_KILL_REGEX"; then
 else
   echo "Showing zombies:"
   see_zombies
-  echo "To kill them all, type: $0 [$FUNNY_KILL_REGEX]"
+  echo "To kill them all, type:"
+  echo "  $(basename $0) [$FUNNY_KILL_REGEX]"
 fi
