@@ -2,7 +2,7 @@
 
 # Copied from a PDF from Joshua McKenty
 # "swift installation 4.McKenty.pdf"
-SWIFT_IP=${1:-$( ifconfig eth0 |grep "inet addr:"|cut -f 2 -d:|cut -f 1 -d' ')}
+export SWIFT_IP=${1:-$( ifconfig eth0 |grep "inet addr:"|cut -f 2 -d:|cut -f 1 -d' ')}
 
 echo This script installs Swift SAIO in your machine. You have to be root to do that.
 echo "I will use the IP taken by eth0: '$SWIFT_IP'"
@@ -142,11 +142,192 @@ cd /etc/swift
 openssl req -new -x509 -nodes -out cert.crt -keyout cert.key
 # USE IP for COMMON NAME
 
+# Pag 17
+cat << EOF >> /etc/swift/proxy-server.conf
+[DEFAULT]
+bind_port = 443
+bind_ip = $SWIFT_IP
+cert_file = /etc/swift/cert.crt
+key_file = /etc/swift/cert.key
+user = swiftdemo
+log_facility = LOG_LOCAL1
 
+[pipeline:main]
+pipeline = healthcheck cache swauth proxy-server
 
+[app:proxy-server]
+use = egg:swift#proxy
+allow_account_management = true
 
+[filter:swauth]
+use = egg:swift#swauth
+super_admin_key = swauthkey
+default_swift_cluster = local#https://$SWIFT_IP:443/v1
 
+[filter:healthcheck]
+use = egg:swift#healthcheck
 
+[filter:cache]
+use = egg:swift#memcache
+EOF
+
+# Pag 18
+cat << EOF >> /etc/swift/swift.conf
+[swift-hash]
+# random unique string that can never change
+swift_hash_path_suffix = riccardo-sakura-swift-tutorial
+EOF
+
+# Pag 19: Account server
+cd /etc/swift/account-server 
+cat << EOF > 1.conf
+[DEFAULT]
+devices = /srv/1/node
+mount_check = false
+bind_port = 6012
+user = swiftdemo
+log_facility = LOG_LOCAL2
+[pipeline:main]
+pipeline = account-server
+[app:account-server]
+use = egg:swift#account
+[account-replicator]
+vm_test_mode = yes
+[account-auditor]
+[account-reaper]
+EOF
+sed -e "s/srv\/1/srv\/2/" -e "s/6012/6022/" -e "s/LOG_LOCAL2/LOG_LOCAL3/" 1.conf > 2.conf
+sed -e "s/srv\/1/srv\/3/" -e "s/6012/6032/" -e "s/LOG_LOCAL2/LOG_LOCAL4/" 1.conf > 3.conf
+sed -e "s/srv\/1/srv\/4/" -e "s/6012/6042/" -e "s/LOG_LOCAL2/LOG_LOCAL5/" 1.conf > 4.conf
+
+# Pag 20: Container 
+cd /etc/swift/container-server
+cat << EOF > 1.conf
+[DEFAULT]
+devices = /srv/1/node
+mount_check = false
+bind_port = 6011
+user = swiftdemo
+log_facility = LOG_LOCAL2
+[pipeline:main]
+pipeline = container-server
+[app:container-server]
+use = egg:swift#container
+[container-replicator]
+vm_test_mode = yes
+[container-updater]
+[container-auditor]
+EOF
+sed -e "s/srv\/1/srv\/2/" -e "s/601/602/" -e "s/LOG_LOCAL2/LOG_LOCAL3/" 1.conf > 2.conf
+sed -e "s/srv\/1/srv\/3/" -e "s/601/603/" -e "s/LOG_LOCAL2/LOG_LOCAL4/" 1.conf > 3.conf
+sed -e "s/srv\/1/srv\/4/" -e "s/601/604/" -e "s/LOG_LOCAL2/LOG_LOCAL5/" 1.conf > 4.conf
+
+# Pag 21: Object Server
+cd /etc/swift/object-server
+cat << EOF > 1.conf
+[DEFAULT]
+devices = /srv/1/node
+mount_check = false
+bind_port = 6010
+user = swiftdemo
+log_facility = LOG_LOCAL2
+[pipeline:main]
+pipeline = object-server
+[app:object-server]
+use = egg:swift#object
+[object-replicator]
+vm_test_mode = yes
+[object-updater]
+[object-auditor]
+EOF
+sed -e "s/srv\/1/srv\/2/" -e "s/601/602/" -e "s/LOG_LOCAL2/LOG_LOCAL3/" 1.conf > 2.conf
+sed -e "s/srv\/1/srv\/3/" -e "s/601/603/" -e "s/LOG_LOCAL2/LOG_LOCAL4/" 1.conf > 3.conf
+sed -e "s/srv\/1/srv\/4/" -e "s/601/604/" -e "s/LOG_LOCAL2/LOG_LOCAL5/" 1.conf > 4.conf
+
+# Pag 22: Binaries
+su swiftdemo -c "
+cat << EOF > ~/bin/resetswift
+#!/bin/bash
+
+swift-init all stop
+# find /var/log/swift -type f -exec rm -f {} \;
+sudo umount /mnt/sdb1
+sudo mkfs.xfs -f -i size=1024 /srv/swift-disk
+sudo mount /mnt/sdb1
+sudo mkdir /mnt/sdb1/1 /mnt/sdb1/2 /mnt/sdb1/3 /mnt/sdb1/4
+sudo chown swiftdemo:swiftdemo /mnt/sdb1/*
+mkdir -p /srv/1/node/sdb1 /srv/2/node/sdb2 /srv/3/node/sdb3 /srv/4/node/sdb4
+sudo chown swiftdemo:swiftdemo /mnt/sdb1/*
+sudo rm -f /var/log/debug /var/log/messages /var/log/rsyncd.log /var/log/syslog
+sudo service rsyslog restart
+sudo service memcached restart
+EOF
+
+# Pag 23: Binaries 2
+cat << EOF > ~/bin/remakerings
+#!/bin/bash
+
+cd /etc/swift
+
+rm -f *.builder *.ring.gz backups/*.builder backups/*.ring.gz
+
+swift-ring-builder object.builder create 18 3 1
+swift-ring-builder object.builder add z1-$SWIFT_IP:6010/sdb1 1
+swift-ring-builder object.builder add z2-$SWIFT_IP:6020/sdb2 1
+swift-ring-builder object.builder add z3-$SWIFT_IP:6030/sdb3 1
+swift-ring-builder object.builder add z4-$SWIFT_IP:6040/sdb4 1
+swift-ring-builder object.builder rebalance
+swift-ring-builder container.builder create 18 3 1
+swift-ring-builder container.builder add z1-$SWIFT_IP:6011/sdb1 1
+swift-ring-builder container.builder add z2-$SWIFT_IP:6021/sdb2 1
+swift-ring-builder container.builder add z3-$SWIFT_IP:6031/sdb3 1
+swift-ring-builder container.builder add z4-$SWIFT_IP:6041/sdb4 1
+swift-ring-builder container.builder rebalance
+swift-ring-builder account.builder create 18 3 1
+swift-ring-builder account.builder add z1-$SWIFT_IP:6012/sdb1 1
+swift-ring-builder account.builder add z2-$SWIFT_IP:6022/sdb2 1
+swift-ring-builder account.builder add z3-$SWIFT_IP:6032/sdb3 1
+swift-ring-builder account.builder add z4-$SWIFT_IP:6042/sdb4 1
+swift-ring-builder account.builder rebalance
+EOF
+
+# Pag 24: 
+cat << EOF > ~/bin/startmain
+#!/bin/bash
+
+swift-init main start
+EOF
+
+cat << EOF > ~/bin/recreateaccounts
+#!/bin/bash
+
+# Replace swauthkey with whatever your super_admin key is (recorded in
+# /etc/swift/proxy-server.conf).
+swauth-prep -K swauthkey -A https://$SWIFT_IP:443/auth/
+swauth-add-user -K swauthkey -A https://$SWIFT_IP:443/auth/ -a test tester testing
+swauth-add-user -K swauthkey -A https://$SWIFT_IP:443/auth/ -a test2 tester2 testing2
+swauth-add-user -K swauthkey -A https://$SWIFT_IP:443/auth/ test tester3 testing3
+swauth-add-user -K swauthkey -A https://$SWIFT_IP:443/auth/ -a -r reseller reseller reseller
+EOF
+
+# Pag 25:
+cat << EOF > ~/bin/startrest
+#!/bin/bash
+
+swift-init rest start
+EOF
+
+chmod +x ~/bin/*
+
+# Pag 26
+. ~/.bashrc
+remakerings
+cd ~/swift/trunk; ./.unittests
+sudo bin/startmain
+recreateaccounts
+
+"
+#/end user swift demo (!!)
 
 
 
