@@ -1,0 +1,5 @@
+
+setterm -reset
+stty sane
+echo "Now the terminal should be ok ;)"
+echo
