@@ -1,0 +1,21 @@
+_conf:
+ colors: 
+    title:    brown
+    line_key: orange
+    line_val: gold
+ sort: false
+Packets:
+  list:     dpkg -l
+  installed?:  "dpkg -L request-tracker3.8" 
+  purge: dpkg -P <packet_to_be_purged>
+distro:
+  get current:  lsb_release -a
+  upgrade:      
+  - update-manager -d (graphical) 
+  - do-release-upgrade -d (textual)
+  - requires sudo apt-get install update-manager-core 
+Debian:
+  ifdownup: 'sleep 5 | ifdown eth0 && ifup eth0'
+  remove everything with Graphics: apt-get --purge remove liborbit2 
+Gnome:
+  Torvalds suggests this: sudo apt-get install gnome-tweak-tool

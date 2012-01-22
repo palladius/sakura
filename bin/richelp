@@ -1,0 +1,117 @@
+#!/usr/bin/env ruby
+
+require ENV['SAKURALIB'] + '/ric.rb'
+require 'yaml'           # to parse .yml files :)
+require 'find'
+
+HELP_DIR =  "#{$SAKURADIR}/doc/richelp/"
+
+$some_exception = false
+
+def help(k, value=red('???'), query='', opts = {} )
+  a = k.to_s.escape_printf 
+  b = value.to_s.escape_printf
+  if (query != '')  
+    return unless (a.match(/#{query}/i) || b.match(/#{query}/i) )
+  end
+	return sprintf( 
+	  "#{ colora( $color_line_key, "%-#{$column_length}s") } #{ colora( ($color_line_val rescue 2) , "%s") }#{red " (#{opts})" unless opts.to_s == '{}' }\n" % [a,b]
+	)  rescue prosso("Bad Line ('#{$!}'): #{ [gray( a), white( b)] }")
+end
+
+def title(s)
+  puts( colora($color_title," #{s}") ) 
+end
+
+
+def special_help_title?(k2)
+  k2.match(/^_/) # inizia con '_'
+end
+
+def exception_yml(msg='')
+  $some_exception = true
+  { "Exception parsing YML file: '#{red msg}'" => 
+    { 'File/Line' => "#{__FILE__}, line #{__LINE__}", 
+      "Legal files" => yellow( $help_files.sort.join(', ')) ,
+    } 
+  }
+end
+
+def init(helpfile)
+    # compute help files
+  $help_files = []  
+  Find.find(HELP_DIR) { |f| $help_files << File.basename(f, '.yml') if f.match('.yml$') } 
+    # compute max length on the left
+    # TODO make this length dynamic on the search
+  $column_length = 5 # minimum
+  if( helpfile == '' || helpfile.nil? )
+    usage
+    exit 1
+  end
+  if helpfile == 'all'
+    puts "usali tutti TBD: #{$help_files.join ' '}"
+    helpfiles = $help_files
+  else
+    helpfiles = [ helpfile ]
+  end 
+  helpfiles.each do |helpfile|
+    $help_opt = helpfile_parse( helpfile) 
+    $help_opt.each{ |k1,v1|
+      v1.each{ |k2,v2| 
+         $column_length = k2.length if ( k2.length > $column_length )
+      } unless special_help_title?(k1)
+    }   
+  end
+end
+
+
+def usage
+  puts "Usage: #{$0} [-hdvm] <FILE> [<QUERY>]"
+  puts " -d:   debug"
+  puts " -h:   this help"
+  puts " -m:   open file with textmate (or GUARDA equivalent)"
+  puts " -t:   just test file"
+  puts "Files are: " + yellow( $help_files.join(', '))
+  exit 1
+end
+
+def sanitize_file(file_str)
+  file_str = file_str.gsub(/\.yml$/,'')  
+  File.expand_path "~/doc/help/#{file_str}.yml"
+end
+
+def show_test(file_str)
+#  file = File.expand_path "~/doc/help/#{file_str}.yml"
+  file = sanitize_file(file_str)
+  hash_or_errorstring = YAML.load_file( file ) rescue "#{$!}"
+  #deb hash_or_errorstring.class
+  if hash_or_errorstring.class == Hash
+    puts "OK File yml: #{green file}"
+    exit 0
+  else
+    puts "Some problems with '#{file}': #{red hash_or_errorstring}"
+    exit 78
+  end
+  
+end
+
+def main
+  usable_argv = ARGV.select{|arg| ! arg.match /^-/ }
+  debug_on('from ARGV') if ARGV.match /-d/ 
+  usage if ARGV.match /^-h/ 
+  file_str  = usable_argv[0]
+  query_str = usable_argv[1] rescue '' 
+  init(file_str)
+  puts "Search for: '#{green query_str}' into #{gray "#{file_str}.yml"}" if query_str 
+  if ARGV.match /^-t/
+    show_test(file_str) # just test 
+  else
+    show_help(query_str)
+  end
+  mate_cmd = "guarda ~/doc/help/#{file_str}.yml"
+  puts "# To add stuff, type: #{gray mate_cmd }"
+  `#{mate_cmd}` if ARGV.match /-m/
+  exit ($some_exception ? 42 : 0)
+end
+
+main()
