@@ -1,0 +1,57 @@
+_conf:
+ colors: 
+  title:    white
+  line_key: red
+  line_val: lred
+ sort: false
+ mantain_crlf: true
+Strings:
+ upper/lower case: UPCASE(), downcase, Capitalize,  singularize/pluralize()
+ REGEX:    "reads conf file, regex+memorize:    subject = (/^Subject\: (.+)$/).match(email)[1]"
+Arrays:
+ flatten: 'flattens [ [a,b],c] into [a,b,c]'
+ compact: removes nil (not to confuse with flatten)
+ include?: '%%w[ jan feb march].include?("feb") = true'
+rails views:
+ ComboBox on model:  ' collection_select("role", "user_id", User.find(:all, :order => "username") , :id, :username , :include_blank => true )  '
+rails generators:
+ model:      script/generate model    user name:string hashed_password:string salt:string
+ scaffold:   script/generate scaffold user name:string hashed_password:string salt:string
+ nifty auth: script/generate nifty_authentication --help (Ryan Bates awesome gem)
+capistrano:
+ avanti:   cap deploy
+ indietro: cap deploy:rollback
+ mine:     cap ric (my stuff)
+nullity:
+ 'obj.nil?':  dice se é nullo
+ 'obj ||= "init"':   per inizializzare un oggetto, se null va a INIT se no rimane se stesso...
+Rake:
+ 'rake -T': shows all rake helps
+ "rake db:migrate RAILS_ENV=production": run migrations (migrate DB) in production
+ "rake db:migrate:all": migrates all 3 envs
+ "rake db:rollback": back ONE step
+ "rake db:migrate:redo STEP=3": rolls back 3 migrations and executes them back :)
+ 'rake routes': shows RESTful routes and stuff, very cool, i.e. safewatch 'rake routes|grep -i api |grep GET'
+gems:
+ capistrano: for easy deploy
+ navigation_helper: Gem for navigation menu, http://github.com/rpheath/navigation_helper
+ problem w infinite stack:  gem install roart --no-rdoc --no-ri # without documentation can work :)
+ watir install: "http://wiki.openqa.org/display/WTR/Install+Watir#InstallWatir-Mac"
+ watir on Mac: 
+   - sudo gem update --system 
+   - sudo gem install firewatir
+   - sudo gem install safariwatir"
+heroku:
+  push/deploy: git push heroku master  # push/deploy
+  remote rake action: "heroku rake db:migrate # executes rake remotely.."
+  Add to repo: "git remote add heroku git@heroku.com:APPNAME.git"
+tricks n tips:
+  # On my Mac I have a lot of libs in 777 mode!!!
+  fix permissions:  "find /usr/local/lib/ruby/  -type d -print0 | xargs -0 -s 1000 sudo chmod 755 "
+  rails server more clean: "rails server | egrep --line-buffered -v '^Rendered|Load \(' "
+  trace_vars: 'trace_var( :$_, proc{|v| pgray "$_ is now #{v}" }) # super cool!'
+Rails:
+  pkgs to make rails work: apt-get install libsqlite3-dev
+  camel:    '"active_record".camelize    => "ActiveRecord"'
+  tableize: '"RawScaledScorer".tableize  => "raw_scaled_scorers"'
+
