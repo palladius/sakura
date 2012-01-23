@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
 
-$arr_int = [10.5, 5.4, 40.3, 58.0, 9.9, 58.0 ]
+# Fake array of integers
+#$arr_int = [10.5, 5.4, 40.3, 58.0, 9.9, 58.0 ]
 
  # doppioni code: http://snippets.dzone.com/posts/show/3838
 module Enumerable
@@ -17,25 +18,22 @@ module Enumerable
 end
 
 ########################
-# Array powerup class
+# my personal Array powerup class
 class Array
   
-  alias :to_s_secondo_ruby :to_s
+  alias :to_s_according_to_ruby :to_s
+  
   def to_s
     "[ #{join(', ').to_s} ]"
   end
   
+    # naive removal of ARGV options :)
     # ARGV: "-h -dn -aaa A B C" --> "A B C"
   def remove_options
     select{|x| ! x.match( /^-/ ) }
   end
 
-    # mosso su OBJECT :-) 
-  # def sort_on(something)
-  #   sort{ |x,y| x.send(something) <=> y.send(something) }
-  # end
-    
-  # EL penso debba essere ESATTO come match. NON una regex :(
+  # EL should be an EXACT match, NOT a regex :(
   def from(el)
     return [] unless self.include?(el) 
     ix1 = self.index(el)
@@ -65,7 +63,7 @@ class Array
     map { |e| yield e }.inject({}) { |carry, e| carry.merge! e }
   end
   
-  # sarebbe la figata con method_not_existent che plurali -> mappa i singolari tipo
+  # it would be awesome with 'method_not_existent' to mark all the plurals into a singular call of the elements :)
   def names
     map{|x| x.name }
   end
@@ -116,8 +114,7 @@ class Array
   alias :avg :average
   
   def scalar_product(arr2)
-    #debug_on
-    # assert size coincide
+    # assert size must be the same
     throw "must be same size (self: #{size}) / arg: #{arr2.size})!!!" if( size != arr2.size )
     ret = 0.0
     for i in (0..size)
@@ -157,7 +154,6 @@ class Array
   # ....
   # printf with perfect %10d length
   def smart_printf(opts={})
-    #debug_on :debugging_smart_printf
     printf_template = ''
     # assret its a AoA
     width=self[0].size
@@ -169,9 +165,7 @@ class Array
     end
     printf_template += "\n"
     deb("printf_template: #{printf_template}")
-    #max_column_lengths = # self.map
     self.each{ |line| 
-      #deb( line.join(", "), "\n") 
       puts( printf_template % line ) # [0], line[1]
     }
   end
@@ -179,14 +173,12 @@ class Array
   #def prepend_all(str);   map{|x| x.prepend(str) };  end
   
   alias :trim :trim_all
-  # come UNIQ - C, returns uncity with cardinality into an elegant HASH :)
-  # sort is inutile
+  # like UNIQ - C, returns uncity with cardinality into an elegant HASH :)
+  # sort is pointless
   def uniq_c(min_cardinality = 1) # sort=false)
      hash=Hash.new
-#     arr = sort ? self.sort : self 
      self.map{|x| hash[x] = (hash[x] + 1) rescue 1  }
-     #self.uniq
-     return hash.select{|k,v| v >= min_cardinality}
+     hash.select{|k,v| v >= min_cardinality}
   end
   
   def color(regex, opts = {} )
@@ -194,7 +186,6 @@ class Array
     map{|line| 
       line.gsub(regex) {|match|
         match.color(opts[:color])
-        #match.class
       } 
     } rescue map{|line| line.gsub(/(b)/,green('b')) }
   end
@@ -216,14 +207,10 @@ class Array
     opts[:color] ||= :yellow
     color(autoregex(string_or_array_or_regex), opts)
   end
-  # potrei metterlo in Enumerable...
+  # I could put it in Enumerable...
   
     # find duplicates
     # if count, does what uniq -c does (returns occurrences as well)
-
-  # def dups
-  #   inject({}) {|h,v| h[v]=h[v].to_i+1; h}.reject{|k,v| v==1 }.keys
-  # end
   def duplicates(count = false)
     count ? dups_c : dups
   end
@@ -247,17 +234,12 @@ class Array
       pazure "Cool! Seems like you called a plural attribute over an array. It would be *SO* cool to call map.#{$1} but I dont trust myself enough, so its better that you use: #{green "map_#{$1}"}"
       return super #return self.map{|x| x.send($1, *args ) }
     end
-    #super(self.object_id)
-    #super(method_name, args)
     return true
   end
   
-  # finds index of regex, per sicurezza stringihifico tutto
+  # finds index of regex, to be sure I stringify everything
   def index_regex(regex)
     first_element = self.map{|x| x.to_s}.grep(regex).first
-    #=> "cinque"
-    #irb(main):015:0> $a.index( "cinque" )
-    #el = self.grep(regex) # trova un elemento o piu elementi
     return index( first_element )
   end
   
