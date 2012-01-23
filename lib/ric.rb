@@ -64,7 +64,7 @@ def reload_doesnt_work_properly!(first_time=false,enable_debug=false)
   debug_on("reload_doesnt_work_properly called with debug enabled!") if enable_debug
   str = "Reloaded Riclibs v#{$RICLIB_VERSION} -- per la #{$RICLIB['nreloaded']} a volta"
   first_time = false if $RICLIB['nreloaded'] > 1 
-  modules_to_be_included = $RIC_LIB_MODULES + _get_auto_files("auto/") + _get_auto_files("classes/") 
+  modules_to_be_included = $RIC_LIB_MODULES + _get_auto_files("classes/") 
   modules_to_be_included.each{ |cls| 
     was_necessary = require "#{$SAKURADIR}/lib/#{cls}.rb"
     deb "Pass[#{npass}] Loading: #{cls} (necessary: #{was_necessary})" rescue puts("nil #{$!}")
