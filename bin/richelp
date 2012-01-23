@@ -1,11 +1,13 @@
 #!/usr/bin/env ruby
 
-require ENV['SAKURALIB'] + '/ric.rb'
-require 'yaml'           # to parse .yml files :)
+require ENV['SAKURALIB'] + '/ric.rb' # || die( "Can't find $SAKURALIB!")
+require 'yaml' # to parse .yml files
 require 'find'
 
-HELP_DIR =  "#{$SAKURADIR}/doc/richelp/"
+# Defined in module:
+#$HELP_DIR =  "#{$SAKURADIR}/doc/richelp/"
 
+# local status... this is SOOOOO 80s!
 $some_exception = false
 
 def help(k, value=red('???'), query='', opts = {} )
@@ -13,10 +15,10 @@ def help(k, value=red('???'), query='', opts = {} )
   b = value.to_s.escape_printf
   if (query != '')  
     return unless (a.match(/#{query}/i) || b.match(/#{query}/i) )
-  end
-	return sprintf( 
-	  "#{ colora( $color_line_key, "%-#{$column_length}s") } #{ colora( ($color_line_val rescue 2) , "%s") }#{red " (#{opts})" unless opts.to_s == '{}' }\n" % [a,b]
-	)  rescue prosso("Bad Line ('#{$!}'): #{ [gray( a), white( b)] }")
+  end 
+  return sprintf( 
+    "#{ colora( $color_line_key, "%-#{$column_length}s") } #{ colora( ($color_line_val rescue 2) , "%s") }#{red " (#{opts})" unless opts.to_s == '{}' }\n" % [a,b]
+  ) rescue prosso("Bad Line ('#{$!}'): #{ [gray( a), white( b)] }")
 end
 
 def title(s)
@@ -40,7 +42,7 @@ end
 def init(helpfile)
     # compute help files
   $help_files = []  
-  Find.find(HELP_DIR) { |f| $help_files << File.basename(f, '.yml') if f.match('.yml$') } 
+  Find.find($HELP_DIR) { |f| $help_files << File.basename(f, '.yml') if f.match('.yml$') } 
     # compute max length on the left
     # TODO make this length dynamic on the search
   $column_length = 5 # minimum
@@ -71,28 +73,8 @@ def usage
   puts " -h:   this help"
   puts " -m:   open file with textmate (or GUARDA equivalent)"
   puts " -t:   just test file"
-  puts "Files are: " + yellow( $help_files.join(', '))
+  puts "Available files are: " + yellow( $help_files.join(', '))
   exit 1
-end
-
-def sanitize_file(file_str)
-  file_str = file_str.gsub(/\.yml$/,'')  
-  File.expand_path "~/doc/help/#{file_str}.yml"
-end
-
-def show_test(file_str)
-#  file = File.expand_path "~/doc/help/#{file_str}.yml"
-  file = sanitize_file(file_str)
-  hash_or_errorstring = YAML.load_file( file ) rescue "#{$!}"
-  #deb hash_or_errorstring.class
-  if hash_or_errorstring.class == Hash
-    puts "OK File yml: #{green file}"
-    exit 0
-  else
-    puts "Some problems with '#{file}': #{red hash_or_errorstring}"
-    exit 78
-  end
-  
 end
 
 def main
@@ -108,7 +90,7 @@ def main
   else
     show_help(query_str)
   end
-  mate_cmd = "guarda ~/doc/help/#{file_str}.yml"
+  mate_cmd = "vim #{$HELP_DIR}/#{file_str}.yml"
   puts "# To add stuff, type: #{gray mate_cmd }"
   `#{mate_cmd}` if ARGV.match /-m/
   exit ($some_exception ? 42 : 0)
