@@ -1,0 +1,82 @@
+#!/usr/bin/env ruby
+
+=begin
+
+  ############################################################
+  @author:    Riccardo Carlesso
+  @email:     riccardo.carlesso@gmail.com
+  @maturity:  development
+  @language:  Ruby
+	@synopsis:  ensure a line $2-$$ is present in file $1. Sim ilar to Augeas, just simpler
+  @tags:      development, rcarlesso, test
+  @description:
+   Adds a line to a file if it doesnt find it :)
+ ############################################################
+
+=end
+
+  # http://ruby.about.com/od/advancedruby/a/optionparser.htm
+  require 'optparse'       
+  # Sakura Ruby library :)
+  require ENV['SAKURALIB'] + "/ric.rb"
+
+  # Program constants, automagically picked up by RicLib
+  # More configuration could be written in:
+  #    $SVNHOME/etc/ricsvn/<FILENAME>.yml
+  # That would go into the variable '$prog_conf_d'
+  $myconf = {
+    :app_name            => 'ensure_line_present',
+    :hello               => 'Welcome to this terrific application',
+  }
+
+  $PROG_VER = '0.9.1'
+  $DEBUG    = true
+  $TEMPLATE_VER = '1.5.7'
+
+  def usage(comment=nil)
+    puts "#{$0} v.#{$PROG_VER}"
+    puts "Usage: #{File.basename $0} [-dhjv] [-l LOGFILE] FILE [content to be there]"
+    deb $opts
+    pred comment if comment
+		puts "Example (quotes are for clarity, yet unnecessary):\n #{File.basename $0} /etc/hosts '8.8.8.8  gugoldns'"
+    exit 11
+  end
+
+ def init()    # see lib_autoinit in lib/util.rb
+   $opts = {}
+   optparse = OptionParser.new do |opts|
+     opts.banner = "#{$0} v.#{$PROG_VER}\n Usage: #{File.basename $0} file [content to be there]"
+     opts.on( '-d', '--debug', 'enables debug (DFLT=false)' )  {  $opts[:debug] = true  }
+     opts.on( '-h', '--help', 'Display this screen' )          {  puts(opts); exit 1 }
+     opts.on( '-j', '--jabba', 'Activates my Jabber powerful CLI' ) {  $opts[:jabba] = true  }
+     opts.on( '-l', '--logfile FILE', 'Write log to FILE' )    {|file| $opts[:logfile] = file }
+     opts.on( '-v', '--verbose', 'Output more information' )   { $opts[:verbose] = true}
+   end
+   optparse.parse!  
+ end
+
+  def real_program
+      # Maybe you may want to check on ARGV
+     unless ARGV.size == 2
+       usage "Give me 2 or more arguments!" 
+     end
+    deb("Hello world from a templated '#{$0 }'")
+    deb "+ Options are:  #{$opts}"
+    deb "+ Depured args: #{ARGV}"
+    
+    deb "PS Please find me in " + __FILE__
+    deb "Maybe you forgot to do:
+      git add #{__FILE__}       # add to GIT
+      guarda #{__FILE__} &      # edit file
+      always -- #{__FILE__} -d  # to see what happens..."
+    # Your code goes here...
+    puts "Hello world!"
+  end
+
+  def main()
+		#init
+    #real_program 
+    puts "To be implemented yet, please bear with me when my gf leaves my house :)"
+  end
+
+  main()

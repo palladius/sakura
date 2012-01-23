@@ -1,3 +1,5 @@
+#!/bin/bash
+
 while read riga; do echo -en "\033[0;32m$riga\033[0m\n"; done   
 #echo -en "\033[0;32m"
 #cat
