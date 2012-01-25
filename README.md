@@ -57,5 +57,6 @@ Many people contributed to it. Today for the first time Im contributing back!
 Thanks for who believed in me:
 
 - Enrico "Vector field" Biondini
-- Chris <a href='https://github.com/palladius/sakura/raw/master/sounds/awesome.m4a'>"awesome"</a> Glass (Notice Awesome.m4a sound, under Creative Commons)
-- Lucilla "Mum" Gennari
+- Chris <a href='https://github.com/palladius/sakura/raw/master/sounds/awesome.m4a'>"awesome"</a> Glass (Notice `Awesome.m4a` sound, under Creative Commons)
+- Lucilla "Mum" Gennari for love and support
+- Dmitry V Golovashkin <Dmitry.Golovashkin@sas.com> for `timeout3`
