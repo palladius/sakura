@@ -17,7 +17,7 @@ This is my famous SVN which is becoming opensource!
 Go to the directory where you want to 'install' this software. Then download the repo:
 
 	git clone git@github.com/palladius/sakura.git
-	cat sakura/templates/bashrc.inject >> ~.bashrc
+	cat sakura/templates/bashrc.inject >> ~/.bashrc
 
 Note. Any help is appreciated to make this changeable!
 
