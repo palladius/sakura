@@ -40,7 +40,7 @@ For instant gratification try the following:
     zombies                                          # prints processes that show zombies (plus funny options to kill them)
     find . -size +300M | xargs mvto /tmp/bigfiles/   # moves big files to that directory
     alias gp='never_as_root git pull'                # only if u r not root it runs!
-    dimmiora                                         # Tells you the time with Riccardo voice in Italian. Brilliant!
+    tellme-time                                      # Tells you the time with Riccardo voice in Italian. Brilliant!
 
 ### BUGS
 
