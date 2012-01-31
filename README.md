@@ -31,7 +31,7 @@ Everything in this repo is under the Creative Commons license, except where othe
 See `doc/sakura-samples.txt` for some usage. 
 For instant gratification try the following:
 
-    h ubuntu                                         # shows a richelp of my 'ubuntu' cheatsheet
+    richelp ubuntu                                   # shows a richelp of my 'ubuntu' cheatsheet
     ls | act                                         # randomly scrambles the lines! Taken from cat/cat ;)
     ps | rainbow                                     # colors all lines differently
     twice itunes -                                   # lowers volume of iTunes... twice :)

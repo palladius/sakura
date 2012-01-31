@@ -1,0 +1,6 @@
+#!/bin/sh
+
+$SAKURADIR/bin/dimmi $( date  +"sonole %H ee %M minuti " )
+
+#$SAKURADIR/bin/dimmi $( date  +"sonole %H ee %M minuti virgola fratro" )
+

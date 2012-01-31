@@ -1,0 +1,32 @@
+#!/bin/bash
+
+DIMMIPATH="$SAKURADIR/sounds/"
+SUONA=/usr/bin/ogg123
+
+if [ ! -f $SUONA ] ; then
+	echo "Ogg123 not installed, try: sudo apt-get install vorbis-tools"
+	exit 2
+fi
+
+function gestisci() {
+	PAROLA="$*"
+	if test -z "$1" ; then
+		return
+	fi
+	#echo "DEB ARG: $PAROLA"	
+	FNAME="$DIMMIPATH/$PAROLA.ogg"
+	RISERVA="$DIMMIPATH/boh.ogg"
+	if [ -f "$FNAME" ] ; then
+		$SUONA  "$FNAME" >/dev/null 2>/dev/null
+	else
+		$SUONA  "$RISERVA" >/dev/null 2>/dev/null
+		echo "$FNAME non trovato" >&2
+	fi
+}
+
+gestisci "$1"
+while shift; do
+  if test ! -z "$1" ; then
+    gestisci $1 
+  fi
+done
