@@ -3,3 +3,7 @@ alias 'cdsak=cd $SAKURADIR'
 alias sak="giallo With sakura everything is easier and more verbose..; . $SAKURADIR/bashrc"
 alias ssa="rosso SSA is sourcing sakura.. ; . $SAKURADIR/bashrc"
 alias  sa="rosso SA  is now sourcing sakura.. ; . $SAKURADIR/bashrc"
+
+
+# git
+alias git-undo-last-commit='git reset --soft HEAD^'
