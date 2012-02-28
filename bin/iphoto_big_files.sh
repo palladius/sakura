@@ -17,9 +17,10 @@ function usage() {
    iphoto_big_files.sh --dest DESTDIR     # to be implemented yet :(
 More elaborate:
    iphoto_big_files.sh 400M -print0 | xargs -0 mvto /media/myhd/bigvideos/
-   iphoto_big_files.sh 100M  | while read F ; do mv "$F" /Volumes/MyDisk/MyDir/; done
+   iphoto_big_files.sh 100M  | while read F ; do mv -n "$F" /Volumes/MyDisk/MyDir/; done # moves without overwriting
 '
 }
+#iphoto_big_files.sh 60M | while read t ; do mv -n "$t" /Volumes/FreeAgent\ GoFlex\ Drive/important-backups/; done
 
 # cathches '-h', '--help' and much else :(
 if echo "$1" | fgrep -q -- "-h" ; then
