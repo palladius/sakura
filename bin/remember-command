@@ -7,7 +7,7 @@
   @email:     riccardo.carlesso@gmail.com
   @maturity:  development
   @language:  Ruby
-  @synopsis:  [Brief Description here]
+  @synopsis:  dumps command into a history file
   @tags:      development, rcarlesso, test
   @description:
    This script tries to remember what you just did on the CLI 
@@ -38,25 +38,12 @@
     #exit 11
   end
 
-# def init()    # see lib_autoinit in lib/util.rb
-#   $opts = {}
-#   optparse = OptionParser.new do |opts|
-#     opts.banner = "#{$0} v.#{$PROG_VER}\n Usage: #{File.basename $0} [options] file1 file2 ..."
-#     opts.on( '-d', '--debug', 'enables debug (DFLT=false)' )  {  $opts[:debug] = true  }
-#     opts.on( '-h', '--help', 'Display this screen' )          {  puts(opts); exit 1 }
-#     opts.on( '-j', '--jabba', 'Activates my Jabber powerful CLI' ) {  $opts[:jabba] = true  }
-#     opts.on( '-l', '--logfile FILE', 'Write log to FILE' )    {|file| $opts[:logfile] = file }
-#     opts.on( '-v', '--verbose', 'Output more information' )   { $opts[:verbose] = true}
-#   end
-#   optparse.parse!  
-# end
-
   def real_program
     debug_on 'Just created script, presuming u need some debug. TODO REMOVE ME when everything works!' if $DEBUG
       # Maybe you may want to check on ARGV
-    path = File.expand_path($myconf[:remember_dir])
-    path = File.expand_path(ENV['SVNHOME'] + "/var/remember/" ) if ENV['SVNHOME']
-    logfile =path +"/"+Socket.gethostname
+    path = File.expand_path($myconf[:remember_dir]) # for normal users
+    path = File.expand_path(ENV['SVNHOME'] + "/var/remember/" ) if ENV['SVNHOME'] # for Riccardo
+    logfile = path +"/all"
     unless ARGV.size > 0
       usage "Give me at least 1 argument!"
       puts "\nTry: cat '#{logfile}'\n\n"
@@ -66,9 +53,7 @@
     # Your code goes here...
     puts `mkdir -p '#{path}'`
     commands= ARGV.join ' '
-    File.open(logfile, 'a') do |f|
-      f.write "#{Time.now} [#{ENV['USER']}] #{commands}\n" 
-    end
+    File.open(logfile, 'a') { |f| f.write "#{Time.now} #{Socket.gethostname} [#{ENV['USER']}] #{commands}\n" }
     puts "#Remembering: '''#{commands}'''"
     system(commands)
   end
