@@ -16,14 +16,14 @@ This is my famous SVN which is becoming opensource!
 
 Go to the directory where you want to 'install' this software. Then download the repo:
 
-	git clone git@github.com/palladius/sakura.git
+	git clone git://github.com/palladius/sakura.git
 	cat sakura/templates/bashrc.inject >> ~/.bashrc
 
 Note. Any help is appreciated to make this changeable!
 
 ## License
 
-Everything in this repo is under the Creative Commons license, except where otherwise stated.
+Everything in this repo is under the Creative Commons license, except where stated otherwise.
 
 ## Usage
 
@@ -54,9 +54,12 @@ Many people contributed to it. Today for the first time Im contributing back!
 
 - Riccardo Carlesso <riccardo.carlesso@gmail.com>
 
+Borrowed code:
+
+- Dmitry V Golovashkin <Dmitry.Golovashkin@sas.com> for `timeout3`
+
 Thanks for who believed in me:
 
 - Enrico "Vector field" Biondini
 - Chris <a href='https://github.com/palladius/sakura/raw/master/sounds/awesome.m4a'>"awesome"</a> Glass (Notice `Awesome.m4a` sound, under Creative Commons)
 - Lucilla "Mum" Gennari for love and support
-- Dmitry V Golovashkin <Dmitry.Golovashkin@sas.com> for `timeout3`
