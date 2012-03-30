@@ -11,7 +11,8 @@
   @tags:      development, rcarlesso, test
   @description:
    This script tries to remember what you just did on the CLI 
-   for future use. It does it by recording on a directory
+   for future use. It does it by recording on a directory.
+   Basically it's a persistent history
  ############################################################
 
 =end
@@ -28,7 +29,7 @@
     :remember_dir        => '~/remember',
   }
 
-  $PROG_VER = '0.9.1'
+  $PROG_VER = '0.9.2'
   $DEBUG    = false
 
   def usage(comment=nil)
@@ -38,7 +39,7 @@
     #exit 11
   end
 
-  def real_program
+  def main
     debug_on 'Just created script, presuming u need some debug. TODO REMOVE ME when everything works!' if $DEBUG
       # Maybe you may want to check on ARGV
     path = File.expand_path($myconf[:remember_dir]) # for normal users
@@ -54,12 +55,9 @@
     puts `mkdir -p '#{path}'`
     commands= ARGV.join ' '
     File.open(logfile, 'a') { |f| f.write "#{Time.now} #{Socket.gethostname} [#{ENV['USER']}] #{commands}\n" }
-    puts "#Remembering: '''#{commands}'''"
+    puts "#Remembering:  '''#{commands}'''"
+    puts "#Written file: #{logfile}"
     system(commands)
-  end
-
-  def main()
-    real_program 
   end
 
   main()
