@@ -20,3 +20,4 @@ t.err
 *.lock
 *.stackdump
 *.kate-swp
+.pydevproject
