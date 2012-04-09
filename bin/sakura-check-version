@@ -1,0 +1,48 @@
+#!/usr/bin/env ruby
+
+=begin
+
+  ############################################################
+  @author:    Riccardo Carlesso
+  @email:     riccardo.carlesso@gmail.com
+  @maturity:  development
+  @language:  Ruby
+  @synopsis:  Checks for Sakura new Version
+  @tags:      development, rcarlesso, production
+ ############################################################
+
+=end
+
+  require 'optparse'       # http://ruby.about.com/od/advancedruby/a/optionparser.htm
+  require 'open-uri'
+  
+  $myconf = {
+    :sakura_version_online            => 'https://raw.github.com/palladius/sakura/master/VERSION',
+  }
+
+  $PROG_VER = '0.9.1'
+  $DEBUG    = false
+  
+  def usage(comment=nil)
+    puts "#{$0} v.#{$PROG_VER}"
+    puts "Usage: #{File.basename $0} [-dhjv] [-l LOGFILE] <FOO> <BAR>"
+    deb $opts
+    pred comment if comment
+    exit 11
+  end
+
+  def main
+    debug_on 'Just created script, presuming u need some debug. TODO REMOVE ME when everything works!' if $DEBUG
+    current_version = File.open(ENV['SAKURADIR'] + "VERSION").read.to_s.chomp
+    online_version = open($myconf[:sakura_version_online]).read.chomp rescue "1.2.3 err(#{$!})"
+    if (online_version == current_version)
+      puts "Your Sakura system is up to date: '#{online_version}'"
+      exit 0
+    else
+      # Note I have no concept whatsoever of newer or older, just different :)
+      puts "Hey!! Newer version available on the web: '#{online_version}' (You have '#{current_version}'). Go get it:\n\tgit pull origin master"
+      exit 1
+    end
+  end
+
+main
