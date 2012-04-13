@@ -1,0 +1,16 @@
+#!/bin/bash
+
+# if ls | not grep string ; then
+#   action
+# fi
+
+# and dont tell me that grep -v is the same, cos its NOT ;)
+
+"$@"
+RET=$?
+
+if [ $RET = 0 ] ; then
+	exit 42
+else
+	exit 0
+fi
