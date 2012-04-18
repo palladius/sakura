@@ -1,0 +1,37 @@
+#!/usr/bin/env ruby
+
+=begin
+
+  ############################################################
+  @author:    Riccardo Carlesso
+  @email:     riccardo.carlesso@gmail.com
+  @maturity:  production
+  @language:  Ruby
+  @synopsis:  [Brief Description here]
+  @tags:      development, rcarlesso, test
+  @description:
+   splits STDIN based on ARGV[1].
+   if ARGV[2] os provided, then joins with it, otherwise it becomes a "\n"
+ ############################################################
+
+=end
+  require 'optparse'       # http://ruby.about.com/od/advancedruby/a/optionparser.htm
+
+  $PROG_VER = '0.9.1'
+  $DEBUG    = false
+
+  def usage(comment=nil)
+    puts "#{$0} v.#{$PROG_VER}"
+    puts "Usage: #{File.basename $0} <SPLIT_STRING> [<JOIN_STRING=\\n>]"
+    puts "Error: #{comment}"  if comment
+    exit 11
+  end
+
+  def main
+    usage "Give me 1 or 2 arguments!" unless ARGV.size > 0
+    split_string = ARGV[0].to_s
+    join_string  = ARGV[1] || "\n"
+    puts STDIN.read.split(split_string).join(join_string)
+  end
+
+  main()
