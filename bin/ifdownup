@@ -1,0 +1,13 @@
+#!/bin/bash
+#
+INTF=${1:-eth0}
+#TAGS=ubuntu,debian
+
+echo "$0 v$VER, down/up of interface '$INTF'.."
+
+echo "Crontabbing to take it up in a minute.."
+echo ifup $INTF | at now + 1 min
+
+echo "Down and up within 5secs of interface '$INTF'..."
+sleep 5 | ifdown $INTF && ifup $INTF
+
