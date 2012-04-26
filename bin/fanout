@@ -1,0 +1,100 @@
+#!/bin/bash
+#Copyright 2000, 2001, 2002, 2003 William Stearns <wstearns@pobox.com>
+#GPL'd, of course.
+#Version 0.6.1, 8/7/2002
+#Home web site: http://www.stearns.org/fanout/
+
+fanoutcleanup () {
+	echo -n Exiting fanout, cleaning up...								>/dev/stderr
+	if [ -n "$OUTFILES" ]; then
+		for ONEFILE in $OUTFILES ; do
+			if [ -f $ONEFILE ]; then
+				rm -f ONEFILE
+			fi
+		done
+	fi
+	echo done.											>/dev/stderr
+	exit
+}
+
+trap fanoutcleanup EXIT								#Clean up on exit
+
+usage () {
+	echo "Usage:"											>/dev/stderr
+	echo "  $0 \"MACHINES\" \"commands and parameters to run on each machine\""			>/dev/stderr
+	echo "  $0 -h	#Show this help"								>/dev/stderr
+	echo												>/dev/stderr
+	echo "Examples:"										>/dev/stderr
+	echo "  fanout \"wstearns@localhost localhost anotherhost.someplace.net\" \\"			>/dev/stderr
+	echo "   \"echo My PID is \\\"\$PPID\\\" ; sleep 15\""						>/dev/stderr
+	echo												>/dev/stderr
+	echo "  fanout \"localhost\" \"uname -a ; rpm -qa | egrep -i '(openlinux|redhat-release)' \\"	>/dev/stderr
+	echo "   ; uptime ; df -P / ; netstat -a | grep '*:*'\" | less"					>/dev/stderr
+	echo												>/dev/stderr
+	echo "  fanout \"localhost myaccount@localhost\" \"uptime\" >uptime-sample"			>/dev/stderr
+	echo												>/dev/stderr
+	echo "  If you set the SERVERS variable in your environment, you can run commands on"		>/dev/stderr
+	echo "  these machines over and over:"								>/dev/stderr
+	echo												>/dev/stderr
+	echo "  export SERVERS=\"web1 web2 mail\""							>/dev/stderr
+	echo "  fanout \"\$SERVERS \" \"uname -a ; ( if [ -f /var/log/dmesg ]; then \\"			>/dev/stderr
+	echo "   cat /var/log/dmesg ; else dmesg ; fi ) | egrep -i '(hd[a-h]|sd[a-h])' ; ls -al \\"	>/dev/stderr
+	echo "   /proc/kcore ; cat /proc/cpuinfo\" >serverspecs"					>/dev/stderr
+	exit
+}
+
+if [ -z "$1" ]; then		usage ;			fi
+if [ "$1" = "-h" ]; then	usage ;			fi
+if [ "$1" = "--noping" ]; then	PING="NO" ; shift ;	fi
+
+MYPID="$$"
+TARGETS=`echo "$1" | tr ' ' '\012' | sort | uniq`				#Sort and remove dupes
+shift										#Leave just the commands and params to be executed.
+STARTTIME=`date`
+for ONETARGET in $TARGETS ; do
+	case $ONETARGET in
+	*@*)									#user@machine form
+		ONEUSER="-l ${ONETARGET%%@*}"
+		ONEMACH=${ONETARGET##*@}
+		HEADER="==== As ${ONETARGET%%@*} on $ONEMACH ===="
+		;;
+	*)									#just machine form
+		ONEUSER=""
+		ONEMACH=$ONETARGET
+		HEADER="==== On $ONEMACH ===="
+		;;
+	esac
+
+	if type -path mktemp >/dev/null 2>/dev/null ; then
+		TMPFILE=`mktemp -q /tmp/fanout.XXXXXX`
+		if [ $? -ne 0 ]; then
+			echo "$0: Can't create temp file ${TMPFILE}." >/dev/stderr
+			exit 1
+		fi
+	else
+		TMPFILE="/tmp/fanout.$MYPID.$ONETARGET.$RANDOM"
+		touch $TMPFILE
+		if [ $? -ne 0 ]; then
+			echo "$0: Can't create temp file ${TMPFILE}." >/dev/stderr
+			exit 1
+		fi
+	fi
+	OUTFILES="$OUTFILES $TMPFILE"						#Remember the filename for later display, cleanup
+	if [ "$PING" = "NO" ] || ping -c 3 $ONEMACH >/dev/null 2>/dev/null ; then
+		echo Starting $ONETARGET >/dev/stderr				#Machine is reachable
+		#Show machine name header, show command output, indented two spaces, save all to a temp file.
+		( echo $HEADER ; ssh -n $ONEUSER $ONEMACH "$*" | sed -e 's/^/  /' ; echo ) >$TMPFILE &
+	else
+		echo $ONETARGET unavailable >/dev/stderr			#Machine not responding
+		echo $HEADER ; echo "==== Machine unreachable by ping" ; echo >$TMPFILE
+	fi
+done
+wait										#Until everyone's done.
+
+echo "Fanout executing \"$*\""
+echo Start time $STARTTIME , End time `date`
+for ONEFILE in $OUTFILES ; do
+	cat $ONEFILE
+	rm -f $ONEFILE
+done
+

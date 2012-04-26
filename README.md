@@ -59,6 +59,7 @@ Many people contributed to it. Today for the first time Im contributing back!
 Borrowed code:
 
 - Dmitry V Golovashkin <Dmitry.Golovashkin@sas.com> for `timeout3`
+- William Stearns <wstearns@pobox.com> (`fanout`, GPL)
 
 Thanks for who believed in me:
 
