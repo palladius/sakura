@@ -1,3 +1,4 @@
+#!/bin/bash
 
 # Common stuff not to be seen in the ~
 export SAKURABIN=$SAKURADIR/bin

@@ -1,0 +1,6 @@
+#!/bib/bash
+
+
+# This is only for Mac
+
+alias ls='ls -G' # colors enabled on Mac
