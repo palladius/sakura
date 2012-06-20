@@ -50,7 +50,7 @@ For instant gratification try the following:
 
 ## Credits
 
-Many people contributed to it. Today for the first time Im contributing back!
+Many people contributed to it. First place goes obviously to my mum (see below).
 
  <img src='http://www.palladius.it/palladius.jpg' height='100' align='right' />
 
