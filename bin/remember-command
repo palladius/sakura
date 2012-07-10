@@ -13,6 +13,8 @@
    This script tries to remember what you just did on the CLI 
    for future use. It does it by recording on a directory.
    Basically it's a persistent history
+   
+   Since version 0.9.3 it supports options. Try -e, its super cool
  ############################################################
 
 =end
@@ -29,8 +31,16 @@
     :remember_dir        => '~/remember',
   }
 
-  $PROG_VER = '0.9.2'
+  $PROG_VER = '0.9.3'
   $DEBUG    = false
+  
+  def deb(str)
+    puts "#DEB# #{str}" if $DEBUG #
+  end
+  
+  def debug_on(str)
+    $DEBUG = true
+  end
 
   def usage(comment=nil)
     puts "#{$0} v.#{$PROG_VER}"
@@ -38,13 +48,54 @@
     puts comment if comment
     #exit 11
   end
+  
+  def init()
+    $opts = {}
+    optparse = OptionParser.new do |opts|
+      # Set a banner, displayed at the top of the help screen.
+      #opts.banner = "#{$0} v.#{$PROG_VER}\n Usage: #{File.basename $0} [options] file1 file2 ..."
+      $opts[:verbose] = $opts[:jabba] = $opts[:debug] = false  
+      $opts[:logfile] = nil
+      opts.on( '-d', '--debug', 'enables debug (DFLT=false)' )  { $opts[:debug] = true}
+      opts.on( '-e', '--edit',  "edits file with vi" )          { $opts[:edit] = true  } 
+      opts.on( '-h', '--help',  'Display this screen' )         { puts(opts); exit 1   }
+      #opts.on( '-j', '--jabba', 'Activates my Jabber powerful CLI' ) {  $opts[:jabba] = true  }
+      opts.on( '-l', '--logfile FILE', 'Write log to FILE' )    {|file| $opts[:logfile] = file }
+      #opts.on( '-o', '--optional [OPT]', "Optional argument" )  {|f| options[:opt] = f || "nothing"}
+      opts.on( '-v', '--verbose', 'Output more information' )   { $opts[:verbose] = true}
+    end
+    optparse.parse!  
+    $DEBUG = $opts[:debug]
+    debug_on('enabled via GetOpts') if $opts[:debug]
+    puts "Being verbose" if $opts[:verbose]
+    puts "Logging to file #{$opts[:logfile]}" if $opts[:logfile]
+    #jabba "Hey, jabbing capability added! @ricdev" if $opts[:jabba]
+  end
+  
+  def remember_and_execute_command(command,logfile)
+    File.open(logfile, 'a') { |f| f.write "#{Time.now} #{Socket.gethostname} [#{ENV['USER']}] #{command}\n" }
+    puts "#Remembering:  '''#{command}'''"
+    puts "#Written file:  #{logfile}"
+    puts "#Now executing: #{command}"
+    system(command)
+    deb "#Just executed (exit=#{$!}): #{command}"
+    deb "#Written file (2): #{logfile}"
+  end
 
   def main
+    init
     debug_on 'Just created script, presuming u need some debug. TODO REMOVE ME when everything works!' if $DEBUG
       # Maybe you may want to check on ARGV
     path = File.expand_path($myconf[:remember_dir]) # for normal users
     path = File.expand_path(ENV['SVNHOME'] + "/var/remember/" ) if ENV['SVNHOME'] # for Riccardo
     logfile = path +"/all"
+    command = ARGV.join ' '
+
+    if ($opts[:edit])
+      remember_and_execute_command("vi '#{logfile}'", logfile)
+      exit 0
+    end
+
     unless ARGV.size > 0
       usage "Give me at least 1 argument!"
       puts "\nTry: cat '#{logfile}'\n\n"
@@ -53,11 +104,10 @@
     end
     # Your code goes here...
     puts `mkdir -p '#{path}'`
-    commands= ARGV.join ' '
-    File.open(logfile, 'a') { |f| f.write "#{Time.now} #{Socket.gethostname} [#{ENV['USER']}] #{commands}\n" }
-    puts "#Remembering:  '''#{commands}'''"
-    puts "#Written file: #{logfile}"
-    system(commands)
+    
+    
+    # normal use
+    remember_and_execute_command(command, logfile)
   end
 
   main()
