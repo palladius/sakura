@@ -13,7 +13,7 @@
    This script tries to remember what you just did on the CLI 
    for future use. It does it by recording on a directory.
    Basically it's a persistent history
-   
+
    Since version 0.9.3 it supports options. Try -e, its super cool
  ############################################################
 
