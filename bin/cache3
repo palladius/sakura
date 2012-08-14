@@ -1,0 +1,50 @@
+#!/usr/bin/env ruby
+
+VER = '1.1'
+
+require 'rubygems'
+begin
+  require 'filecache'           # gem install ruby-cache
+rescue Exception => e
+  puts 'gem filecache requires installation, sorry'  
+  puts 'gem filecache requires installation, sorry. trying to install myself, give me root password'
+  system  'sudo gem install -r filecache'
+  puts  'Try again now!'
+  exit 1
+end
+
+
+$time_cache_secs = 3600
+$cache_dir = File.expand_path("~/.riccache")
+
+def deb(s)
+  #puts "#DEB# #{s}"
+end
+
+# writes a command
+def main
+ # create a new cache called "my-cache", rooted in /home/simon/caches
+ # with an expiry time of 30 seconds, and a file hierarchy three
+ # directories deep
+ cache = FileCache.new("cache3", $cache_dir, $time_cache_secs, 3)
+ cmd = ARGV.join(' ').to_s
+ cmd = 'echo give me an argment' if cmd.length < 1
+
+ # gives a list... but hey! This expires! Maybe better a normal single file serialization...
+ #list = cache.get('_index') || []
+ #list << cmd # unless cmd contains it
+ #deb list
+ #cache.set(list)
+
+ # caches the command and retrieves it
+ if cache.get('output' + cmd)
+   deb "Cache found!(for '#{cmd}')"
+ else
+   deb "Cache not found! Recalculating and setting for the future"
+	 cache.set('output' + cmd, `#{cmd}`)
+ end
+ deb 'anyway calling the cache now'
+ print(cache.get('output' + cmd))
+end
+
+main
