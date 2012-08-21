@@ -21,3 +21,4 @@ t.err
 *.stackdump
 *.kate-swp
 .pydevproject
+bashrc.d/local.d/*.include
