@@ -1,0 +1,74 @@
+#!/usr/bin/env ruby
+
+  # @vote = 9
+  # @comment Questo script e' una autentica figata!!!
+  
+$BASEDIR = "/tmp/.gugol_image/"
+DFLT_ARG = %w{ spaghetti alla bolognese }
+$do_it = true
+
+###### FROM rcarlesso library
+def debug_on(expl)
+	$DEBUG = true
+end
+def deb(s)
+  print s if $DEBUG
+end
+class String
+  def depurate_for_file 
+    gsub(/[\/: \.]/ , '_')
+  end
+end
+#### END RICLIB
+
+def good_extension?(url)
+  File.extname(url).downcase.match( /(jpg|png|gif)$/ ) ? true : false
+end
+
+def download_url(line,match)
+  url = line.gsub(/^.*#{match}=/,'').split('&')[0] 
+  deb "MATCH/URL: #{match} // #{url}"
+  deb url
+  puts url if $dry_run
+  file_name = File.basename(url).downcase
+  if good_extension?(url)
+    `wget '#{url}' -O '#{$mydir}/#{file_name}' 1>/dev/null 2>/dev/null &`  if $do_it
+  else
+    puts "#DEB# Skipping: #{red url rescue url}"
+  end 
+end
+
+def get_url(query)
+  "http://images.google.com/images?hl=en&um=1&sa=1&q=#{query}"
+end
+
+def gugol_image(query)
+  out = `lynx --dump "#{get_url query}"`
+  $mydir = $BASEDIR + query.depurate_for_file() + '/' 
+  deb  "BaseDir: #{$mydir}"
+  `mkdir -p #{$mydir}`
+  out.split("\n").grep( /imgurl=/ ).each{ |line| 
+    download_url(line, 'imgurl')
+  }
+	# on Mac it works... on Linux it doesnt
+  `open #{$mydir} || xdg-open #{$mydir}` if $do_it 
+  puts "Files downloaded in: #{$mydir}"# if mac or linux
+end
+
+def main
+  debug_args = ARGV.select{|arg| arg.match /-d/ }.size > 0
+  $dry_run  = ARGV.select{|arg| arg.match /-n/ }.size > 0
+  if debug_args
+    debug_on("debug args is #{debug_args}") 
+    $do_it = false 
+  end 
+  if $dry_run 
+    deb "# dryrun enabled: just printing stuff"
+    $do_it = false
+  end
+	query = (ARGV.empty? ? DFLT_ARG : ARGV.select{|a| ! a.match /^-/ } ).join(' ')
+	gugol_image(query)
+	puts ".. or try yourself: #{"open '#{ get_url(query) }'"}"
+end
+
+main()

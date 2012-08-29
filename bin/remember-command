@@ -77,7 +77,7 @@
     puts "#Remembering:  '''#{command}'''"
     puts "#Written file:  #{logfile}"
     puts "#Now executing: #{command}"
-    system(command)
+    system(command) # Id need a "$@"
     deb "#Just executed (exit=#{$!}): #{command}"
     deb "#Written file (2): #{logfile}"
   end
@@ -104,7 +104,6 @@
     end
     # Your code goes here...
     puts `mkdir -p '#{path}'`
-    
     
     # normal use
     remember_and_execute_command(command, logfile)
