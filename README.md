@@ -44,10 +44,6 @@ For instant gratification try the following:
     alias gp='never_as_root git pull'                # only if u r not root it runs!
     tellme-time                                      # Tells you the time with Riccardo voice in Italian. Brilliant!
 
-### BUGS
-
-- None (yet!)
-
 ## Credits
 
 Many people contributed to it. First place goes obviously to my mum (see below).
