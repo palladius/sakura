@@ -26,8 +26,10 @@ def process_args(dotted_arg)
 	args = arr_args.map { |arg| arg.to_s.is_number? ? arg.to_s : "'" + arg + "'" }.map{|x| "[#{x}]" }
 	my_program = python_program + args.join('')
 
-	puts python_program_original
+	#puts python_program_original
 	puts my_program
+	# execute python this
+	system("python \"#{my_program}\"")
 end
 	
 def main
