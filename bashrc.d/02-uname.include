@@ -4,7 +4,7 @@
 
 UNAME_FILE="$SAKURADIR/bashrc.d/uname.d/`uname`"
 if [ -f "$UNAME_FILE" ] ; then
-  deb "Sourcing my architecture file: $UNAME_FILE"
+  #deb "Sourcing my architecture file: $UNAME_FILE"
   . "$UNAME_FILE"
 else
   echo "File not found: $UNAME_FILE"

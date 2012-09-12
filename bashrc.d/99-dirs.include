@@ -1,7 +1,7 @@
 
 # Local, depends on final user...
 for INCLUDE_FILE in $SAKURADIR/bashrc.d/local.d/*.include ; do
-  deb "Including local file: $INCLUDE_FILE"
+  #deb "Including local file: $INCLUDE_FILE"
   source "$INCLUDE_FILE"
 done
 
