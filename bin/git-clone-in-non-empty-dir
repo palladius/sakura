@@ -1,0 +1,16 @@
+#!/bin/bash
+
+REPO=${1:-git://github.com/palladius/gceproject-dns.palladius.eu.git}
+DIR=${2:-/tmp/}
+
+echo Cloning repo into dir: $DIR
+
+set +x
+
+# git clone in non-empty dir
+git clone --no-checkout $REPO $DIR/.gitclone.tmp/ &&
+ mv $DIR/.gitclone.tmp/.git $DIR/ &&
+  rmdir $DIR/.gitclone.tmp &&
+   cd $DIR/ &&
+    git reset --hard HEAD # git thinks all files are deleted, this reverses that behaviour
+
