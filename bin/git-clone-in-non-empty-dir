@@ -1,9 +1,12 @@
 #!/bin/bash
 
+
+# From here: http://stackoverflow.com/questions/2411031/git-how-do-i-clone-into-a-non-empty-directory
+
 REPO=${1:-git://github.com/palladius/gceproject-dns.palladius.eu.git}
 DIR=${2:-/tmp/}
 
-echo Cloning repo into dir: $DIR
+echo Cloning $REPO into dir: $DIR
 
 set +x
 
@@ -12,5 +15,7 @@ git clone --no-checkout $REPO $DIR/.gitclone.tmp/ &&
  mv $DIR/.gitclone.tmp/.git $DIR/ &&
   rmdir $DIR/.gitclone.tmp &&
    cd $DIR/ &&
-    git reset --hard HEAD # git thinks all files are deleted, this reverses that behaviour
+    git reset --hard HEAD && # git thinks all files are deleted, this reverses that behaviour
+     echo 'Repo succesfully checked out into: '$DIR ||
+      echo "Some problems here: $?"
 
