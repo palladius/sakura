@@ -1,0 +1,4 @@
+#!/bin/sh
+
+cat ~/.boto | grep gs_oauth2_refresh_token | cut -d'=' -f 2|sed -e 's/ //g'
+
