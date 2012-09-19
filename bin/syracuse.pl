@@ -16,9 +16,7 @@ sub siracusa {
 	return siracusa($t/2);
 }
 
-#use argv;
-#print "arg: " .( $ARGV[0] ). "\n";
-print "# Serie semplice ma bella: se pari dimezzo, se dispari triplico+1\n";
+print "# Simple yet neat algorithm: if n is even, I halve it. If it's odd I triple it and add 1. Look:\n";
 my $arg = 0+int($ARGV[0]);
 if ($arg == 0) {
 	$arg = 42;
@@ -26,6 +24,6 @@ if ($arg == 0) {
 print siracusa($arg);
 #print siracusa(0 + int($ARGV[0]));
 print "\n";
-print "# Durata volo:    $niterations\n";
-print "# Impennata volo: " .($niterations/$arg) ."\n";
+print "# Flight time:     $niterations\n";
+print "# Flight pendency: " .($niterations/$arg) ."\n";
 
