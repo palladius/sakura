@@ -1,0 +1,5 @@
+#!/bin/bash
+
+SITE=${1:-https://logscribe.commondatastorage.googleapis.com}
+
+echodo curl -v -H "Authorization: Bearer $(gsutil-get-oauth2-token)" "$SITE"
