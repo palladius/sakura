@@ -1,9 +1,12 @@
 #!/bin/bash
 
-SITE=${1:-https://logscribe.commondatastorage.googleapis.com}
+BUCKET=${1:-rcarlesso}
+SITE=https://$BUCKET.commondatastorage.googleapis.com
 
+set -x
 curl -v -H "Authorization: Bearer $(gsutil-get-oauth2-token)" "$SITE"
 RET=$?
+set +x
 echo
 echo "= Connection to $SITE returned: $RET ="
 exit $RET
