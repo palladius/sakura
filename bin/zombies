@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Thanks to Jeff Silverman
+# See http://www.linuxquestions.org/questions/linux-server-73/how-to-kill-zombie-process-592732/
+
 FUNNY_KILL_REGEX="machete|garlic|cross|bazooka|shaunofthedead"
 
 function kill_zombies {
@@ -10,7 +13,9 @@ function see_zombies() {
 }
 
 if echo $1 | egrep -q "$FUNNY_KILL_REGEX"; then
-  echo "Killing all zombie process that should be these: $(see_zombies)"
+  echo "Trying to kill all zombie processes: $(see_zombies)"
+  echo "Note that they are quite resistant to our weapons. for more info, see:"
+  echo '  http://www.linuxquestions.org/questions/linux-server-73/how-to-kill-zombie-process-592732/'
   kill_zombies
 else
   echo "Showing zombies:"
