@@ -1,0 +1,52 @@
+commands:
+  adddisk:                    Create a new machine disk.
+  addfirewall:                Create a new firewall.
+  addimage:                   Create a new machine image.
+  addinstance:                Create a new machine instance.
+  addnetwork:                 Create a new network instance.
+  auth:                       Class for forcing client authorization.
+  deletedisk:                 Delete a machine disk.
+  deletefirewall:             Delete a firewall.
+  deleteimage:                Delete a machine image.
+  deleteinstance:             Delete a machine instance.
+  deletenetwork:              Delete a machine network.
+  deleteoperation:            Delete an operation.
+  getdisk:                    Get a machine disk.
+  getfirewall:                Get a firewall.
+  getimage:                   Get a machine image.
+  getinstance:                Get a machine instance.
+  getkernel:                  Get a kernel.
+  getmachinetype:             Get a machine type.
+  getnetwork:                 Get a network instance.
+  getoperation:               Retrieve an operation resource.
+  getproject:                 Get the resource for a Google Compute project.
+  getzone:                    Get a zone.
+  #help:                      Help for all or selected command:
+  listdisks:                  List the machine disks for a project.
+  listfirewalls:              List the firewalls for a project.
+  listimages:                 List the machine images for a project.
+  listinstances:              List the machine instances for a project.
+  listkernels:                List the machine kernels for a project.
+  listmachinetypes:           List the machine types.
+  listnetworks:               List the machine networks for a project.
+  listoperations:             List the operations for a project.
+  listzones:                  List available zones.
+  pull:                       Pull one or more files from an instance.
+  push:                       Push one or more files to an instance.
+  setcommoninstancemetadata:  Set the commonInstanceMetadata field for a Google
+  ssh:                        Ssh to an instance.
+  version:                    Get the current version of this command.
+other:
+ cache project_id:  gcompute getproject --project_id=<your_project_id> --cache_flag_values
+ browse gcompute code project (python): @shortcutme mate ~/Dropbox/.linux/git/gcompute-1.1.pre.20120507.1654
+ howto install: @shortcutme open https://developers.google.com/compute/docs/gcompute_setup 
+ jason json response: gcompute getproject --dump_request_response # or whatever
+ install: pip install https://dl.google.com/compute/gcutil.tar.gz
+ list images: gcutil listimages --project=projects/google
+code snippets:
+ metadata: gcutil-test11 setcommoninstancemetadata --metadata foo:bar --metadata owner:riccardo --metadata data:$(data) -f --metadata perhosturl:http://www.palladius.eu/hosts/
+ kernels: gcutil --print_json --project=google listkernels
+API info:
+ last version: 1.2
+ last release: 20120912
+ API version:  v1beta12
