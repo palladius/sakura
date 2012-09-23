@@ -10,9 +10,7 @@
   @synopsis:  dumps command into a history file
   @tags:      development, rcarlesso, test
   @description:
-   This script tries to remember what you just did on the CLI 
-   for future use. It does it by recording on a directory.
-   Basically it's a persistent history
+	 See in $myconf
 
    Since version 0.9.3 it supports options. Try -e, its super cool
  ############################################################
@@ -21,6 +19,8 @@
 
   require 'optparse'       # http://ruby.about.com/od/advancedruby/a/optionparser.htm
   require 'socket'  
+	require ENV['SAKURALIB'] + '/ric_colors'
+	require ENV['SAKURALIB'] + '/ric_strings'
 
   # Program constants, automagically picked up by RicLib
   # More configuration could be written in:
@@ -29,6 +29,10 @@
   $myconf = {
     :app_name            => 'remember',
     :remember_dir        => '~/remember',
+    :tail_len            => 20,
+		:description         => 'This script tries to remember what you just did on the CLI 
+   for future use. It does it by recording on a directory.
+   Basically its a "persistent" history'
   }
 
   $PROG_VER = '0.9.3'
@@ -44,8 +48,9 @@
 
   def usage(comment=nil)
     puts "#{$0} v.#{$PROG_VER}"
-    puts "Usage: #{File.basename $0} [-dhjv] [-l LOGFILE] <COMMAND> <TO> <ISSUE>"
+    puts "Usage: #{File.basename $0} [-dhjtv] [-l LOGFILE] [-g STR] <COMMAND> <TO> <ISSUE>"
     puts comment if comment
+		puts description
     #exit 11
   end
   
@@ -55,13 +60,14 @@
       # Set a banner, displayed at the top of the help screen.
       #opts.banner = "#{$0} v.#{$PROG_VER}\n Usage: #{File.basename $0} [options] file1 file2 ..."
       $opts[:verbose] = $opts[:jabba] = $opts[:debug] = false  
-      $opts[:logfile] = nil
+      $opts[:logfile] = $opts[:grep] = nil
+			$opts[:tail] = $myconf[:tail_len]
       opts.on( '-d', '--debug', 'enables debug (DFLT=false)' )  { $opts[:debug] = true}
       opts.on( '-e', '--edit',  "edits file with vi" )          { $opts[:edit] = true  } 
       opts.on( '-h', '--help',  'Display this screen' )         { puts(opts); exit 1   }
-      #opts.on( '-j', '--jabba', 'Activates my Jabber powerful CLI' ) {  $opts[:jabba] = true  }
+      opts.on( '-g', '--grep STRING', 'Searchs for STRING' )    {|str|  $opts[:grep] = str  }
       opts.on( '-l', '--logfile FILE', 'Write log to FILE' )    {|file| $opts[:logfile] = file }
-      #opts.on( '-o', '--optional [OPT]', "Optional argument" )  {|f| options[:opt] = f || "nothing"}
+      opts.on( '-t', '--tail', "Just tail argument (dflt tail length=#{$myconf[:tail_len]}" )  {|len| $opts[:tail] = len || $myconf[:tail_len]}
       opts.on( '-v', '--verbose', 'Output more information' )   { $opts[:verbose] = true}
     end
     optparse.parse!  
@@ -69,22 +75,38 @@
     debug_on('enabled via GetOpts') if $opts[:debug]
     puts "Being verbose" if $opts[:verbose]
     puts "Logging to file #{$opts[:logfile]}" if $opts[:logfile]
-    #jabba "Hey, jabbing capability added! @ricdev" if $opts[:jabba]
   end
   
-  def remember_and_execute_command(command,logfile)
-    File.open(logfile, 'a') { |f| f.write "#{Time.now} #{Socket.gethostname} [#{ENV['USER']}] #{command}\n" }
-    puts "#Remembering:  '''#{command}'''"
-    puts "#Written file:  #{logfile}"
+  def remember_and_execute_command(command,logfile,remember=true)
+		if remember
+			File.open(logfile, 'a') { |f| f.write "#{Time.now} #{Socket.gethostname} [#{ENV['USER']}] #{command}\n" } 
+			puts "#Remembering:  '''#{command}'''"
+			puts "#Written file:  #{logfile}"
+		end
     puts "#Now executing: #{command}"
     system(command) # Id need a "$@"
     deb "#Just executed (exit=#{$!}): #{command}"
     deb "#Written file (2): #{logfile}"
   end
 
+	#Tue Aug 28 15:57:38 +0100 2012 derek.dub.corp.google.com [rcarlesso] @tag21 @tags2 my command
+	def remember_color_regex(str)
+		d1,d2,d3,tim,gmt,yr,host,user,command = str.split(' ',9)
+		color_date = gray([d1,d2,d3,tim,gmt,yr].join(' '))
+		color_host = blue(host.split('.').first)
+		color_user = gray(user)
+		# makes the tags cyan :)
+		color_cmd  = yellow(command)
+		color_cmd  = command.split(' ').map{|word| word.begin_with?('@') ? cyan(word) : yellow(word) }.join(' ')
+
+		#puts str
+		#return [ color_date, color_host, color_user, color_cmd ].join ' '
+		color_cmd
+	end
+
   def main
     init
-    debug_on 'Just created script, presuming u need some debug. TODO REMOVE ME when everything works!' if $DEBUG
+    #debug_on 'Just created script, presuming u need some debug. TODO REMOVE ME when everything works!' if $DEBUG
       # Maybe you may want to check on ARGV
     path = File.expand_path($myconf[:remember_dir]) # for normal users
     path = File.expand_path(ENV['SVNHOME'] + "/var/remember/" ) if ENV['SVNHOME'] # for Riccardo
@@ -92,14 +114,24 @@
     command = ARGV.join ' '
 
     if ($opts[:edit])
-      remember_and_execute_command("vi '#{logfile}'", logfile)
+			# vi and piositions at end of file
+      remember_and_execute_command("vi + '#{logfile}'", logfile, false)
       exit 0
     end
 
     unless ARGV.size > 0
-      usage "Give me at least 1 argument!"
-      puts "\nTry: cat '#{logfile}'\n\n"
-      puts `cat '#{logfile}'`
+			# No arguments provided
+      #usage "Give me at least 1 argument!"
+			command = "tail -n #{$opts[:tail]} '#{logfile}'"
+			if $opts[:grep]
+				command ="grep --color '#{ $opts[:grep] }' '#{logfile}'"
+			end
+      deb "command: #{command}"
+      lines = `#{command}`
+			lines.split("\n").each do |line|
+        puts remember_color_regex(line) # "Line: #{line}" 
+		  end
+      $stderr.puts "# Try also: cat #{logfile}"
       exit 1
     end
     # Your code goes here...
