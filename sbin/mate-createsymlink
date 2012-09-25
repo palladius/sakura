@@ -1,0 +1,4 @@
+#!/bin/sh
+
+echo Create TExtMate symlink if you installed the app but dont have in on CLI...
+sudo ln -s /Applications/TextMate.app/Contents/Resources/mate /usr/local/bin/mate
