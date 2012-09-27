@@ -13,14 +13,13 @@ function gestisci() {
 	if test -z "$1" ; then
 		return
 	fi
-	#echo "DEB ARG: $PAROLA"	
 	FNAME="$DIMMIPATH/$PAROLA.ogg"
 	RISERVA="$DIMMIPATH/boh.ogg"
 	if [ -f "$FNAME" ] ; then
 		$SUONA  "$FNAME" >/dev/null 2>/dev/null
 	else
 		$SUONA  "$RISERVA" >/dev/null 2>/dev/null
-		echo "$FNAME non trovato" >&2
+		echo "'$FNAME' not found" >&2
 	fi
 }
 

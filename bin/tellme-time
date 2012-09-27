@@ -1,6 +1,4 @@
 #!/bin/sh
 
+echo It tells you what time is it in Italian via OGG libraries..
 $SAKURADIR/bin/dimmi $( date  +"sonole %H ee %M minuti " )
-
-#$SAKURADIR/bin/dimmi $( date  +"sonole %H ee %M minuti virgola fratro" )
-
