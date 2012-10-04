@@ -57,6 +57,7 @@ Borrowed code:
 - Dmitry V Golovashkin <Dmitry.Golovashkin@sas.com> for `timeout3`
 - William Stearns <wstearns@pobox.com> (`fanout`, GPL)
 - Synergy FOSS <http://synergy-foss.org/support>
+- Google "upload.py" (Apache license)
 
 Thanks for who believed in me:
 
