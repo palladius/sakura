@@ -21,3 +21,5 @@ t.err
 *.kate-swp
 .pydevproject
 bashrc.d/local.d/*.include
+.autopull
+.autopush
