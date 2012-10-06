@@ -1,0 +1,5 @@
+#!/bin/sh
+
+NAME=${1:-test-instance}
+
+echodo gcutil addinstance $NAME --image projects/google/images/centos-6-v20120912
