@@ -1,0 +1,6 @@
+#!/bin/sh
+
+set -x
+
+sudo python /usr/share/imagebundle/image_bundle.py -r / -o /tmp/ --log_file=/tmp/image_creation.log
+
