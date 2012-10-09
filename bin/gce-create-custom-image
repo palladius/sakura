@@ -3,4 +3,6 @@
 set -x
 
 sudo python /usr/share/imagebundle/image_bundle.py -r / -o /tmp/ --log_file=/tmp/image_creation.log
-
+echo please now find the logs and the tar.gz in /tmp. You might want to try this:
+echo gsutil mb gs://gce-java-image/
+echo gsutil cp /tmp/*.tar.gz gs://gce-java-image/java-image.tar.gz
