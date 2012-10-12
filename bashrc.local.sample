@@ -6,5 +6,6 @@ export SAKURA_BASHRC_LOCAL_CONF_VER=1.0.2
 # This should be in the ~/.bashrc !
 #export SAKURADIR=~/path/to/your/sakura/repo/
 
+export SAKURA_BROWSER=google-chrome
 export SAKURARIC=true
 export SAKURA_USER=YOUR_USERNAME
