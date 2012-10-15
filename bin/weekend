@@ -1,0 +1,12 @@
+#!/bin/bash
+
+# saturday and sunday are 6 and 7
+
+if [[ $(date +%u) -gt 5 ]] ; then
+  #echo weekend
+  exit 0
+else
+  #echo feriale
+  exit 1
+fi
+
