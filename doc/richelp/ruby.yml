@@ -50,8 +50,11 @@ tricks n tips:
   fix permissions:  "find /usr/local/lib/ruby/  -type d -print0 | xargs -0 -s 1000 sudo chmod 755 "
   rails server more clean: "rails server | egrep --line-buffered -v '^Rendered|Load \(' "
   trace_vars: 'trace_var( :$_, proc{|v| pgray "$_ is now #{v}" }) # super cool!'
+  bugs yaml ruby193 in psych:  require 'yaml'; YAML::ENGINE.yamler = 'syck'
 Rails:
   pkgs to make rails work: apt-get install libsqlite3-dev
   camel:    '"active_record".camelize    => "ActiveRecord"'
   tableize: '"RawScaledScorer".tableize  => "raw_scaled_scorers"'
-
+rvm:
+  - rvm use ruby-1.8.7
+  - rvm use ruby-1.9.3
