@@ -122,12 +122,15 @@
     unless ARGV.size > 0
 			# No arguments provided
       #usage "Give me at least 1 argument!"
-			command = "tail -n #{$opts[:tail]} '#{logfile}'"
+			mycommand = "tail -n #{$opts[:tail]} '#{logfile}'"
 			if $opts[:grep]
-				command ="grep --color '#{ $opts[:grep] }' '#{logfile}'"
+				mycommand ="grep --color '#{ $opts[:grep] }' '#{logfile}'"
 			end
-      deb "command: #{command}"
-      lines = `#{command}`
+
+      #puts "RubyVer: #{RUBY_VERSION}"
+      deb "command: #{mycommand}"
+			lines = %x{ #{mycommand} } # doesnt work in ruby1.9!
+			#lines = `#{mycommand}` # doesnt work in ruby1.9!
 			lines.split("\n").each do |line|
         puts remember_color_regex(line) # "Line: #{line}" 
 		  end
@@ -138,7 +141,7 @@
     puts `mkdir -p '#{path}'`
     
     # normal use
-    remember_and_execute_command(command, logfile)
+    remember_and_execute_command(mycommand, logfile)
   end
 
   main()

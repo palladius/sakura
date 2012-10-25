@@ -56,5 +56,6 @@ Rails:
   camel:    '"active_record".camelize    => "ActiveRecord"'
   tableize: '"RawScaledScorer".tableize  => "raw_scaled_scorers"'
 rvm:
-  - rvm use ruby-1.8.7
-  - rvm use ruby-1.9.3
+ _cheat: http://cheat.errtheblog.com/s/rvm/
+ nice commands: 
+  - rvm use --default 1.9.3
