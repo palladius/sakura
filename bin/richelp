@@ -4,11 +4,10 @@ require ENV['SAKURALIB'] + '/ric.rb' # || die( "Can't find $SAKURALIB!")
 require 'yaml' # to parse .yml files
 require 'find'
 
-# Defined in module:
-#$HELP_DIR =  "#{$SAKURADIR}/doc/richelp/"
-
 # local status... this is SOOOOO 80s!
 $some_exception = false
+
+include RicHelpModule
 
 def help(k, value=red('???'), query='', opts = {} )
   a = k.to_s.escape_printf 

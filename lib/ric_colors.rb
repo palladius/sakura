@@ -1,12 +1,10 @@
 #!/usr/bin/env ruby
 
   # PLease forgive me this is going to be obsoleted soon
-  # $Id$
-  
   
 module RicColorsObsolete
   
-$debug_pad_colors = nil # [ '(',')']
+$debug_pad_colors = nil # try: [ '(',')']
 $colors_active = false
 
 $color_db = [
