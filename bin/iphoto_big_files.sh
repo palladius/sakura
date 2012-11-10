@@ -5,6 +5,10 @@
 #   iphoto_big_files.sh 300M -print0
 #   iphoto_big_files.sh 300M -print0
 VER=0.9
+SIZE=${1:-150M}
+shift
+ADDITIONAL_OPTS=$*
+DIR=~/iPhoto\ Library/Masters/
 
 function usage() {
   echo "$0 v$VER"
@@ -23,15 +27,11 @@ More elaborate:
 #iphoto_big_files.sh 60M | while read t ; do mv -n "$t" /Volumes/FreeAgent\ GoFlex\ Drive/important-backups/; done
 
 # cathches '-h', '--help' and much else :(
-if echo "$1" | fgrep -q -- "-h" ; then
+if echo "$SIZE" | fgrep -q -- "-h" ; then
 	usage
 	exit 1
 fi
 
-SIZE=${1:-150M}
-shift
-ADDITIONAL_OPTS=$*
-DIR=~/iPhoto\ Library/Masters/
 echo "# Find big movies in iPhoto dir ($DIR) bigger than $SIZE (additional opts: '$ADDITIONAL_OPTS'):" >&2
 #echo find "$DIR" -iname '*.mov' -size $SIZE
 find "$DIR" -iname '*.mov' -size +$SIZE $ADDITIONAL_OPTS
