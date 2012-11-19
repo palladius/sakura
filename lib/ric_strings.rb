@@ -129,13 +129,13 @@ class String
   end
   
   # serio
-  def start_with? prefix
-    prefix = prefix.to_s
-    self[0, prefix.length] == prefix
-  end
+  #def start_with?(prefix)
+  #  prefix = prefix.to_s
+  #  self[0, prefix.length] == prefix
+  #end
 	alias :starts_with? :start_with?
 	alias :begins_with? :start_with?
-	alias :begin_with? :start_with?
+	alias :begin_with?  :start_with?
   
     # 'abcde' => '*****'
   def asterisks(ch='*')
