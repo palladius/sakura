@@ -23,3 +23,5 @@ t.err
 bashrc.d/local.d/*.include
 .autopull
 .autopush
+.git.autopulled
+.git.autopushed
