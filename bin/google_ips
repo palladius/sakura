@@ -1,0 +1,5 @@
+#!/bin/bash
+
+# See: http://support.google.com/a/bin/answer.py?hl=en&answer=60764
+
+nslookup -q=TXT _netblocks.google.com 8.8.8.8
