@@ -1,3 +1,10 @@
+cool:
+ richelp sakura: help to this one
+ richelp ubuntu: help on how to use Ubuntu
+ 'ls | act': gives you random list of your files
 sakura:
-  help: Welcome to sakura
-  # TODO
+ Synopsys: This is about my Sakura project, which is a Git repo freely available on github to
+  help people like you waste their time on funny scripts :) You can also create your own YAML
+  files if you put it in $SAKURADIR/doc/richelp/. For instance you could add your friends you
+  invited to a party and keep track of invitations, presences and absences and make stats over
+  them then.

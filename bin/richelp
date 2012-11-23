@@ -59,6 +59,7 @@ def init(helpfile)
     $help_opt = helpfile_parse( helpfile) 
     $help_opt.each{ |k1,v1|
       v1.each{ |k2,v2| 
+         k2 = k2.to_s
          $column_length = k2.length if ( k2.length > $column_length )
       } unless special_help_title?(k1)
     }   
