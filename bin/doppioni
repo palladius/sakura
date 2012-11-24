@@ -1,0 +1,48 @@
+#!/bin/sh
+
+DIR=${1:-.}
+#DEBUG=true
+DEBUG=false
+
+################################################################################
+# This program finds all files in the current directrory with the same md5 and it prints them out.
+################################################################################
+
+function debugga() {
+  if $DEBUG ; then
+		echo '#DEB# ' $* >&2
+  fi
+}
+TMPFILE="/tmp/md5z.$USER.$$"
+#DOPPIONIcaTMP_DUPLICATES="/tmp/m5d-duplicates"
+#TMPFILE='./.md5z.list'
+TMP_DUPLICATES='./.md5z.duplicates'
+FIND_OPTS='-not -type l'
+
+	# creao lista degli md5 almeno doppi.
+rm -f $TMPFILE $TMP_DUPLICATES
+# in case its empty..
+touch $TMPFILE $TMP_DUPLICATES
+find "$DIR" $FIND_OPTS | fgrep -v '/.svn/' | while read F; do
+	debugga File "$F" 
+	md5sum "$F" >>$TMPFILE  2>/dev/null
+done
+
+debugga "Creating file with duplicates from dir: '$DIR'"
+cat $TMPFILE|sort|awk '{print $1}'|uniq -c|egrep -v " 1"|awk '{print $2}' >$TMP_DUPLICATES
+
+#debugga "Leggo i file e ti dico cosa ho trovato:"
+
+cat $TMP_DUPLICATES|while read row
+	do
+		echo "  ### MD5: $row ###"
+		fgrep $row $TMPFILE|cut -d" " -f 2-
+		echo
+done
+
+if $DEBUG; then
+	debugga Leaving files where they are for debug.
+else
+	rm -f $TMPFILE $TMP_DUPLICATES
+fi
+
