@@ -34,6 +34,7 @@ See `doc/sakura-samples.txt` for some usage.
 For instant gratification try the following:
 
     richelp ubuntu                                   # shows a richelp of my 'ubuntu' cheatsheet
+    richelp sakura synopsis                          # shows a richelp of my 'sakura' cheatsheet, grepping for 'synopsis'
     ls | act                                         # randomly scrambles the lines! Taken from cat/cat ;)
     ps | rainbow                                     # colors all lines differently
     twice itunes -                                   # lowers volume of iTunes... twice :)
@@ -43,6 +44,7 @@ For instant gratification try the following:
     find . -size +300M | xargs mvto /tmp/bigfiles/   # moves big files to that directory
     alias gp='never_as_root git pull'                # only if u r not root it runs!
     tellme-time                                      # Tells you the time with Riccardo voice in Italian. Brilliant!
+    find-duplicates .                                # Tells you files with same size/MD5 in this directory
 
 ## Credits
 

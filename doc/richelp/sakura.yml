@@ -1,11 +1,20 @@
-cool:
- richelp sakura: help to this one
- richelp ubuntu: help on how to use Ubuntu
- 'ls | act': gives you random list of your files
- duplicates: finds file in the current subtree which are identical
 sakura:
  Synopsys: This is about my Sakura project, which is a Git repo freely available on github to
   help people like you waste their time on funny scripts :) You can also create your own YAML
   files if you put it in $SAKURADIR/doc/richelp/. For instance you could add your friends you
   invited to a party and keep track of invitations, presences and absences and make stats over
   them then.
+samples:
+  'ls | act': 'randomly scrambles the lines! Taken from cat/cat ;)'
+  'ps | rainbow': 'colors all lines differently'
+  'twice itunes -': lowers volume of iTunes... twice :)
+  '10 echo Bart Simpson likes it DRY': tells you this 10 times. Very sarcastic script!
+  'seq 100 | 1suN 7': prints every 7th element of the list
+  zombies: 'prints processes that show zombies (plus funny options to kill them)'
+  'find . -size +300M | xargs mvto /tmp/bigfiles/': moves big files to that directory
+  "alias gp='never_as_root git pull'": only if u r not root it runs!
+  dimmiora: Tells you the time with Riccardo voice in Italian. Brilliant!
+  'echo $PATH | split':                             Splits path on ':'. Amazing innit?
+  richelp sakura: help to this one
+  richelp ubuntu: help on how to use Ubuntu
+  duplicates: finds file in the current subtree which are identical
