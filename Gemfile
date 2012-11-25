@@ -3,7 +3,7 @@
 source 'https://rubygems.org'
 
 # Specify your gem's dependencies in sakura.gemspec
-gemspec
+#gemspec
 
 group :test do
   gem 'rake'
