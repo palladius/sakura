@@ -1,8 +1,8 @@
 #!/bin/bash
 
 VER=1.0a
-GEMS='xmpp4r-simple xmpp4r ric'
-PKGS='vim polygen cowsay'
+GEMS='xmpp4r-simple xmpp4r ric bundler'
+PKGS='vim polygen cowsay ruby rake'
 
 sudo gem install --no-ri --no-rdoc $GEMS
 sudo apt-get install -y $PKGS
