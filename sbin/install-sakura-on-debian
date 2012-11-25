@@ -1,0 +1,10 @@
+#!/bin/bash
+
+VER=1.0a
+GEMS='xmpp4r-simple xmpp4r ric'
+PKGS='vim polygen cowsay'
+
+sudo gem install --no-ri --no-rdoc $GEMS
+sudo apt-get install -y $PKGS
+sudo touch /root/sakura-installed-ver$VER.touch
+echo             sakura-installed-ver$VER.touch
