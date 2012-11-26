@@ -10,8 +10,8 @@ GEMS='xmpp4r-simple xmpp4r ric bundler nokogiri google_drive'
 
 
 # MAIN
+yellow Trying to install $0 v$VER...
 set -x
-echo Trying to install $0 v$VER...
 sudo apt-get install -y $PKGS
 sudo gem install --no-ri --no-rdoc $GEMS
 
