@@ -1,10 +1,17 @@
 #!/bin/bash
 
-VER=1.0a
-GEMS='xmpp4r-simple xmpp4r ric bundler'
+# nothing can fail
+set -e
+
+VER=1.1
+GEMS='xmpp4r-simple xmpp4r ric bundler nokogiri google_drive'
 PKGS='vim polygen cowsay ruby rake'
 
+
+# MAIN
+set -x
 sudo gem install --no-ri --no-rdoc $GEMS
 sudo apt-get install -y $PKGS
+
 sudo touch /root/sakura-installed-ver$VER.touch
 echo             sakura-installed-ver$VER.touch
