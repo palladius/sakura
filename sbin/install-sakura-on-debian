@@ -3,8 +3,9 @@
 # nothing can fail
 set -e
 
-VER=1.4
-PKGS='vim polygen cowsay ruby1.8-dev ruby1.8 ri1.8 rdoc1.8 irb1.8 rake rubygems libxml2 libxml2-dev libxslt1-dev'
+VER=1.4b
+PKGS='vim polygen cowsay ruby1.8-dev ruby1.8 ri1.8 rdoc1.8 irb1.8 rake rubygems libxml2 libxml2-dev libxslt1-dev 
+libxslt-dev libxml2-dev libreadline-ruby1.8 libruby1.8 libopenssl-ruby'
 GEMS='xmpp4r-simple xmpp4r ric bundler nokogiri google_drive'
 
 
