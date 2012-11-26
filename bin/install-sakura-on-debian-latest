@@ -1,0 +1,4 @@
+#!/bin/bash
+
+set -x
+curl 'https://raw.github.com/palladius/sakura/master/sbin/install-sakura-on-debian' | sudo sh
