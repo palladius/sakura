@@ -3,13 +3,14 @@
 # nothing can fail
 set -e
 
-VER=1.2
+VER=1.3
+PKGS='vim polygen cowsay ruby rake rubygems libxml2 libxml2-dev libxslt1-dev'
 GEMS='xmpp4r-simple xmpp4r ric bundler nokogiri google_drive'
-PKGS='vim polygen cowsay ruby rake rubygems'
 
 
 # MAIN
 set -x
+echo Trying to install $0 v$VER...
 sudo apt-get install -y $PKGS
 sudo gem install --no-ri --no-rdoc $GEMS
 
