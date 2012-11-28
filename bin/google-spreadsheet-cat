@@ -1,0 +1,40 @@
+#!/usr/bin/ruby1.8
+
+require "rubygems"
+require "google_drive"
+require "socket"
+
+VER    = '1.1'
+
+# TODO change your account here!
+user       = 'YOUR_USER@gmail.com'                          # Your gmail account
+pass       = 'YOUR_TOKEN_DONT_USE_THE_PASSWORD!'            # GoogleSpreadsheet-specific
+default_id = '0AlCr2c3SCUOjdHZ5aUpxTTQzNGxQRkZCTFNYNUVSMWc' # Your Google Spreadsheet ID
+
+default_worksheet = 0
+doc_id = ARGV[0] rescue default_id
+worksheet_id = ARGV[1].to_i rescue default_worksheet
+url = "https://docs.google.com/a/google.com/spreadsheet/ccc?key=#{doc_id}#gid=#{worksheet_id}"
+
+def usage()
+	$stderr.puts "Usage: #{$0} [spreadhseet_id] [worksheet_id]"
+end
+
+$session = GoogleDrive.login(user,pass)
+
+# First worksheet of
+ws = $session.spreadsheet_by_key(doc_id).worksheets[worksheet_id]
+
+# Gets content of A2 cell.
+#p ws[2, 1]  #==> "hoge"
+
+
+# Dumps all cells.
+$stderr.puts "Dumping document Rows/Cols: #{ws.num_rows}x#{ws.num_cols}x"
+$stderr.puts  "================================================================================"
+ws.rows.each do |row|
+	puts row.join("\t")
+end
+$stderr.puts  "================================================================================"
+$stderr.puts "#For curiosity, take a look here: #{url}"
+
