@@ -1,0 +1,6 @@
+#!/bin/sh
+
+# Riccardo only!
+
+echodo git clone ssh://git@bitbucket.org/palladius/gic.git
+
