@@ -10,8 +10,11 @@ task :default => :test
 namespace :test do
   desc "Run mini tests"
   task :mini => :clean do
-    Dir['test/test_mini*'].each do |file|
+    Dir['test/*.rb'].each do |file|
       system "ruby #{file}"
+    end
+    Dir['test/*.sh'].each do |file|
+      system "#{file}"
     end
   end
 end
