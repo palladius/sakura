@@ -7,6 +7,7 @@ source 'https://rubygems.org'
 
 group :test do
   gem 'rake'
+  gem 'roodi'
 
   platform :ruby do
     gem 'rmagick'
