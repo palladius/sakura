@@ -1,0 +1,7 @@
+#!/bin/bash
+
+  # dice cosa fa poi la fa :-)
+
+(echo -en 'EchoDo: ' ; echoargs -- "$@" )>&2
+
+$@
