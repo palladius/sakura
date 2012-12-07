@@ -1,7 +1,7 @@
 #!/bin/bash
 
-  # dice cosa fa poi la fa :-)
+  # Sakura-simplified version of this amazing script
 
-(echo -en 'EchoDo: ' ; echoargs -- "$@" )>&2
+(echo -en 'SachoDo: ' ; echo "$@" )>&2
 
 $@
