@@ -1,6 +1,13 @@
-#!/bin/sh
+#!/bin/bash
 
 # Riccardo only!
 
-echodo git clone ssh://git@bitbucket.org/palladius/gic.git
+set -u
+set -e
+set -x
 
+echo Installing Ric repo in appropriate dir...
+cd ~/ws
+echodo git clone ssh://git@bitbucket.org/palladius/gic.git
+verde Ok, enjoy Ric.
+yellow 'PS. If you were succesfully able to install my repo, please report it to palladiusbonton@gmail.com with some proof and Ill be glad to pay you some bucks!'
