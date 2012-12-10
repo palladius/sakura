@@ -104,20 +104,8 @@
 		color_cmd
 	end
 
-  def main
-    init
-    path = File.expand_path($myconf[:remember_dir]) # for normal users
-    path = File.expand_path(ENV['SVNHOME'] + "/var/remember/" ) if ENV['SVNHOME'] # for Riccardo
-    logfile = path +"/all"
-    command = ARGV.join ' '
 
-    if ($opts[:edit]) # vi and piositions at end of file
-      remember_and_execute_command("vi + '#{logfile}'", logfile, false)
-      exit 0
-    end
-
-    unless ARGV.size > 0
-	# No arguments provided
+  def show_last_commands(logfile)
 	mycommand = "tail -n #{$opts[:tail]} '#{logfile}'"
 	if $opts[:grep]
 		mycommand ="grep --color '#{ $opts[:grep] }' '#{logfile}'"
@@ -129,14 +117,24 @@
             puts remember_color_regex(line) # "Line: #{line}" 
         end
 	$stderr.puts "# Try also: cat #{logfile}"
+  end
+
+  def main
+    init
+    path = File.expand_path($myconf[:remember_dir]) # for normal users
+    path = File.expand_path(ENV['SVNHOME'] + "/var/remember/" ) if ENV['SVNHOME'] # for Riccardo
+    logfile = path +"/all"
+    command = ARGV.join ' '
+    if ($opts[:edit]) # vi and piositions at end of file
+      remember_and_execute_command("vi + '#{logfile}'", logfile, false)
+      exit 0
+    end
+    unless(ARGV.size > 0) # No arguments provided
+	show_last_commands(logfile)
 	exit 1
     end
- 
-	# Your code goes here...
-	puts `mkdir -p '#{path}'`
-
-	# normal use
-	remember_and_execute_command(mycommand, logfile)
+    puts `mkdir -p '#{path}'`
+    remember_and_execute_command(mycommand, logfile)
   end
 
   main()
