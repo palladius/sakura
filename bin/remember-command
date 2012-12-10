@@ -106,42 +106,37 @@
 
   def main
     init
-    #debug_on 'Just created script, presuming u need some debug. TODO REMOVE ME when everything works!' if $DEBUG
-      # Maybe you may want to check on ARGV
     path = File.expand_path($myconf[:remember_dir]) # for normal users
     path = File.expand_path(ENV['SVNHOME'] + "/var/remember/" ) if ENV['SVNHOME'] # for Riccardo
     logfile = path +"/all"
     command = ARGV.join ' '
 
-    if ($opts[:edit])
-			# vi and piositions at end of file
+    if ($opts[:edit]) # vi and piositions at end of file
       remember_and_execute_command("vi + '#{logfile}'", logfile, false)
       exit 0
     end
 
     unless ARGV.size > 0
-			# No arguments provided
-      #usage "Give me at least 1 argument!"
-			mycommand = "tail -n #{$opts[:tail]} '#{logfile}'"
-			if $opts[:grep]
-				mycommand ="grep --color '#{ $opts[:grep] }' '#{logfile}'"
-			end
-
-      #puts "RubyVer: #{RUBY_VERSION}"
-      deb "command: #{mycommand}"
-			lines = %x{ #{mycommand} } # doesnt work in ruby1.9!
-			#lines = `#{mycommand}` # doesnt work in ruby1.9!
-			lines.split("\n").each do |line|
-        puts remember_color_regex(line) # "Line: #{line}" 
-		  end
-      $stderr.puts "# Try also: cat #{logfile}"
-      exit 1
+	# No arguments provided
+	mycommand = "tail -n #{$opts[:tail]} '#{logfile}'"
+	if $opts[:grep]
+		mycommand ="grep --color '#{ $opts[:grep] }' '#{logfile}'"
+	end
+	deb "command: #{mycommand}"
+	lines = %x{ #{mycommand} } # doesnt work in ruby1.9!
+	#lines = `#{mycommand}` # doesnt work in ruby1.9!
+	lines.split("\n").each do |line|
+            puts remember_color_regex(line) # "Line: #{line}" 
+        end
+	$stderr.puts "# Try also: cat #{logfile}"
+	exit 1
     end
-    # Your code goes here...
-    puts `mkdir -p '#{path}'`
-    
-    # normal use
-    remember_and_execute_command(mycommand, logfile)
+ 
+	# Your code goes here...
+	puts `mkdir -p '#{path}'`
+
+	# normal use
+	remember_and_execute_command(mycommand, logfile)
   end
 
   main()
