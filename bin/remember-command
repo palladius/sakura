@@ -19,8 +19,8 @@
 
   require 'optparse'       # http://ruby.about.com/od/advancedruby/a/optionparser.htm
   require 'socket'  
-	require ENV['SAKURALIB'] + '/ric_colors'
-	require ENV['SAKURALIB'] + '/ric_strings'
+  require ENV['SAKURALIB'] + '/ric_colors'
+  require ENV['SAKURALIB'] + '/ric_strings'
 
   # Program constants, automagically picked up by RicLib
   # More configuration could be written in:
@@ -124,7 +124,7 @@
     path = File.expand_path($myconf[:remember_dir]) # for normal users
     path = File.expand_path(ENV['SVNHOME'] + "/var/remember/" ) if ENV['SVNHOME'] # for Riccardo
     logfile = path +"/all"
-    command = ARGV.join ' '
+    mycommand = ARGV.join ' '
     if ($opts[:edit]) # vi and piositions at end of file
       remember_and_execute_command("vi + '#{logfile}'", logfile, false)
       exit 0
