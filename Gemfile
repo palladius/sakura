@@ -7,7 +7,9 @@ source 'https://rubygems.org'
 
 group :test do
   gem 'rake'
+  # For linting
   gem 'roodi'
+  gem 'nitpick'
 
   platform :ruby do
     gem 'rmagick'
