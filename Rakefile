@@ -8,15 +8,14 @@ task :default => :test
 #end
 
 namespace :test do
-  desc "Run mini tests"
-  task :mini => :clean do
-    Dir['test/*.rb'].each do |file|
-      system "ruby #{file}"
-    end
-    Dir['test/*.sh'].each do |file|
-      system "#{file}"
-    end
-  end
+	desc "Run mini tests"
+	puts 'Rake test being executed...'
+	Dir['test/*.rb'].each do |file|
+		system "ruby #{file}"
+	end
+	Dir['test/*.sh'].each do |file|
+		system "#{file}"
+	end
 end
 
 #begin
