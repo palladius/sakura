@@ -32,6 +32,4 @@ end
 
 #task :test => [:spec]
 
-task :default => :test
-
 #return 0
