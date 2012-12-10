@@ -5,19 +5,19 @@ LOGFILE=/var/log/riccardo/ok.log
 touch "$LOGFILE"
 
 # logs and prints output!
-oklogga() {
-  MSG="$1"
+oklog() {
+	MSG="$1"
 	logger -f "$LOGFILE" -p info -t ok "$MSG"
 }
 
-oklogga "Started with args: '$*'"
+oklog "Started with args: '$*'"
 
 if [ "$1" = '-' ] ; then
  echo 'Called ok with -, assuming STDIN!'	>&2
- oklogga "called from stdin"
+ oklog "called from stdin"
  cat | ricnotify yellow "OK from STDIN '$*'"
  RET=$?
- oklogga "End STDIN RET=$RET for: '$*'" 
+ oklog "End STDIN RET=$RET for: '$*'" 
  exit $RET
 fi
 
@@ -27,7 +27,6 @@ echo "`data` Start '$*'"
 "$@" 2>&1 | tee "$FILE"
 RET=$PIPESTATUS
 
-#echo "DEBUG $?=$? ~RET=$RET PIPESTATUS=$PIPESTATUS"
 MSG=_NONE_
 
 if [ 0 = $RET ] ; then 
@@ -39,5 +38,5 @@ else
 	echo "`data` End (ERR) '$*'"
 	echo "There were some errors which returned: $RET" | ricnotify red "Err with '$*'"
 fi
-oklogga "End $MSG($RET): '$*'"
+oklog "End $MSG($RET): '$*'"
 exit $RET
