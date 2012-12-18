@@ -1,3 +1,3 @@
 
-puts 'testing a test, so mayube its a meta test. OK'
+puts 'Test that shnould FAIL.. (exit 1)'
 exit 1
