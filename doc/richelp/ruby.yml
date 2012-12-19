@@ -41,6 +41,10 @@ gems:
    - sudo gem update --system 
    - sudo gem install firewatir
    - sudo gem install safariwatir"
+ yaml:
+  - require 'set'
+  - require 'yaml'
+  - "puts Set.new([1,2,3,4]).to_yaml"
 heroku:
   push/deploy: git push heroku master  # push/deploy
   remote rake action: "heroku rake db:migrate # executes rake remotely.."
