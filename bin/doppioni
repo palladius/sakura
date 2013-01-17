@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 DIR=${1:-.}
 #DEBUG=true
@@ -25,7 +25,7 @@ rm -f $TMPFILE $TMP_DUPLICATES
 touch $TMPFILE $TMP_DUPLICATES
 find "$DIR" $FIND_OPTS | fgrep -v '/.svn/' | while read F; do
 	debugga File "$F" 
-	md5sum "$F" >>$TMPFILE  2>/dev/null
+	md5sum "$F" >>$TMPFILE  # 2>/dev/null
 done
 
 debugga "Creating file with duplicates from dir: '$DIR'"
