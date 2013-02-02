@@ -1,16 +1,25 @@
 #!/bin/bash
 
-FILE=/tmp/gce-getproject.$$.tmp
 # verify gem jazor has been installed
-if [ -f /usr/bin/jazor ] ; then
-  echo 'jazor found... ok'
-else
-  echo 'jazor not founf. Try this: sudo gem install jazor'
+if [ ! -f /usr/bin/jazor ] ; then
+  echo 'Jazor gem not found. Try this: sudo gem install jazor'
   exit 1
 fi
 
-gcutil getproject --format json > $FILE
-# if no ARGV[1]
-echo 'Project Metadata:'
-jazor $FILE commonInstanceMetadata.items 'map{ |x| x[0] }'
+GCUTIL_JSON="gcutil getproject --format json"
 
+if "$1" -eq 'help' ; then
+	echo "$0 [<METADATA>]"
+	echo " Provides a list of metadata. If you provide the key, it returns the value"
+	exit 1
+fi
+
+if [ "$#" -eq 0 ];then
+  #echo 'no args: listing then'
+  echo 'Project Metadata:'
+  $GCUTIL_JSON | jazor 'commonInstanceMetadata.items.map{|x| x["key"] }.each{|x| print x, "\n" }; "\n"'
+else
+  ARGUMENT="$1"
+  #echo "Looking for arg=$ARGUMENT"
+  $GCUTIL_JSON | jazor 'commonInstanceMetadata.items.map{|x| x["key"]=="'$ARGUMENT'" ? x["value"] : null }.compact()[0]'
+fi
