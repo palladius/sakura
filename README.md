@@ -56,10 +56,11 @@ Many people contributed to it. First place goes obviously to my mum (see below).
 
 Borrowed code:
 
-- Dmitry V Golovashkin <Dmitry.Golovashkin@sas.com> for `timeout3`
-- William Stearns <wstearns@pobox.com> (`fanout`, GPL)
+- Dmitry V Golovashkin <Dmitry.Golovashkin@sas.com>: `timeout3`
+- William Stearns <wstearns@pobox.com>: `fanout`, GPL
 - Synergy FOSS <http://synergy-foss.org/support>
-- Google "upload.py" (Apache license)
+- Google: "upload.py" (Apache license)
+- Micha Niskin <micha@thinkminimo.com>: `jsawk`
 
 Thanks for who believed in me:
 
