@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# @tags: gce, google compute engine, metadata, json, parser
+
 # verify gem jazor has been installed
 if [ ! -f /usr/bin/jazor ] ; then
   echo 'Jazor gem not found. Try this: sudo gem install jazor'
