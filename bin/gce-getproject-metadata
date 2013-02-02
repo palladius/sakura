@@ -10,18 +10,26 @@ fi
 
 GCUTIL_JSON="gcutil getproject --format json"
 
-if "$1" -eq 'help' ; then
+usage() {
 	echo "$0 [<METADATA>]"
-	echo " Provides a list of metadata. If you provide the key, it returns the value"
+	echo " --help: this help"
+	echo " <METADATA>: retrieves value for this metadata Key"
+	echo " --show: retrieves a list of metadata keys"
+	echo "Note. Only the current project is available ATM. To change project, you have to change ~/.gcutil.flags"
 	exit 1
+}
+
+if [ "A$1" = 'A--help' -o "A$1" = 'A-h' ] ; then
+	usage
+fi
+if [ "$#" -eq 0 ];then
+  usage
 fi
 
-if [ "$#" -eq 0 ];then
-  #echo 'no args: listing then'
-  echo 'Project Metadata:'
-  $GCUTIL_JSON | jazor 'commonInstanceMetadata.items.map{|x| x["key"] }.each{|x| print x, "\n" }; "\n"'
+if [ "$1" = '--show' ];then
+  echo 'List of Project Metadata:'
+  $GCUTIL_JSON | jazor 'commonInstanceMetadata.items.map{|x| x["key"] }.each{|x| print "- " + x, "\n" }; "\n"'
 else
   ARGUMENT="$1"
-  #echo "Looking for arg=$ARGUMENT"
   $GCUTIL_JSON | jazor 'commonInstanceMetadata.items.map{|x| x["key"]=="'$ARGUMENT'" ? x["value"] : null }.compact()[0]'
 fi
