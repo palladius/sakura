@@ -1,0 +1,16 @@
+#!/bin/bash
+
+FILE=/tmp/gce-getproject.$$.tmp
+# verify gem jazor has been installed
+if [ -f /usr/bin/jazor ] ; then
+  echo 'jazor found... ok'
+else
+  echo 'jazor not founf. Try this: sudo gem install jazor'
+  exit 1
+fi
+
+gcutil getproject --format json > $FILE
+# if no ARGV[1]
+echo 'Project Metadata:'
+jazor $FILE commonInstanceMetadata.items 'map{ |x| x[0] }'
+
