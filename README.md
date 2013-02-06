@@ -45,6 +45,7 @@ For instant gratification try the following:
     alias gp='never_as_root git pull'                # only if u r not root it runs!
     tellme-time                                      # Tells you the time with Riccardo voice in Italian. Brilliant!
     find-duplicates .                                # Tells you files with same size/MD5 in this directory
+    facter is_google_vm                              # Tells if it's a GCE Virtual Machine
 
 ## Credits
 

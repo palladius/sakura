@@ -1,0 +1,3 @@
+
+echo TEST 80 ruby sak
+export FACTERLIB="$FACTERLIB:$SAKURALIB/facter/"

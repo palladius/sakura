@@ -1,4 +1,6 @@
 # This file tries to keep the changelog in a YMLtastic way! :)
+1.0.5:
+  - facter libs available!
 1.0.4:
   - make install is now possible!
 1.0.0:
