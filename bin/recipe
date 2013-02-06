@@ -1,0 +1,19 @@
+#!/bin/bash
+
+# TODO automcompletion
+# TODO
+
+recipe="$1"
+
+usage() {
+	RECIPEDIR=$SAKURALIB/recipes/
+	echo Recipes: `cd $RECIPEDIR && ls *.recipe`
+}
+if [ "aa$1" = "aa" ] ; then
+	usage
+else
+	echo recipe install for $1:
+	echo PreChecks
+	echo Get code from... needs ruby
+	echo PostChecks
+fi
