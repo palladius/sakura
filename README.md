@@ -67,4 +67,4 @@ Thanks for who believed in me:
 - Enrico "Vector field" Biondini
 - Chris <a href='https://github.com/palladius/sakura/raw/master/sounds/awesome.m4a'>"awesome"</a> Glass (Notice `Awesome.m4a` sound, under Creative Commons)
 - Lucilla "Mum" Gennari for love and support
-- Jeffrey Silverman, my wise colleague
+- Jeffrey Silverman, my wise colleague for wise suggestions

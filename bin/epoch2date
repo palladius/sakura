@@ -1,0 +1,5 @@
+#!/bin/bash
+
+#set -x
+DATE=${1:-0}
+perl -e 'print scalar(localtime('$DATE')), "\n"'
