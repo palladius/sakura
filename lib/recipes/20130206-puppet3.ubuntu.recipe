@@ -1,0 +1,16 @@
+Date: 20130206
+Description: |
+  installs Puppet3 on Ubuntu Lucid
+  and tries to autodetect distro. It is tested on Lucid and Precise
+Name: puppet3
+URL: http://projects.puppetlabs.com/projects/1/wiki/Puppet_Ubuntu
+Prerequisites:
+ - facter lsbdistid | egrep ^Ubuntu$
+Code: <
+  sudo su -
+  echo -e "deb http://apt.puppetlabs.com/ {{facter|lsbdistcodename}} main\ndeb-src http://apt.puppetlabs.com/ {{facter|lsbdistcodename}} main" >> /etc/apt/sources.list.d/puppet.list
+  apt-key adv --keyserver keyserver.ubuntu.com --recv 4BD6EC30
+  apt-get update
+  apt-get install puppet # For the puppet client run:
+Test:
+  puppet --version | egrep ^3\.
