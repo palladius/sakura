@@ -8,6 +8,7 @@ Packets:
   list:     dpkg -l
   installed?:  "dpkg -L request-tracker3.8" 
   purge: dpkg -P <packet_to_be_purged>
+  quale pacchetto ha questo file: dpkg -S /usr/bin/scp
 distro:
   get current:  lsb_release -a
   upgrade:      
