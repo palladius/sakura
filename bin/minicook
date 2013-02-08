@@ -1,4 +1,4 @@
-#!/usr/bin/ruby1.8 -w
+#!/usr/bin/ruby1.8 
 
 =begin
 
@@ -43,24 +43,41 @@ Tries to be more agile, to Get things Done (TM)",
     exit 11
   end
 
+=begin
+
+
+
+  TODO: locks in case many things access it 
+
+=end
 class Recipe
   @prerequisite_checked = false
   @postrequisite_checked = false
 
   def initialize(file)
     @yaml = YAML.load_file(file)
-    puts "Initializing CookBook module #{yellow @yaml['name']}"
+    puts "Initializing CookBook module: #{yellow @yaml['name']}"
     validate
   end
 
+  def check_facter_prerequisites
+    deb 'check facter'
+    if @yaml['prerequisites']['facter']
+      Facter.loadfacts
+      @yaml['prerequisites']['facter'].each do |k,wanted|
+        deb "Checking facter: #{k} => #{wanted}"
+        puts "I have this: #{Facter.send(k)}"
+	puts "I want this: #{wanted}" 
+      end
+    end
+  end
 
   def check_prerequisites
     deb @yaml['prerequisites'].inspect
     # verify FACTER 
-
-    # verify HERE
-
+    check_facter_prerequisites
     # verify MODULES
+    deb 'check module'
     @prerequisite_checked = true
     true
   end
@@ -119,7 +136,7 @@ class Recipe
   end
 
   def validate()
-    necessary_fields = %w{ description prerequisites install test uninstall }
+    necessary_fields = %w{ name description prerequisites install uninstall }
     necessary_fields.each do |key|
       throw "Missing field: '#{key}' in the yaml file!" unless @yaml[key]
     end
@@ -152,6 +169,7 @@ end
 def apply(filename)
    puts("apply: #{azure filename}")
    recipe = Recipe.new(filename)
+   puts recipe.to_s(true) 
    # prerequisites
    pwhite "1. Prerequisites"
    recipe.check_prerequisites
@@ -159,6 +177,8 @@ def apply(filename)
    recipe.install unless $opts[:dryrun]
    pwhite "3. POSTREQUISITES"
    recipe.check_postrequisites
+   pwhite "4. finished, reprinting object just for the craic"
+   puts recipe.to_s(true) 
 end
 
   def real_program

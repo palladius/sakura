@@ -1,11 +1,16 @@
 prechecks:
 prerequisites:
   facter: # needs that facter by KEY equals VALUE
-    lsbdistid: Ubuntu
-code:
+    lsbdistid: Ubuntuzzz
+description: This try to install skype on Ubuntu!
+name: skype
+install:
   here: |
     sudo apt-add-repository "deb http://archive.canonical.com/ $(lsb_release -sc) partner"
     sudo apt-get update && sudo apt-get install skype
-test:
+  test:
+    here:
+      installed on ubuntu: dpkg -l | egrep '^ii  skype'
+uninstall:
   here:
-    installed on ubuntu: dpkg -l | egrep '^ii  skype'
+    sudo apt-get remove skype
