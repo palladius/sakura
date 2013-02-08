@@ -44,6 +44,9 @@ Tries to be more agile, to Get things Done (TM)",
   end
 
 class Recipe
+  @prerequisite_checked = false
+  @postrequisite_checked = false
+
   def initialize(file)
     @yaml = YAML.load_file(file)
     puts "Initializing CookBook module #{yellow @yaml['name']}"
@@ -51,21 +54,35 @@ class Recipe
   end
 
 
-  def prerequisites
+  def check_prerequisites
     deb @yaml['prerequisites'].inspect
     # verify FACTER 
 
     # verify HERE
 
     # verify MODULES
+    @prerequisite_checked = true
+    true
+  end
+
+  def check_postrequisites
+    #deb @yaml['prerequisites'].inspect
+    if test()
+       green "TEST OK!"
+    else
+	pred "Some error in testing => Rolling back"
+	return false
+    end
+    @postrequisite_checked = true
+    true
   end
 
 
   def valid?
-    try
+    begin
 	validate
 	true
-    catch
+    rescue
 	false
     end 
   end
@@ -75,13 +92,37 @@ class Recipe
 
   end
 
-  def test
+  def install
+    # manage code HERE
+    code = @yaml['code'] 
+    # manage code FILE
+    pred code.inspect
+  end
 
+  def name
+    @yaml['name']
+  end
+  def description
+    @yaml['description']
+  end
+
+  def test
+    true
+  end
+
+  def to_s(verbose=true)
+    ret = "MiniBookRecipe(#{name})" 
+    return ret unless verbose
+    ret += "\nName: #{name}"
+    ret += "\nDescription: #{description}"
+    ret
   end
 
   def validate()
-    
-
+    necessary_fields = %w{ description prerequisites install test uninstall }
+    necessary_fields.each do |key|
+      throw "Missing field: '#{key}' in the yaml file!" unless @yaml[key]
+    end
   end
 
 
@@ -113,9 +154,11 @@ def apply(filename)
    recipe = Recipe.new(filename)
    # prerequisites
    pwhite "1. Prerequisites"
-   puts recipe.prerequisites
-   pwhite "2. INSTALL: TODO"
-   pwhite "3. POST"
+   recipe.check_prerequisites
+   pwhite "2. INSTALL "
+   recipe.install unless $opts[:dryrun]
+   pwhite "3. POSTREQUISITES"
+   recipe.check_postrequisites
 end
 
   def real_program

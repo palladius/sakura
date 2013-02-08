@@ -1,11 +1,11 @@
-Date: 20130206
-Description: |
+date: 20130206
+description: |
   installs Puppet3 on Ubuntu Lucid
   and tries to autodetect distro. It is tested on Lucid and Precise
   Puppet 3 is a super cool version of Puppet with nifty new features.
   It can also deploy modules automagically.
 name: puppet-v3
-URL: http://projects.puppetlabs.com/projects/1/wiki/Puppet_Ubuntu
+url: http://projects.puppetlabs.com/projects/1/wiki/Puppet_Ubuntu
 prerequisites:
     facter:
       lsbdistid: Ubuntu
@@ -13,12 +13,20 @@ prerequisites:
       distro is Ubuntu: 'facter lsbdistid | egrep ^Ubuntu$'
     modules:
     - vanilla
-code: 
- here: <
-  sudo su -
-  echo -e "deb http://apt.puppetlabs.com/ {{facter|lsbdistcodename}} main\ndeb-src http://apt.puppetlabs.com/ {{facter|lsbdistcodename}} main" >> /etc/apt/sources.list.d/puppet.list
-  apt-key adv --keyserver keyserver.ubuntu.com --recv 4BD6EC30
-  apt-get update
-  apt-get install puppet # For the puppet client
-Test:
-  puppet --version | egrep ^3\.
+install: 
+  here: |
+    echo -e "deb http://apt.puppetlabs.com/ {{facter|lsbdistcodename}} main\ndeb-src http://apt.puppetlabs.com/ {{facter|lsbdistcodename}} main" >> /etc/apt/sources.list.d/minicook-puppet.list
+    apt-key adv --keyserver keyserver.ubuntu.com --recv 4BD6EC30
+    apt-get update
+    apt-get install puppet # For the puppet client
+  test:
+    here:
+      puppet version 3: -  puppet --version | egrep ^3\.
+uninstall:
+  here: |
+    rm /etc/apt/sources.list.d/minicook-puppet.list
+    apt-get update
+    apt-get remove puppet # For the puppet client
+  test:
+    here:
+      either no puppet or puppet with version 2: which puppet || puppet --version | egrep ^2\.
