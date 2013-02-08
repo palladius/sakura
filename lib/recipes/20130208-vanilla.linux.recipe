@@ -1,0 +1,33 @@
+#############
+# Created with 'minicook generate'
+#############
+date: 20130206
+description: |
+  installs Vanilla Riccardo package
+name: ric-vanilla
+version: 0.9
+#url: not yet
+prerequisites:
+    #facter:
+    #  lsbdistid: Ubuntu
+    #here: 
+    #  distro is Ubuntu: 'facter lsbdistid | egrep ^Ubuntu$'
+    #modules:
+    #- vanilla
+  packages: 
+    - rubygems
+  file: 
+    - /usr/bin/gem
+install: 
+  here: |
+    touch /root/vanilla-minicook-installed.touch
+    gem install ric
+  test:
+    here:
+      vanilla touch file: test -f  /root/vanilla-minicook-installed.touch
+uninstall:
+  here: |
+    rm /root/vanilla-minicook-installed.touch
+  test:
+    here:
+      vanilla touch file: 'test ! -f  /root/vanilla-minicook-installed.touch'
