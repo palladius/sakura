@@ -16,8 +16,10 @@ prerequisites:
     #- vanilla
   packages: 
     - rubygems
+    - git
   file: 
     - /usr/bin/gem
+    - /usr/bin/git
 install: 
   here: |
     touch /root/vanilla-minicook-installed.touch
