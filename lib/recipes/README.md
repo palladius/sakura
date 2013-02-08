@@ -20,7 +20,7 @@ This requires facter
  $ sudo gem install facter
  $ git clone https://github.com/palladius/sakura/
  $ sakura/bin/minicook list
- $ sakura/bin/minicook deploy puppet3
+ $ sakura/bin/minicook apply puppet3
 
 TODO
 ----

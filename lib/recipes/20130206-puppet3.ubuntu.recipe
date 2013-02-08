@@ -4,11 +4,15 @@ Description: |
   and tries to autodetect distro. It is tested on Lucid and Precise
   Puppet 3 is a super cool version of Puppet with nifty new features.
   It can also deploy modules automagically.
-Name: puppet-v3
+name: puppet-v3
 URL: http://projects.puppetlabs.com/projects/1/wiki/Puppet_Ubuntu
 prerequisites:
-  here: 
-    distro is Ubuntu: 'facter lsbdistid | egrep ^Ubuntu$'
+    facter:
+      lsbdistid: Ubuntu
+    here: 
+      distro is Ubuntu: 'facter lsbdistid | egrep ^Ubuntu$'
+    modules:
+    - vanilla
 code: 
  here: <
   sudo su -

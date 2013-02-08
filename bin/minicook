@@ -15,6 +15,8 @@
 =end
 
   require 'optparse'       # http://ruby.about.com/od/advancedruby/a/optionparser.htm
+  require 'yaml'
+  require 'facter'
   
   require ENV['SAKURADIR'] + '/lib/ric.rb'
 
@@ -27,39 +29,93 @@
     :description         => "This is a minimal configuration manager for Linux, inspired by Chef and Puppet.
 Tries to be more agile, to Get things Done (TM)",
     :recipes_dir         => ENV['SAKURADIR'] + '/lib/recipes/',
+    :available_commands  => %w{apply help list} ,
   }
 
   $PROG_VER = '0.1.1'
   $DEBUG    = false
 
   def usage(comment=nil)
-    puts "#{$0} v.#{$PROG_VER}"
-    puts "Usage: #{File.basename $0} [-dhjv] [-l LOGFILE] <FOO> <BAR>"
-    deb $opts
+    puts $optparse.banner
+    puts $optparse.summarize
     pred comment if comment
     puts "Description: #{ $myconf[:description] }"
     exit 11
   end
 
+class Recipe
+  def initialize(file)
+    @yaml = YAML.load_file(file)
+    puts "Initializing CookBook module #{yellow @yaml['name']}"
+    validate
+  end
+
+
+  def prerequisites
+    deb @yaml['prerequisites'].inspect
+    # verify FACTER 
+
+    # verify HERE
+
+    # verify MODULES
+  end
+
+
+  def valid?
+    try
+	validate
+	true
+    catch
+	false
+    end 
+  end
+
+
+  def execute
+
+  end
+
+  def test
+
+  end
+
+  def validate()
+    
+
+  end
+
+
+end
+
 # include it in main if you want a custome one
 def init()    # see lib_autoinit in lib/util.rb
   $opts = {}
-  optparse = OptionParser.new do |opts|
-    opts.banner = "#{$0} v.#{$PROG_VER}\n Usage: #{File.basename $0} [list|apply] [recipe] ..."
+  $opts[:recipes_dir] = $myconf[:recipes_dir]
+  $optparse = OptionParser.new do |opts|
+    opts.banner = "#{$0} v.#{$PROG_VER}\n Usage: #{File.basename $0} [directive] [...]\nDirectives are: #{ $myconf[:available_commands].join(',') }" 
     opts.on( '-d', '--debug', 'enables debug (DFLT=false)' )  {  $opts[:debug] = true ; $DEBUG = true }
     opts.on( '-h', '--help', 'Display this screen' )          {  puts(opts); exit 1 }
-    opts.on( '-j', '--jabba', 'Activates my Jabber powerful CLI' ) {  $opts[:jabba] = true  }
     opts.on( '-n', '--dryrun', "Don't really execute code" ) { $opts[:dryrun] = true }
-    opts.on( '-l', '--logfile FILE', 'Write log to FILE' )    {|file| $opts[:logfile] = file }
+    opts.on( '-l', '--recipes-dir DIR', 'Recipes dir from DIR (dflt:)' )    {|dir| $opts[:recipes_dir] = dir }
     opts.on( '-v', '--verbose', 'Output more information' )   { $opts[:verbose] = true}
   end
-  optparse.parse!  
+  $optparse.parse!  
 end
 
 def list(dir)
-  puts Dir.list(dir)
+  files = Dir.glob("#{dir}/*.recipe")
+  puts files.join("\n")
+  files
+end
 
-
+def apply(filename)
+   puts("apply: #{azure filename}")
+   recipe = Recipe.new(filename)
+   # prerequisites
+   pwhite "1. Prerequisites"
+   puts recipe.prerequisites
+   pwhite "2. INSTALL: TODO"
+   pwhite "3. POST"
 end
 
   def real_program
@@ -71,12 +127,24 @@ end
     deb("Hello world from a templated '#{yellow $0 }'")
     deb "+ Options are:  #{gray $opts}"
     deb "+ Depured args: #{azure ARGV}"
-    deb "+ Your configuration: #{purple $myconf}"
-    
-    deb "PS Please find me in " + yellow("#{__FILE__}")
-    # Your code goes here...
-    puts "Hello world from #{$myconf[:app_name]}!"
-    puts "Description: #{ $myconf[:description] }"
+    deb "+ Your configuration: #{purple $myconf.inspect}"
+    directive = ARGV[0]
+    case directive
+      #when 1..5
+      #  puts "Its between 1 and 5"
+      when 'apply'
+        apply(ARGV[1])
+      when ''
+      when nil
+        usage('give me at least one argument!')
+      when 'help'
+        usage
+      when 'list'
+        list($opts[:recipes_dir])
+      else
+        puts "You gave me unknown directive ('#{directive}') -- I have no idea what to do with that."
+        exit 1
+    end
   end
 
   def main()
