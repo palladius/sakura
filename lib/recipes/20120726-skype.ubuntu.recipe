@@ -1,9 +1,11 @@
-
 prechecks:
-Prerequisites:
-  architecture: Ubuntu
-code: |
-  sudo apt-add-repository "deb http://archive.canonical.com/ $(lsb_release -sc) partner"
-  sudo apt-get update && sudo apt-get install skype
+prerequisites:
+  facter: # needs that facter by KEY equals VALUE
+    lsbdistid: Ubuntu
+code:
+  here: |
+    sudo apt-add-repository "deb http://archive.canonical.com/ $(lsb_release -sc) partner"
+    sudo apt-get update && sudo apt-get install skype
 test:
-  dpkg -l | egrep '^ii  skype'
+  here:
+    installed on ubuntu: dpkg -l | egrep '^ii  skype'

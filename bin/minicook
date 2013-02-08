@@ -1,0 +1,87 @@
+#!/usr/bin/ruby1.8 -w
+
+=begin
+
+  ############################################################
+  @author:    Riccardo Carlesso
+  @email:     riccardo.carlesso@gmail.com
+  @maturity:  development
+  @language:  Ruby
+  @synopsis:  Brief Description here
+  @tags:      development, rcarlesso, test
+  @description: See description 
+ ############################################################
+
+=end
+
+  require 'optparse'       # http://ruby.about.com/od/advancedruby/a/optionparser.htm
+  
+  require ENV['SAKURADIR'] + '/lib/ric.rb'
+
+  # Program constants, automagically picked up by RicLib
+  # More configuration could be written in:
+  #    $SVNHOME/etc/ricsvn/<FILENAME>.yml
+  # That would go into the variable '$prog_conf_d'
+  $myconf = {
+    :app_name            => "minicook",
+    :description         => "This is a minimal configuration manager for Linux, inspired by Chef and Puppet.
+Tries to be more agile, to Get things Done (TM)",
+    :recipes_dir         => ENV['SAKURADIR'] + '/lib/recipes/',
+  }
+
+  $PROG_VER = '0.1.1'
+  $DEBUG    = false
+
+  def usage(comment=nil)
+    puts "#{$0} v.#{$PROG_VER}"
+    puts "Usage: #{File.basename $0} [-dhjv] [-l LOGFILE] <FOO> <BAR>"
+    deb $opts
+    pred comment if comment
+    puts "Description: #{ $myconf[:description] }"
+    exit 11
+  end
+
+# include it in main if you want a custome one
+def init()    # see lib_autoinit in lib/util.rb
+  $opts = {}
+  optparse = OptionParser.new do |opts|
+    opts.banner = "#{$0} v.#{$PROG_VER}\n Usage: #{File.basename $0} [list|apply] [recipe] ..."
+    opts.on( '-d', '--debug', 'enables debug (DFLT=false)' )  {  $opts[:debug] = true ; $DEBUG = true }
+    opts.on( '-h', '--help', 'Display this screen' )          {  puts(opts); exit 1 }
+    opts.on( '-j', '--jabba', 'Activates my Jabber powerful CLI' ) {  $opts[:jabba] = true  }
+    opts.on( '-n', '--dryrun', "Don't really execute code" ) { $opts[:dryrun] = true }
+    opts.on( '-l', '--logfile FILE', 'Write log to FILE' )    {|file| $opts[:logfile] = file }
+    opts.on( '-v', '--verbose', 'Output more information' )   { $opts[:verbose] = true}
+  end
+  optparse.parse!  
+end
+
+def list(dir)
+  puts Dir.list(dir)
+
+
+end
+
+  def real_program
+    debug_on 'Just created script, presuming u need some debug. TODO REMOVE ME when everything works!' if $DEBUG
+      # Maybe you may want to check on ARGV
+    # unless ARGV.size == 2
+    #   usage "Give me 2 arguments!" 
+    # end
+    deb("Hello world from a templated '#{yellow $0 }'")
+    deb "+ Options are:  #{gray $opts}"
+    deb "+ Depured args: #{azure ARGV}"
+    deb "+ Your configuration: #{purple $myconf}"
+    
+    deb "PS Please find me in " + yellow("#{__FILE__}")
+    # Your code goes here...
+    puts "Hello world from #{$myconf[:app_name]}!"
+    puts "Description: #{ $myconf[:description] }"
+  end
+
+  def main()
+    init
+    real_program 
+  end
+
+main

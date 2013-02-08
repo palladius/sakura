@@ -45,6 +45,19 @@ gems:
   - require 'set'
   - require 'yaml'
   - "puts Set.new([1,2,3,4]).to_yaml"
+flow control:
+  switch case: |
+   See this:
+     case myvar
+       when 1..5
+        puts "Its between 1 and 5"
+       when 6
+        puts "Its 6"
+       when String
+        puts "You passed a string"
+       else
+        puts "You gave me #{a} -- I have no idea what to do with that."
+     end
 heroku:
   push/deploy: git push heroku master  # push/deploy
   remote rake action: "heroku rake db:migrate # executes rake remotely.."

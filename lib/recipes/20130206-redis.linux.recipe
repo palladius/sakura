@@ -1,0 +1,17 @@
+##########################################################
+# this recipe installs redis on a generic linux machine
+##########################################################
+date: 20130208
+description: installs Redix on any Linux Machine
+name: redis-from-sources
+url: "http://redis.io/download"
+prerequisites:
+  facter: 
+    lsbdistid: Ubuntu
+    kernel: Linux
+code: 
+  file: sh scripts/redis.sh
+tests:
+  here:
+    process working: 'ps aux | grep redis'
+    file exists:     '[ -f redis-*/src/redis-server ]'
