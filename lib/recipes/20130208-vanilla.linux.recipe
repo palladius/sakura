@@ -24,6 +24,8 @@ install:
   here: |
     touch /root/vanilla-minicook-installed.touch
     gem install ric
+  gems:
+    - ric
   test:
     here:
       vanilla touch file: test -f  /root/vanilla-minicook-installed.touch

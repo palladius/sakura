@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
 
 class String
+  include RicDebug
 
   def basename
     split('/').last

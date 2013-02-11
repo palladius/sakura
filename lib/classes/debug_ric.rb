@@ -1,4 +1,27 @@
 
+
+# copied from Mixins in Programming ruby book, pag 119
+
+module RicDebug
+  puts "DEBUG: including module RicDebug, as a mixin within #{self.class}"
+
+  def whoami?
+    "#{self.class.name} (\##{self.object_id}): #{self}"
+  end
+
+  def trace()
+    puts "== Riccardo Debug Trace program (excuse verboity) =="
+    puts "File: #{__FILE__}"
+    #TODO put verbose context like call stack, ...  
+  end
+
+  def to_verbose_s()
+    whoami?
+  end
+end
+
+
+
 ################################################################################################################
 # DEBUG AND ERRORS
 ################################################################################################################
@@ -171,4 +194,3 @@ private
     #puts "$_debug_tags: #{$_debug_tags} (#{$_debug_tags.map{|x| x.class}})"
     deb "_manage_debug_tags(): new tags are: #{$_debug_tags}", :tag => :debug
   end
-

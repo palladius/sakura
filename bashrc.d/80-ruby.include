@@ -1,2 +1,4 @@
 
 export FACTERLIB="$FACTERLIB:$SAKURALIB/facter/"
+
+alias irb-sakura="echodo irb -r $SAKURALIB/ric.rb"
