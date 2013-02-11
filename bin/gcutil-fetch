@@ -1,0 +1,36 @@
+#!/bin/bash
+
+# Author: A. Iurlano
+
+# run this as normal user, with bash shell
+
+GZNAME=`curl -s https://developers.google.com/compute/docs/gcutil/  | grep -o 'https://code.google.com/p/google-compute-engine-tools/downloads/detail?name=gcutil-[^"]*.tar.gz'| grep -o 'gcutil.*'`
+
+GCURL='https://google-compute-engine-tools.googlecode.com/files/'${GZNAME}
+
+#echo ${GCURL} 
+#echo ${GZNAME}
+
+cd /usr/local/
+
+sudo wget -c ${GCURL} -O ${GZNAME}
+
+sudo tar zxvf ${GZNAME}
+
+export FOLDERNAME=${GZNAME:0:$((${#GZNAME}-7))}
+
+sudo rm -f /usr/local/gcutil
+sudo ln -sf /usr/local/${FOLDERNAME} /usr/local/gcutil
+
+#check if it was added to the path
+grep -q '/usr/local/gcutil' ~/.bashrc 
+if [ $? -ne 0 ]; then
+  cat <<EOF >> ~/.bashrc
+
+export PATH=/usr/local/gcutil:\${PATH}
+
+EOF
+  echo "Warning: Your .bashrc file was modified."
+  echo "         Remember to do . ~/.bashrc or logout and login back in"
+fi
+

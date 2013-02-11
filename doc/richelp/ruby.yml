@@ -12,6 +12,8 @@ Arrays:
  flatten: 'flattens [ [a,b],c] into [a,b,c]'
  compact: removes nil (not to confuse with flatten)
  include?: '%%w[ jan feb march].include?("feb") = true'
+File and Directories:
+ glob: Dir.glob("config.?")                #=> ["config.h"]
 rails views:
  ComboBox on model:  ' collection_select("role", "user_id", User.find(:all, :order => "username") , :id, :username , :include_blank => true )  '
 rails generators:
@@ -45,6 +47,7 @@ gems:
   - require 'set'
   - require 'yaml'
   - "puts Set.new([1,2,3,4]).to_yaml"
+  - YAML.load_file('some.yml')
 flow control:
   switch case: |
    See this:
