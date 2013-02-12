@@ -13,7 +13,7 @@ GCURL='https://google-compute-engine-tools.googlecode.com/files/'${GZNAME}
 
 cd /usr/local/
 
-sudo wget -c ${GCURL} -O ${GZNAME}
+sudo -E wget -c ${GCURL} -O ${GZNAME}
 
 sudo tar zxvf ${GZNAME}
 
@@ -31,6 +31,6 @@ export PATH=/usr/local/gcutil:\${PATH}
 
 EOF
   echo "Warning: Your .bashrc file was modified."
-  echo "         Remember to do . ~/.bashrc or logout and login back in"
+  echo "         Remember to do . ~/.bashrc or logout and log back in"
 fi
 
