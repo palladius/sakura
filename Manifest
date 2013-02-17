@@ -145,7 +145,6 @@ bin/tail-n+2
 bin/tellme
 bin/tellme-time
 bin/timeout3
-bin/tmpfile
 bin/top5
 bin/trim
 bin/trova-broken-symlink
@@ -170,6 +169,18 @@ bin/whitefy
 bin/yellow
 bin/yellowfy
 bin/zombies
+docz/polygen/dell.grm
+docz/polygen/frati.grm
+docz/polygen/heanet.grm
+docz/richelp/gcompute.yml
+docz/richelp/gcutil.yml
+docz/richelp/gmail.yml
+docz/richelp/ruby.yml
+docz/richelp/sakura.yml
+docz/richelp/sql.yml
+docz/richelp/ubuntu.yml
+docz/richelp/yaml.yml
+docz/richelp/yml.yml
 etc/sakura/devel.yml
 etc/synergy.conf.example
 images/color-sample.png
@@ -201,6 +212,7 @@ lib/sonice-players/itunes_win.rb
 lib/sonice-players/mpd.rb
 lib/sonice-players/rhythmbox.rb
 profile
+sakuric.gemspec
 sbin/install-sakura-on-debian
 sbin/make-install.sh
 sbin/mate-createsymlink
