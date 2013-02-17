@@ -1,6 +1,9 @@
 
 #################
 # Deploy the gem 'sakuric'
+
+version = File.read( 'VERSION' ) rescue "0.0.42_sakbug"
+
 Echoe.new('sakuric', version ) do |p|
   p.description    = "My SAKURA gem with various utilities. This is my swiss-army knife for Linux and Mac. See README.md for amazing examples"
   p.url            = "http://github.com/palladius/sakura"

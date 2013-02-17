@@ -90,7 +90,6 @@ bin/iphoto_big_files.sh
 bin/itunes
 bin/jason-xpath.rb
 bin/jsawk
-bin/jsawk-scaricato
 bin/json-xpath.rb
 bin/keepup
 bin/lsof-top10
@@ -188,6 +187,7 @@ images/google.jpg
 images/icons/toilet.png
 images/sakura.jpg
 images/sakura2.jpg
+init.rb
 lib/classes/arrays.rb
 lib/classes/debug_ric.rb
 lib/classes/fake_data.rb
@@ -393,6 +393,8 @@ sounds/unquarto.ogg
 sounds/virgola.ogg
 sources/c/usleep.c
 spec/my_first_spec.rb
+tasks/sakuric-gem.rake
+tasks/testing.rake
 templates/bashrc.inject
 templates/happy_christmas.ascii_art
 test/roodi.sh
