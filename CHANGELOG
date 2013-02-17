@@ -1,0 +1,13 @@
+# Should be parsed automagically by echoe gem :)
+# This file tries to keep the changelog in a YMLtastic way! :)
+2.0.0a. Made a ruby gem called 'sakuric'
+
+1.0.5. facter libs available!
+
+1.0.4. make install is now possible!
+
+1.0.0. Added ruby library to support my "richelp"
+
+0.9.7. Silented the debug phrase
+
+0.9.3. Changed heavily the bashrc!

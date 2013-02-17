@@ -1,11 +1,28 @@
 require 'rake'
+require 'echoe'
 
 desc "Run tests hypothetically"
 task :default => :test
 
-#Rake::TestTask.new do |t|
-# t.libs << 'test'
-#end
+version = File.read( 'VERSION' ) rescue "0.0.42_sakbug"
+
+#################
+# Deploy the gem 'sakuric'
+Echoe.new('sakuric', version ) do |p|
+  p.description    = "My SAKURA gem with various utilities. This is my swiss-army knife for Linux and Mac. See README.md for amazing examples"
+  p.url            = "http://github.com/palladius/sakura"
+  p.author         = "Riccardo Carlesso"
+  p.email          = "['p','ll','diusbonton].join('a') @ gmail.com"
+  p.ignore_pattern = [
+    "tmp/*", 
+    "tmp/*", #"tmp/*/*", "tmp/*/*/*",
+    "private/*",
+    ".noheroku",
+    '.travis.yml',
+  ]
+  p.development_dependencies = [ 'ric','echoe' ]
+  p.runtime_dependencies     = [ 'ric' ]
+end
 
 namespace :test do
 	desc "Run mini tests"
@@ -18,17 +35,3 @@ namespace :test do
 	end
 end
 
-#begin
-#  require 'rspec/core/rake_task'             
-#rescue LoadError
-#  require 'rubygems'
-#  retry
-#end
-
-#RSpec::Core::RakeTask.new(:spec) do |t|
-#  t.pattern = 'spec/*_spec.rb'
-#end
-
-#task :test => [:spec]
-
-#return 0

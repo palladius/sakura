@@ -2,8 +2,8 @@
 
 source 'https://rubygems.org'
 
-# Specify your gem's dependencies in sakura.gemspec
-#gemspec
+gem 'echoe'
+gem 'ric'
 
 group :test do
   gem 'rake'
