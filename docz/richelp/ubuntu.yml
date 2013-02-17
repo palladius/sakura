@@ -18,5 +18,6 @@ distro:
 Debian:
   ifdownup: 'sleep 5 | ifdown eth0 && ifup eth0'
   remove everything with Graphics: apt-get --purge remove liborbit2 
+  dpkg nazi: wrap dpkg with '-o Dpkg::Options::="--force-confnew"' and -y at the end
 Gnome:
   Torvalds suggests this: sudo apt-get install gnome-tweak-tool
