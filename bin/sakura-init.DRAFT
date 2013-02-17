@@ -1,4 +1,4 @@
-
+#!/bin/bash
 
 echo Make sure the bashrc is patched. If the bashrc.inject is not, inject it.
 echo if the .local is not existing, offer to copy it and patch it with current DIR and current user... maybe with a .erb template.

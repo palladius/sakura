@@ -1,5 +1,4 @@
+#!/bin/bash
 
 # removes the first line from STDIN!
-
-tail -n +2 
-
+echodo tail -n +2 

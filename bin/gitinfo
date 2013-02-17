@@ -1,2 +1,3 @@
+#!/bin/bash
 
 echodo "cat .git/config"
