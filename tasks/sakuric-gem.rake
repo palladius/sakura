@@ -9,6 +9,9 @@ Echoe.new('sakuric', version ) do |p|
   p.url            = "http://github.com/palladius/sakura"
   p.author         = "Riccardo Carlesso"
   p.email          = "['p','ll','diusbonton].join('a') @ gmail.com"
+  #  So I can't accidentally ship with without certificate! Yay!
+  # See: http://rubydoc.info/gems/echoe/4.6.3/frames
+  p.require_signed = true
   p.ignore_pattern = [
     "tmp/*", 
     "tmp/*", #"tmp/*/*", "tmp/*/*/*",
@@ -16,6 +19,6 @@ Echoe.new('sakuric', version ) do |p|
     ".noheroku",
     '.travis.yml',
   ]
-  p.development_dependencies = [ 'ric','echoe' ]
+  #p.development_dependencies = [ 'ric','echoe' ]
   p.runtime_dependencies     = [ 'ric' ]
 end

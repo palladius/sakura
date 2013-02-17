@@ -1,5 +1,7 @@
 # Should be parsed automagically by echoe gem :)
 # This file tries to keep the changelog in a YMLtastic way! :)
+2.0.2. Signed the gem!
+
 2.0.0a. Made a ruby gem called 'sakuric'
 
 1.0.5. facter libs available!
