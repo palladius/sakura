@@ -27,3 +27,4 @@ bashrc.d/local.d/*.include
 .git.autopushed
 
 bin/geo-ip-city.sh
+doc
