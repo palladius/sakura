@@ -3,3 +3,6 @@ Do the following:
 
   cat templates/bashrc.inject  >> ~/.bashrc
 
+Or also
+
+  sudo gem install sakuric    # sakura was already taken :-(

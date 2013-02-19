@@ -39,13 +39,8 @@ For instant gratification try the following:
     ps | rainbow                                     # colors all lines differently
     twice itunes -                                   # lowers volume of iTunes... twice :)
     10 echo Bart Simpson likes it DRY                # tells you this 10 times. Very sarcastic script!
-    seq 100 | 1suN 7                                 # prints every 7th element of the list
-    zombies                                          # prints processes that show zombies (plus funny options to kill them)
-    find . -size +300M | xargs mvto /tmp/bigfiles/   # moves big files to that directory
-    alias gp='never_as_root git pull'                # only if u r not root it runs!
-    tellme-time                                      # Tells you the time with Riccardo voice in Italian. Brilliant!
-    find-duplicates .                                # Tells you files with same size/MD5 in this directory
-    facter is_google_vm                              # Tells if it's a GCE Virtual Machine
+    ...
+    # See `docz/CHEATSHEET` for more!
 
 ## Credits
 
