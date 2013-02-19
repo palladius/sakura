@@ -5,12 +5,14 @@
 version    = File.read( 'VERSION' )       # shouldnt rescue at all, should fail :)
 cheatsheet = File.read('docz/CHEATSHEET') rescue "_COULDNT_FIND_DOCZ_CHEATSHEET"
 
+# GEM NAMES to iterate for
+GEMNAMES = %w{ sakuric sakura sakuruby }
 GEM_NAMES = %w{sakuric sakura}
 GEM_NAMES.each do |gemname|
   Echoe.new(gemname, version ) do |p|
     p.summary        = "My SAKURA gem. See http://github.com/palladius/sakura"
+    p.summary        = "My SAKURA gem. See http://github.com/palladius/sakura"
     p.description    = "My SAKURA gem with various utilities. This is my swiss-army knife for Linux and Mac. See README.md for amazing examples, like:
-  
   #{cheatsheet}
     "
     p.url            = "http://github.com/palladius/sakura"
@@ -20,13 +22,16 @@ GEM_NAMES.each do |gemname|
     # See: http://rubydoc.info/gems/echoe/4.6.3/frames
     p.require_signed = true
     p.ignore_pattern = [
+      "*.gemspec",
       "tmp/*", #"tmp/*/*", "tmp/*/*/*",
       "private/*",
-      "*.gemspec",
       ".noheroku",
       '.travis.yml',
     ]
     #p.development_dependencies = [ 'ric','echoe' ]
-    p.runtime_dependencies     = [ 'ric' ]
+    p.runtime_dependencies     = [ 
+      'ric',     # cos its mine and it comes in handy for colors and stuff! :)
+      #'pelusa'  for Linting
+    ]
   end
 end
