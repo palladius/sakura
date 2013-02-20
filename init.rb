@@ -4,5 +4,5 @@
 
 #require 'sakuric'
 
-require 'lib/sakuric'
+require File.expand_path(File.dirname(__FILE__) + '/lib/init.rb' ) 
 

@@ -1,15 +1,11 @@
+########################################################################
 # This file tries to keep the changelog in a YMLtastic way! :)
-2.0.4:
-  - Refactored cheatsheet
-2.0.0:
-  - Made a ruby gem called 'sakuric'. See tasks/sakuric-gem.rake
-1.0.5:
-  - facter libs available!
-1.0.4:
-  - make install is now possible!
-1.0.0:
-  - Added ruby library to support my "richelp"
-0.9.7:
-  - Silented the debug phrase
-0.9.3:
-  - Changed heavily the bashrc!
+########################################################################
+2.0.5: 20130220 Refactored lib/ in ruby. God how shitty it was before! :)
+2.0.4: Refactored cheatsheet
+2.0.0: Made a ruby gem called 'sakuric'. See tasks/sakuric-gem.rake
+1.0.5: facter libs available!
+1.0.4: make install is now possible!
+1.0.0: Added ruby library to support my "richelp"
+0.9.7: Silented the debug phrase
+0.9.3: Changed heavily the bashrc!

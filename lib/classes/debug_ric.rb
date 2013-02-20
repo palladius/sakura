@@ -3,7 +3,7 @@
 # copied from Mixins in Programming ruby book, pag 119
 
 module RicDebug
-  puts "DEBUG: including module RicDebug, as a mixin within #{self.class}"
+  #$stderr.puts "DEBUG: including module RicDebug, as a mixin within #{self.class}"
 
   def whoami?
     "#{self.class.name} (\##{self.object_id}): #{self}"
@@ -19,7 +19,6 @@ module RicDebug
     whoami?
   end
 end
-
 
 
 ################################################################################################################
