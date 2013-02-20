@@ -3,12 +3,13 @@ module Sakuric
   #print "[DEBUG] Including sakura.Sakuric"
   $SAKURA_DFLTDIR = '~/git/sakura/'
   $VERSION        = 'TBD_from($DIR/VERSION)'
+  SCRIPT_BEGUN    = Time.now
   
-  def self.version
-    $VERSION = File.read(File.expand_path(sakuric_dir() + '/VERSION')) # reads version file
+  def self.VERSION
+    $VERSION = File.read(File.expand_path(BASEDIR() + '/VERSION')) # reads version file
   end
   
-  def self.sakuric_dir
+  def self.BASEDIR
     File.expand_path(File.dirname(__FILE__) + '/..')
   end
   

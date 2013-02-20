@@ -9,8 +9,8 @@
 require File.expand_path(File.dirname(__FILE__) + '/sakuric')
 
 #$SAKURA_DFLTDIR = '~/git/sakura/'
-$SAKURADIR      = Sakuric.sakuric_dir # File.expand_path(ENV['SAKURADIR'] || $SAKURA_DFLTDIR)
-$RICLIB_VERSION = Sakuric.version()
+$SAKURADIR      = Sakuric.BASEDIR # File.expand_path(ENV['SAKURADIR'] || $SAKURA_DFLTDIR)
+$RICLIB_VERSION = Sakuric.VERSION
 
 #DOESNT work on some machines! Nescio cur! require 'rubygems'     # necessary for other gems
 require 'digest/md5'
@@ -47,7 +47,7 @@ def reload_doesnt_work_properly!(first_time=false,enable_debug=false)
   $RELOADED_ONCE += 1
   npass = $RICLIB['nreloaded']
   if npass > 1
-    $stderr.puts "[ERR] More than first pass (#{npass}): Should be quitting checcacchio!"
+    $stderr.puts "[ERR] More than first pass (pass=#{npass}): Should be quitting checcacchio!"
     #return 
   end
   debug_on("reload_doesnt_work_properly called with debug enabled!") if enable_debug
@@ -58,6 +58,7 @@ def reload_doesnt_work_properly!(first_time=false,enable_debug=false)
     was_necessary = require "#{$SAKURADIR}/lib/#{cls}.rb"
     deb "Pass[#{npass}] Loading: #{cls} (necessary: #{was_necessary})" rescue puts("nil #{$!}")
   }
+  npass += 1
 end
 
 
@@ -67,18 +68,25 @@ end
   
   $RELOAD_DEBUG serve a debuggare il tutto.
 =end
-def _init(explaination='no explaination given')
+def _init(explaination='no explaination given', initial_debug_state = false)
   $RELOAD_DEBUG = false # 
   deb "pre init '#{explaination}'" if $RELOAD_DEBUG
-  $SCRIPT_BEGUN = Time.now
-  $USER          = 'riccardo'
+  #$USER          = 'riccardo'
   $INIT_DEBUG    = false   # dice se debuggare la mia intera infrastruttura o no...
   $RELOADED_ONCE = 0    # aiuta a capuire quante volte includo sta cazo di lib! Sempre 2!!!
   $RIC_LIB_MODULES = %w{ classes/debug_ric } # to be explicitly included in this order.
   $HOME  = File.expand_path('~')
-  $DEBUG ||= false 
+  $DEBUG ||= initial_debug_state 
   $PROG  = File.basename($0)
-
+  case $PROG
+    when 'irb'
+      print "[DEB] Welcome to Sakura within IRB! Happy playing. Try 'Sakuric.VERSION'"
+    when 'ruby'
+      print "[DEB] Welcome to Sakura within RUBY! Happy playing. Try 'Sakuric.VERSION'"
+    default
+      # do nothing
+  end
+    
   ################################################################################	
   # Path to riccardo's Library... Library stuff
   $LOAD_PATH << './lib' 

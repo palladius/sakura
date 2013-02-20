@@ -63,6 +63,7 @@ bin/gce-create-custom-image
 bin/gce-curl-get-instances-for-project
 bin/gce-get-token
 bin/gce-getproject-metadata
+bin/gce-instances-and-quotas.py
 bin/gce-public-ip
 bin/gcutil-fetch
 bin/giallo
@@ -122,6 +123,7 @@ bin/run-parts.sh
 bin/sakura-check-version
 bin/sakura-init.DRAFT
 bin/sakura-version
+bin/sakura-version.rb
 bin/sano
 bin/sbianca
 bin/sblua
@@ -168,6 +170,8 @@ bin/whitefy
 bin/yellow
 bin/yellowfy
 bin/zombies
+docz/CHEATSHEET
+docz/gutenberg/dante.txt
 docz/polygen/dell.grm
 docz/polygen/frati.grm
 docz/polygen/heanet.grm
@@ -191,11 +195,11 @@ init.rb
 lib/classes/arrays.rb
 lib/classes/debug_ric.rb
 lib/classes/fake_data.rb
-lib/classes/ric_debug.rb
 lib/classes/ricconf.rb
 lib/classes/richelp.rb
 lib/classes/strings.rb
 lib/facter/google_compute_engine.rb
+lib/init.rb
 lib/recipes/20120411-puppet-rump-palladius.recipe
 lib/recipes/20120726-skype.ubuntu.recipe
 lib/recipes/20130206-puppet3.ubuntu.recipe
@@ -204,13 +208,14 @@ lib/recipes/20130208-vanilla.linux.recipe
 lib/recipes/Makefile
 lib/recipes/README.md
 lib/recipes/scripts/redis.sh
-lib/ric.rb
 lib/ric_colors.rb
 lib/ric_strings.rb
+lib/sakuric.rb
 lib/sonice-players/itunes_mac.rb
 lib/sonice-players/itunes_win.rb
 lib/sonice-players/mpd.rb
 lib/sonice-players/rhythmbox.rb
+lib/version.rb
 profile
 sbin/install-sakura-on-debian
 sbin/make-install.sh
@@ -398,6 +403,7 @@ tasks/testing.rake
 templates/bashrc.inject
 templates/happy_christmas.ascii_art
 test/roodi.sh
+test/sakura-version.rb
 test/test_mini_failing.rb
 test/test_mini_ok.rb
 test/test_ruby_syntax.sh
