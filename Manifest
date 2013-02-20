@@ -217,6 +217,7 @@ lib/sonice-players/mpd.rb
 lib/sonice-players/rhythmbox.rb
 lib/version.rb
 profile
+sakuric.gemspec
 sbin/install-sakura-on-debian
 sbin/make-install.sh
 sbin/mate-createsymlink
