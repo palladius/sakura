@@ -22,7 +22,7 @@ GEM_NAMES.each do |gemname|
     p.ignore_pattern = [
       "tmp/*", #"tmp/*/*", "tmp/*/*/*",
       "private/*",
-      "private/*.gemspec",
+      "*.gemspec",
       ".noheroku",
       '.travis.yml',
     ]
