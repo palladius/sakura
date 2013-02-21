@@ -1,0 +1,11 @@
+sources: lib/**/*.rb
+lints:
+  InstanceVariables:
+    limit: 5
+  LineRestriction:
+    limit: 80
+    exclude:
+      - SomeClass
+  Properties:
+    enabled: false
+
