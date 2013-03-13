@@ -1,0 +1,130 @@
+#
+# TODO build objects in ruby that deserialize from yaml, like Language verbs
+##
+## Lettere strane:
+# é 
+# Umlaut: ä ö ü  Ä  Ö Ü 
+Names:
+ Objekte (objects):
+  Kuli: pen
+  Kugel Schreiber: ball pen (penna a sfera)
+  Schreibtisch: Desk (scrivania)
+  Stuhl: Chair
+  Drucker: Printer
+  'Handy (CH: Natel)': mobile phone
+  Tisch: table
+  Lampe: lamp
+  Tasse: cup
+  Glas / Wasser: glass
+  Flasche (plstik / Glass): bottle
+  Papierkorb: Paper trashbin
+  Uhr: watch / clock / hour
+  Zeitung: Newspaper
+  Tür: door
+  die Wand: wall
+  Fenster: window
+ Dress:
+  Die Schuhe: shoes (_PLURAL)
+  #Masculin
+  der Anzug (Anzuege): suit(s)
+  der Rock (Roecke): skirt
+  der Gürtel (Guertel): belt
+  der Mann: the man
+  der Pulli: the Pullover # also good in German
+  # F 
+  die Bluse: blouse (skirt for woman)
+  die Frau: the girl
+  die Hose: pants
+  # N
+  das Hemd: shirt (man)
+  das Kleid: dress (woman)
+ Food:
+  der Kaffee: coffee
+  der Tee: tea
+  die Zitrone: lemon
+  der Zucker: sugar
+  die Milsch: milk
+  das Brot: bread
+  das Ei (Eier): egg(s)
+  die Wurst: some kind of meat?
+  die Tomate: tomato
+  der Kaese: cheese
+  der Salat: salad
+  das Fischfiler: fish filet (filet is neutrum)
+  die Kartoffeln: potatoes? (_PLURAL)
+  die Suppe: soup
+  das Haehnchen: chicken
+  der Rotwein/Weisswein: red/white wine
+  das Wasser: water
+  das Glas: glass
+  das Bier: beer
+  die Flasche: the bottle
+ City places:
+  - das Hotel
+  - die Schule
+  - das Museum
+  - die post
+  - das theater
+  - die Bank
+  - das Kino
+  - das Café
+  - das Restaurant
+  - der Kiosk
+  - der Parkplatz
+  - der Gärthnerweg
+  - der Taxistand
+  - der Marbachweg
+  - der Weg
+  - die Europa-Allee
+  - die Allee
+  - die Berlinerstrasse
+  - die Strasse
+  - Der Bodensee, Der Zurichsee (= Der See, English - Lake)
+  - Die See (= Der Ozean, Das Mer)
+#RubyObject: VerbList
+#RubyObject VerbList:
+#pronouns: [ Ich, Du, Herr/sie/sobenme , Wer, Ihr, Sie ]
+Verben (Verbs):
+  pronouns:  [ Ich, Du, Herr/sie/er , Wir, Ihr, Sie ]
+  Sein (to be):    [ bin, bist, ist, sind, seid, sind ]
+  Haben (to have): [ habe, hast, hat, haben, habt, haben]
+  Gehen (to go):   [ gehe, gest, get, gehen, gest, gehen] # @TBC
+Partikel (Particelle):
+    Wo:  Where. Wo ist London? Wo ist das katz? Wo treffen wer uns?
+    Wer: Who. Wer ist das (che minchia e)?
+    Wie: How. ???
+    Was: what. Was ist das?
+    Welcher (M): Which. Welcher kontinent ist das?
+    Welche (F):  Which. Welche  stadt ist das?
+    Welches (N): Which. Welches ?!? ist das?
+    Woher: Where from. Woher kommst du?
+Prepositions: [ wo | wer | wie | was | welcher | welche | welcher ]
+Greetings:
+ Name:
+  - Wie heisst du?
+  - Ich heisse Riccardo. Und wie heissen Sie?
+  - Ich heisse Angela. Angela Merkel.
+ Nationalität:
+  - Woher kommst du Riccardo?
+  - Ich bin Italianer / Ich komme aus Bologna, Italien. Und woher kommen Sie?
+  - Ich bin Deutsche. Ich komme aus Bayern, Deutschland.
+  - Welche Nationalitaet hast du?
+  - Ich bin franzosisch. Ich spreche ...
+ how are you:
+  - Wie geht es dir?
+  - Danke, mir geht est gut. Wie geths? 
+  - Mir geht est auch gut. Wie gehts Daniel?
+  - Alles gut
+ work / ?:
+  - Was sind sie von Beruf? (Where do you work?)
+  - Ich arbeit bei Google (I work for Google ) # (Die Firma ist Google)
+  - Was sind Sie von Beruf, Riccardo?
+  - Ich bin [von Beruf] Ingenieur. Und Sie?
+  - Ich bin Arzt (Doktor).
+ please to meet you:
+   - Freut mich.
+   - Mich auch.
+ Spelling:
+  - Die stadt ist Warschau.
+  - Wie schreibt man das?
+  - Das schreibt man W A R S C H A U

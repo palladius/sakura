@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 
-require ENV['SAKURALIB'] + '/ric.rb' # || die( "Can't find $SAKURALIB!")
+require ENV['SAKURALIB'] + '/sakuric.rb' # || die( "Can't find $SAKURALIB!")
 require 'yaml' # to parse .yml files
 require 'find'
 
