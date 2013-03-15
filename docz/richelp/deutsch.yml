@@ -85,10 +85,12 @@ Names:
 #RubyObject VerbList:
 #pronouns: [ Ich, Du, Herr/sie/sobenme , Wer, Ihr, Sie ]
 Verben (Verbs):
-  pronouns:  [ Ich, Du, Herr/sie/er , Wir, Ihr, Sie ]
+ Pronouns:  [ Ich, Du, Herr/sie/er , Wir, Ihr, Sie ]
+ AutoVerben:
   Sein (to be):    [ bin, bist, ist, sind, seid, sind ]
   Haben (to have): [ habe, hast, hat, haben, habt, haben]
   Gehen (to go):   [ gehe, gest, get, gehen, gest, gehen] # @TBC
+  Wurden (to become):  TBD
 Partikel (Particelle):
     Wo:  Where. Wo ist London? Wo ist das katz? Wo treffen wer uns?
     Wer: Who. Wer ist das (che minchia e)?
