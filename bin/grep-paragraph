@@ -1,0 +1,10 @@
+#!/bin/sh
+
+# @chicca
+# This checks for all paragraph matching the $1. A paragraph is a series of
+# lines separated by TWO consecutive "\n"
+
+# Luca Ferroni reccomends this script! :-)
+ARGOMENTO=${1:-carlesso}
+#echo "DEB Grepping blank-line-separated paragraph containing '$ARGOMENTO' " >&2
+sed -e '/./{H;$!d;}' -e 'x;/'"$ARGOMENTO"'/!d;'
