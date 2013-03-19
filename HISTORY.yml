@@ -1,6 +1,7 @@
 ########################################################################
 # This file tries to keep the changelog in a YMLtastic way! :)
 ########################################################################
+2.1.5: Better testing
 2.1.4: Virtualenv added for python
 2.1.3: Minor fixes
 2.0.5: 20130220 Refactored lib/ in ruby. God how shitty it was before! :)

@@ -11,8 +11,17 @@ clean:
 install:
 	sbin/make-install.sh
 
+TEST_SUBDIRS =  lib/recipes/  docz/richelp/
+
+# make test a phony target
+.PHONY: clean
+.PHONY: test
 test:
-	cd lib/recipes/ && make
+	for dir in $(TEST_SUBDIRS); do \
+		echo "Making1 subdir (pwd=`pwd`): $(MAKE) -C $$dir"; \
+    $(MAKE) -C $$dir; \
+		echo "Making2 subdir (pwd=`pwd`): $(MAKE) -C $$dir"; \
+  done
 
 # pre deploys gem
 predeploy:
