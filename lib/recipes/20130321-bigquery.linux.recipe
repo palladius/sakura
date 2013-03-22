@@ -1,0 +1,18 @@
+
+# prepares python environment to run bigquery...
+
+virtualenv bq_ve
+
+source bq_ve/bin/activate
+pip install --upgrade numpy
+pip install --upgrade yolk
+pip install --upgrade ipython
+pip install --upgrade pandas
+pip install --upgrade matplotlib
+pip install tornado
+pip install pyzmq
+bq init
+ipython notebook --pylab=inline
+
+# from schwehr@
+

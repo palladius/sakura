@@ -6,26 +6,32 @@
 # Umlaut: ä ö ü  Ä  Ö Ü 
 Names:
  Objekte (objects):
-  Kuli: pen
-  Kugel Schreiber: ball pen (penna a sfera)
-  Schreibtisch: Desk (scrivania)
-  Stuhl: Chair
-  Drucker: Printer
-  'Handy (CH: Natel)': mobile phone
-  Tisch: table
-  Lampe: lamp
-  Tasse: cup
-  Glas / Wasser: glass
-  Flasche (plstik / Glass): bottle
-  Papierkorb: Paper trashbin
-  Uhr: watch / clock / hour
-  Zeitung: Newspaper
-  Tür: door
-  die Wand: wall
-  Fenster: window
+  M:
+    der Tisch: table
+    der Kuli: pen (Kuli/Kulis/Kuli/Kuli) # http://de.wiktionary.org/wiki/Kuli
+    der Kugel Schreiber: ball pen (penna a sfera)
+    der Schreibtisch: Desk (scrivania)
+    der Stuhl: Chair
+    der Drucker: Printer
+    der Papierkorb: Paper trashbin
+  F:
+    die Wand: wall
+    die Uhr: watch / clock / hour
+    die Sache: thing/object
+    die Flasche (plstik / Glass): bottle
+    die Zeitung: Newspaper
+    die Tür: door
+    die Lampe: lamp
+    die Tasse: cup
+  N:
+   das Etui: astuccio
+   das Auto: the car
+   das Fenster: window
+   das Handy (CH: Natel): mobile phone
+   das Mobiltelefon: the mobile
+   das Glas / das Wasser: glass
  Dress:
-  Die Schuhe: shoes (_PLURAL)
-  #Masculin
+  # M
   der Anzug (Anzuege): suit(s)
   der Rock (Roecke): skirt
   der Gürtel (Guertel): belt
@@ -38,27 +44,31 @@ Names:
   # N
   das Hemd: shirt (man)
   das Kleid: dress (woman)
+  # P
+  Die Schuhe: shoes (_PLURAL)
  Food:
   der Kaffee: coffee
   der Tee: tea
-  die Zitrone: lemon
   der Zucker: sugar
-  die Milsch: milk
-  das Brot: bread
-  das Ei (Eier): egg(s)
-  die Wurst: some kind of meat?
-  die Tomate: tomato
   der Kaese: cheese
   der Salat: salad
-  das Fischfiler: fish filet (filet is neutrum)
+  der Rotwein/Weisswein: red/white wine
+
+  die Flasche: the bottle
+  die Wurst: some kind of meat?
+  die Tomate: tomato
+  die Zitrone: lemon
+  die Milsch: milk
   die Kartoffeln: potatoes? (_PLURAL)
   die Suppe: soup
+
+  das Brot: bread
+  das Ei (Eier): egg(s)
+  das Fischfiler: fish filet (filet is neutrum)
   das Haehnchen: chicken
-  der Rotwein/Weisswein: red/white wine
   das Wasser: water
   das Glas: glass
   das Bier: beer
-  die Flasche: the bottle
  City places:
   - das Hotel
   - die Schule
@@ -71,23 +81,22 @@ Names:
   - das Restaurant
   - der Kiosk
   - der Parkplatz
-  - der Gärthnerweg
   - der Taxistand
-  - der Marbachweg
   - der Weg
-  - die Europa-Allee
+  - der Gärthnerweg (der Weg)
+  - der Marbachweg
   - die Allee
-  - die Berlinerstrasse
+  - die Europa-Allee
   - die Strasse
+  - die Berlinerstrasse
   - Der Bodensee, Der Zurichsee (= Der See, English - Lake)
   - Die See (= Der Ozean, Das Mer)
 #RubyObject: VerbList
-#RubyObject VerbList:
 #pronouns: [ Ich, Du, Herr/sie/sobenme , Wer, Ihr, Sie ]
 Verben (Verbs):
  Pronouns:  [ Ich, Du, Herr/sie/er , Wir, Ihr, Sie ]
  AutoVerben:
-  Sein (to be):    [ bin, bist, ist, sind, seid, sind ]
+  Sein (to be) + NOM:    [ bin, bist, ist, sind, seid, sind ]
   Haben (to have): [ habe, hast, hat, haben, habt, haben]
   Gehen (to go):   [ gehe, gest, get, gehen, gest, gehen] # @TBC
   Wurden (to become):  TBD
@@ -101,7 +110,7 @@ Partikel (Particelle):
     Welches (N): Which. Welches ?!? ist das?
     Woher: Where from. Woher kommst du?
 Prepositions: [ wo | wer | wie | was | welcher | welche | welcher ]
-Greetings:
+Greetings / Sentences:
  Name:
   - Wie heisst du?
   - Ich heisse Riccardo. Und wie heissen Sie?
@@ -130,3 +139,16 @@ Greetings:
   - Die stadt ist Warschau.
   - Wie schreibt man das?
   - Das schreibt man W A R S C H A U
+20130321 Akkusatifs (Kapitel 7):
+ - ich sehe den Mann/ihr (him)
+ - wir sehen ein Mädchen/es
+ - ich gebe (der Frau/ihr) eine Schokolade
+ - affermation: du gibst dem Mann einen Ball!
+ - was gibst du dem Mann? den Ball!
+ - wem gibst du den Ball? .. dem Mann!
+ - ich gebe dem Mann Giorgio's Ball
+ - Wessen Ball gibst du dem Mann?
+Surious:
+ - Alles macht Sinn (??? Deutsch): Everything makes sense in Deutsch - Gisela
+Links:
+
