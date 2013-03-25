@@ -1,0 +1,4 @@
+
+egrep ^gs_oauth2_refresh_token ~/.boto | cut -f 2 -d'=' | cut -f 2 -d' '
+
+

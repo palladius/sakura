@@ -16,5 +16,8 @@ alias git-undo-last-commit='git reset --soft HEAD^'
 alias ps1_normal="export PS1='\u@\h:\w\$ '"
 alias ps1_coloured="export PS1='\u@\h:\w (TODO COLORS)\$ '"
 
+# screen / byobu
+alias screens='screen ls'
+
 #ls 
 alias ll='ls -al'
