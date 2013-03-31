@@ -1,3 +1,9 @@
 
-- OK make this a ruby gem
+TODO:
+- Make this ruby1.9 compliant
+- OK make this a ruby gem (@bug see below)
 - copy the lib/ structure from Rails (sittin gon shoulders of giants)
+
+BUGS:
+- binaries built from gem are exectued with Ruby, not SH, even if they have a
+  bash she-bang
