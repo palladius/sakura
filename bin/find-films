@@ -1,4 +1,4 @@
 #!/bin/sh
 
 set -x
-find ${1:-.} -iname \*mp4 -or  -iname \*mov 
+find . -iname \*mp4 -or  -iname \*mov $*
