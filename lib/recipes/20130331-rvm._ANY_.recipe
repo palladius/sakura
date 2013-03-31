@@ -1,0 +1,5 @@
+
+# this recipe is both for linux and Mac
+
+curl -L https://get.rvm.io | bash -s stable --ruby
+
