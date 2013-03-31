@@ -1,0 +1,11 @@
+#!/bin/sh
+
+if uname | grep -q Darwin ; then
+  echo "DEB: Ok we are on a Mac, executing this: $*" >&2
+  "$@"
+  exit $?
+else
+  echo "DEB: Not on a Mac, wont execute this but still exit 0: $*" >&2
+  exit 0
+fi
+
