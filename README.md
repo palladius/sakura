@@ -57,7 +57,7 @@ Borrowed code:
 - Synergy FOSS <http://synergy-foss.org/support>
 - Google: `upload.py` (Apache license)
 - Micha Niskin <micha@thinkminimo.com>: `jsawk`
-- A. Iurlano <http://github.com/aiurlano>: `gcutil-fetch`
+- A. Iurlano <http://github.com/aiurlano>: `gcutil-fetch`, `gsutil-fetch`
 - Ian Bicking <http://blog.ianbicking.org/>: virtualenv
 
 Thanks for who believed in me:
