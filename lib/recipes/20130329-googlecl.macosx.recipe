@@ -1,15 +1,18 @@
-
-# http://www.freshblurbs.com/blog/2010/06/19/installing-googlecl-mac.html
-
-mkdir ~/src
-cd ~/src
-curl -O http://gdata-python-client.googlecode.com/files/gdata-2.0.10.tar.gz
-tar xzvf gdata-2.0.10.tar.gz
-cd gdata-2.0.10
-sudo python setup.py install
-
-curl -O https://googlecl.googlecode.com/files/googlecl-0.9.14.tar.gz
-tar xzvf googlecl-0.9.14.tar.gz
-cd googlecl-0.9.14
-sudo python setup.py install
-
+##########################################################
+# this recipe installs GoogleCL on a machine (Mac for sure,
+# Linux ~TBC)
+##########################################################
+date: 20130329
+description: installs GoogleCL on a Machine
+name: googlecl-on-mac
+url: 'http://www.freshblurbs.com/blog/2010/06/19/installing-googlecl-mac.html'
+#prerequisites:
+#  facter:
+#    lsbdistid: Ubuntu
+#    kernel: Linux
+code:
+  file: sh scripts/googlecl.macosx.sh
+tests:
+  here:
+    package installed: '[ -f /usr/local/bin/google ]'
+    config file exists:     '[ -f scripts/googlecl.macosx.sh ]'
