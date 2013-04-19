@@ -5,3 +5,10 @@ deb() {
         echo "[SAKDEB] $*" >&2
 }
 
+# Math: http://www.cyberciti.biz/faq/linux-unix-convert-hex-to-decimal-number/
+h2d(){
+  echo "ibase=16; $@"|bc
+}
+d2h(){
+  echo "obase=16; $@"|bc
+}
