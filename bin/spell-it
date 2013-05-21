@@ -1,0 +1,99 @@
+#!/bin/bash
+
+declare -a icao
+
+icao[32]="spazio"
+
+
+icao[65]="MAIUSCOLO ANCONA"
+icao[66]="MAIUSCOLO BOLOGNA"
+icao[67]="MAIUSCOLO COMO"
+icao[68]="MAIUSCOLO DOMODOSSOLA"
+icao[69]="MAIUSCOLO EMPOLI"
+icao[70]="MAIUSCOLO FIRENZE"
+icao[71]="MAIUSCOLO Genova"
+icao[72]="MAIUSCOLO HOTEL"
+icao[73]="MAIUSCOLO IMOLA"
+icao[74]="MAIUSCOLO JOLLY"
+icao[75]="MAIUSCOLO KAPPA"
+icao[76]="MAIUSCOLO LIVORNO"
+icao[77]="MAIUSCOLO MILANO"
+icao[78]="MAIUSCOLO NAPOLI"
+icao[79]="MAIUSCOLO OTRANTO"
+icao[80]="MAIUSCOLO PISA"
+icao[81]="MAIUSCOLO QU"
+icao[82]="MAIUSCOLO ROMA"
+icao[83]="MAIUSCOLO SAVONA"
+icao[84]="MAIUSCOLO TORINO"
+icao[85]="MAIUSCOLO UDINE"
+icao[86]="MAIUSCOLO VENEZIA"
+icao[87]="MAIUSCOLO WASHINGTON"
+icao[88]="MAIUSCOLO XILOFONO"
+icao[89]="MAIUSCOLO YORK"
+icao[90]="MAIUSCOLO ZARA"
+
+icao[97]="minuscolo ancona"
+icao[98]="minuscolo Bologna"
+icao[99]="minuscolo Como"
+icao[100]="minuscolo Domodossola"
+icao[101]="minuscolo Empoli"
+icao[102]="minuscolo Firenze"
+icao[103]="minuscolo Genova"
+icao[104]="minuscolo hotel"
+icao[105]="minuscolo Imola"
+icao[106]="minuscolo Jolly"
+icao[107]="minuscolo Kappa"
+icao[108]="minuscolo Livorno"
+icao[109]="minuscolo Milano"
+icao[110]="minuscolo Napoli"
+icao[111]="minuscolo Otranto"
+icao[112]="minuscolo Pisa"
+icao[113]="minuscolo Quadro"
+icao[114]="minuscolo Roma"
+icao[115]="minuscolo Savona"
+icao[116]="minuscolo Torino"
+icao[117]="minuscolo Udine"
+icao[118]="minuscolo Venezia"
+icao[119]="minuscolo Washington"
+icao[120]="minuscolo Xilofono"
+icao[121]="minuscolo York"
+icao[122]="minuscolo Zara"
+
+#icao[48]="nadazero"
+#icao[49]="unaone"
+#icao[50]="bissotwo"
+#icao[51]="terrathree"
+#icao[52]="kartefour"
+#icao[53]="pantafive"
+#icao[54]="soxisix"
+#icao[55]="setteseven"
+#icao[56]="oktoeight"
+#icao[57]="novenine"
+
+icao[48]="zero"
+icao[49]="uno"
+icao[50]="due"
+icao[51]="tre"
+icao[52]="quattro"
+icao[53]="cinque"
+icao[54]="sei"
+icao[55]="sette"
+icao[56]="otto"
+icao[57]="nove"
+
+if test $# = 0
+then
+  read a
+else
+  a=$1
+fi
+
+echo -n $a | od -w1 -t u1 -An -v | while read i
+do
+  if test -z "${icao[$i]}"
+  then
+    echo "carattere numero $i"
+  else
+    echo ${icao[$i]}
+  fi
+done
