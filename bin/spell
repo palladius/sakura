@@ -1,0 +1,127 @@
+#!/bin/bash
+
+declare -a icao
+
+icao[32]="spazio"
+
+
+icao[65]="MAIUSCOLO ANCONA"
+icao[66]="MAIUSCOLO BOLOGNA"
+icao[67]="MAIUSCOLO COMO"
+icao[68]="MAIUSCOLO DOMODOSSOLA"
+icao[69]="MAIUSCOLO EMPOLI"
+icao[70]="MAIUSCOLO FIRENZE"
+icao[71]="MAIUSCOLO GENOVE"
+icao[72]="MAIUSCOLO HOTEL"
+icao[73]="MAIUSCOLO IMOLA"
+icao[74]="MAIUSCOLO JOLLY"
+icao[75]="MAIUSCOLO KAPPA"
+icao[76]="MAIUSCOLO LIVORNO"
+icao[77]="MAIUSCOLO MILANO"
+icao[78]="MAIUSCOLO NAPOLI"
+icao[79]="MAIUSCOLO OTRANTO"
+icao[80]="MAIUSCOLO PISA"
+icao[81]="MAIUSCOLO QU"
+icao[82]="MAIUSCOLO ROMA"
+icao[83]="MAIUSCOLO SAVONA"
+icao[84]="MAIUSCOLO TORINO"
+icao[85]="MAIUSCOLO UDINE"
+icao[86]="MAIUSCOLO VENEZIA"
+icao[87]="MAIUSCOLO WASHINGTON"
+icao[88]="MAIUSCOLO X"
+icao[89]="MAIUSCOLO YORK"
+icao[90]="MAIUSCOLO ZARA"
+
+icao[65]="MAIUSCOLO ALPHA"
+icao[66]="MAIUSCOLO BRAVO"
+icao[67]="MAIUSCOLO CHARLIE"
+icao[68]="MAIUSCOLO DELTA"
+icao[69]="MAIUSCOLO ECHO"
+icao[70]="MAIUSCOLO FOXTROT"
+icao[71]="MAIUSCOLO GOLF"
+icao[72]="MAIUSCOLO HOTEL"
+icao[73]="MAIUSCOLO INDIA"
+icao[74]="MAIUSCOLO JULIETT"
+icao[75]="MAIUSCOLO KILO"
+icao[76]="MAIUSCOLO LIMA"
+icao[77]="MAIUSCOLO MIKE"
+icao[78]="MAIUSCOLO NOVEMBER"
+icao[79]="MAIUSCOLO OSCAR"
+icao[80]="MAIUSCOLO PAPA"
+icao[81]="MAIUSCOLO QUEBEC"
+icao[82]="MAIUSCOLO ROMEO"
+icao[83]="MAIUSCOLO SIERRA"
+icao[84]="MAIUSCOLO TANGO"
+icao[85]="MAIUSCOLO UNIFORM"
+icao[86]="MAIUSCOLO VICTOR"
+icao[87]="MAIUSCOLO WHISKEY"
+icao[88]="MAIUSCOLO X-RAY"
+icao[89]="MAIUSCOLO YANKEE"
+icao[90]="MAIUSCOLO ZULU"
+
+
+icao[97]="minuscolo alpha"
+icao[98]="minuscolo bravo"
+icao[99]="minuscolo charlie"
+icao[100]="minuscolo delta"
+icao[101]="minuscolo echo"
+icao[102]="minuscolo foxtrot"
+icao[103]="minuscolo golf"
+icao[104]="minuscolo hotel"
+icao[105]="minuscolo india"
+icao[106]="minuscolo juliett"
+icao[107]="minuscolo kilo"
+icao[108]="minuscolo lima"
+icao[109]="minuscolo mike"
+icao[110]="minuscolo november"
+icao[111]="minuscolo oscar"
+icao[112]="minuscolo papa"
+icao[113]="minuscolo quebec"
+icao[114]="minuscolo romeo"
+icao[115]="minuscolo sierra"
+icao[116]="minuscolo tango"
+icao[117]="minuscolo uniform"
+icao[118]="minuscolo victor"
+icao[119]="minuscolo whiskey"
+icao[120]="minuscolo x-ray"
+icao[121]="minuscolo yankee"
+icao[122]="minuscolo zulu"
+
+#icao[48]="nadazero"
+#icao[49]="unaone"
+#icao[50]="bissotwo"
+#icao[51]="terrathree"
+#icao[52]="kartefour"
+#icao[53]="pantafive"
+#icao[54]="soxisix"
+#icao[55]="setteseven"
+#icao[56]="oktoeight"
+#icao[57]="novenine"
+
+icao[48]="zero"
+icao[49]="uno"
+icao[50]="due"
+icao[51]="tre"
+icao[52]="quattro"
+icao[53]="cinque"
+icao[54]="sei"
+icao[55]="sette"
+icao[56]="otto"
+icao[57]="nove"
+
+if test $# = 0
+then
+  read a
+else
+  a=$1
+fi
+
+echo -n $a | od -w1 -t u1 -An -v | while read i
+do
+  if test -z "${icao[$i]}"
+  then
+    echo "carattere numero $i"
+  else
+    echo ${icao[$i]}
+  fi
+done
