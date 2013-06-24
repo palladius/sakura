@@ -1,3 +1,4 @@
 
-echo "ibase=16; $1"|bc
+HEX=${1:-ffff}
+echo "ibase=16; $(echo $HEX | capitalize )"|bc
 
