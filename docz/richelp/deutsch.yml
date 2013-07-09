@@ -109,6 +109,20 @@ Partikel (Particelle):
     Welche (F):  Which. Welche  stadt ist das?
     Welches (N): Which. Welches ?!? ist das?
     Woher: Where from. Woher kommst du?
+Gehen/sein DAT/AKK:
+  # gehen + in AKK
+  - Ich gehe in den Park    # M AKK
+  - Ich gehe in die Schule  # F AKK
+  - Ich gehe in den Kino    # N AKK
+  - Ich gehe in die Ferien  # P AKK§
+  # sein + in DAT
+  - Ich bin  in dem Park (im)   # M DAT
+  - Ich bin  in der Schule  # F DAT
+  - Ich bin  in dem Kino (im)  # N DAT
+  - Ich bin  in den Ferien  # P DAT
+  # Exceptions
+  - Ich (gehe zur / bin bei der) Arbeit
+  - Ich (gehe nach / bin zu) Haus
 Prepositions: [ wo | wer | wie | was | welcher | welche | welcher ]
 Greetings / Sentences:
  Name:
@@ -301,9 +315,9 @@ Thu 27 Juni - Elizabeth:
   Vocab: 
     das Gericht: dish (eine spezialität)
     das Getraenk: beverage
-    das Essen: "comida" (in Google, im Restaurant, ..)
-    mögen: to like (or: gerne essen, ...)
+    das Essen: comida (in Google, im Restaurant, ..)
     möglich: likely, possible.
+    mögen: to like (or, gerne essen, ...)
     Das gemüse: vegetable (sing.)
     Koestlich: very flavorful (gustoso)
     Bleiben: to remain (ich bin geblieben)
@@ -337,7 +351,7 @@ Thu 27 Juni - Elizabeth:
     die Speisekarte: the menu (karte of dishes)
     vorspeise: antipasti
     hauptspeise: main dish
-    'die Rechnung': the bill (literally 'operation': addiktion/subtraktion/moltiplikation/division)
+    'die Rechnung': the bill (literally 'operation', addiktion/subtraktion/moltiplikation/division)
     schwul: gay
     das stimmet: its true
     Das denke (think)/glaube (believe)/finde(find) ich auch: I think so too.
@@ -349,6 +363,17 @@ Thu 27 Juni - Elizabeth:
       - keit (f): ie Moeglichkeit 
       - schaft: evissenschaft (credo si scriva cosi TODO, knowledge), ...
       - heit: - gesundheit (health), ...
+    einladen: to invite
+    zusammen: together
+    trennen (getrennt): to separate/split
+    die Bedienung: the service
+    das Salz: the salt
+    der Pfeffer: the pepper
+    das Blut: blood
+    salzig/suess: salzig, sweet
+    scharf: chilie/hot
+    sauer: sour
+    bitter: bitter (!)
   phrases:
    - bringen + dat (person) + akk (food)
    - [Ich mochte] Bezhalen, bitte (swiss)
@@ -366,3 +391,64 @@ Thu 27 Juni - Elizabeth:
   Past:
     - Gestern habe ich nach REsto gegangen und besetzen (mi son seduto)
     - Dann habe ich den Kellner gerufen
+    - ...
+  Altre frasi:
+    - die Bedienung war gut, (un-)friendlich.
+    - Wie schmecht chokolade? Es schmekt suess (sweet)
+    - Die suppe is nicht salzig genug (not savoury enough)
+    - Die suppe is zu salzig (too savoury)
+    - Ich mochte etwas anderes (something else)
+Lekt 7 florian (pag 36):
+  dict:
+   die Tasche (en): borsa
+   der Parfum (uems): profumo
+   die Schminke/das Makeup: trucchi (only plural)
+   der teller (=): piatto/i
+   der Topf und die Pfanne: pentole e coperchi
+   das Handtuck,Badetuch: asciugamano
+   eine Decke: tovaglia
+   Kiss/kissen: cuscino
+   Sonder|angebot: special|offer 
+   behilflicht: helpful
+   Bestimmtes: specific
+   schauen: to see/look around
+   wichtig: important
+   anders /andere/anderes: diefferent
+   gleich: same
+   Stock / die Etage: floor
+   das Parterre / das Erdgeschoss: ground floor
+   die Treppe (f.s.): la scala
+   die Stufe: lo scalino (step)
+   das Paar schuhe: one pair [of] shoes # like eine tasse caffee
+   Umkleidekabine: cabina di cambio vestiti
+   sich umziehen: to change (clothes)
+   davor: Before then, (without what happens after)
+   Bevor: before that... (with what happens after)
+   der strand: the beach
+   an|ziehen: indossare (put on)
+   tragen: to wear
+   Badehose: costume da bagno
+   Meeresfruechte: fruits de mer, seafood.
+  Abteilung:
+  - Kleiderabteilung # Kleidungsabteilung (note the S)
+  - Spielabteilung
+  - Haushaltswarenabteilung
+  - Elektronikabteilung
+  - Damenabteilung
+  - Herrenabteilung
+  - Sportartikelabteilung
+  - Kosmetikabteilung
+  - Lebenmittelabteilung
+  - Textilabteilung
+  Sentences:
+    Can ich ihnen behilflich sein: can I be helpful to you?
+    Ich bin nich interesiert: Im not interested
+    In welche Stock sind wir?: Wir sind im dritten Stock
+    Welche Farbe steht mir: which color suits me?
+    unten <=> oben (adverb): di sopra / di sotto
+    unter <=> ueber (preposition): over/below # uber dem
+    Ich gehe an die Kasse. Davor probiere ich die Schuhe an: I go to the till (la cassa), (but) before
+    Bevor ich die SAchuihe kaufe, probiere ich sie an. (note "bevor" instead of "davor")
+    Bevor man ins kino geht, muss man ein ticket kaufen.
+    Die schuhe passen mir nicht: le scarpe non mi vanno bene.
+    Ich bezahle an der Kasse: I buy at the till (DAT).
