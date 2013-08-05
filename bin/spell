@@ -4,6 +4,21 @@ declare -a icao
 
 icao[32]="blank space"
 
+icao[45]="dash (hyphen)"
+
+icao[48]="nadazero"
+icao[49]="unaone"
+icao[50]="bissotwo"
+icao[51]="terrathree"
+icao[52]="kartefour"
+icao[53]="pantafive"
+icao[54]="soxisix"
+icao[55]="setteseven"
+icao[56]="oktoeight"
+icao[57]="novenine"
+
+icao[126]="tilde"
+
 icao[65]="Uppercase ALPHA"
 icao[66]="Uppercase BRAVO"
 icao[67]="Uppercase CHARLIE"
@@ -30,6 +45,8 @@ icao[87]="Uppercase WHISKEY"
 icao[88]="Uppercase X-RAY"
 icao[89]="Uppercase YANKEE"
 icao[90]="Uppercase ZULU"
+
+icao[95]="underscore"
 
 icao[97]="Lowercase alpha"
 icao[98]="Lowercase bravo"
@@ -58,16 +75,6 @@ icao[120]="Lowercase x-ray"
 icao[121]="Lowercase yankee"
 icao[122]="Lowercase zulu"
 
-icao[48]="nadazero"
-icao[49]="unaone"
-icao[50]="bissotwo"
-icao[51]="terrathree"
-icao[52]="kartefour"
-icao[53]="pantafive"
-icao[54]="soxisix"
-icao[55]="setteseven"
-icao[56]="oktoeight"
-icao[57]="novenine"
 
 if test $# = 0
 then
@@ -80,7 +87,7 @@ echo -n $a | od -w1 -t u1 -An -v | while read i
 do
   if test -z "${icao[$i]}"
   then
-    echo "carattere numero $i"
+    echo "Character number $i"
   else
     echo ${icao[$i]}
   fi
