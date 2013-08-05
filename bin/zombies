@@ -3,7 +3,7 @@
 # Thanks to Jeff Silverman
 # See http://www.linuxquestions.org/questions/linux-server-73/how-to-kill-zombie-process-592732/
 
-FUNNY_KILL_REGEX="machete|garlic|cross|bazooka|shaunofthedead"
+FUNNY_KILL_REGEX="machete|garlic|cross|bazooka|shaunofthedead|chainsaw"
 
 function kill_zombies {
   kill -HUP `ps -A -ostat,ppid | grep -e '^[Zz]' | awk '{print $2}'`
