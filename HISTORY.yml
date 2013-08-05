@@ -1,6 +1,7 @@
 ########################################################################
 # This file tries to keep the changelog in a YMLtastic way! :)
 ########################################################################
+2.1.5: Updated to ruby1.9.3 by Chris for tests. Also maybe fixed the shell test script
 2.1.5: Better testing
 2.1.4: Virtualenv added for python
 2.1.3: Minor fixes
