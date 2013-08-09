@@ -1,4 +1,4 @@
 #!/bin/sh
 
-curl -s http://metadata.google.internal/0.1/meta-data/network | json-xpath.rb networkInterface.0.accessConfiguration.0.externalIp    
+curl -s http://metadata.google.internal/0.1/meta-data/network | json-xpath.rb networkInterface.0.accessConfiguration.0.externalIp
 

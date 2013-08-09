@@ -32,7 +32,7 @@ function find_duplicates() {
     debugga "We are on a Linux hopefully"
     cat $TMPFILE|sort|awk '{print $1}'|
       uniq -c|egrep -v " 1"|awk '{print $2}'
-  fi	
+  fi
 }
 
 	# creating list of all md5s at least double.
@@ -40,7 +40,7 @@ rm -f $TMPFILE $TMP_DUPLICATES
 # in case its empty..
 touch "$TMPFILE" "$TMP_DUPLICATES"
 find "$DIR" $FIND_OPTS | egrep -v '/.svn/|/.git/' | while read F; do
-	debugga File "$F" 
+	debugga File "$F"
 	md5sum "$F" >>$TMPFILE  # 2>/dev/null
 done
 

@@ -21,4 +21,4 @@ my @Astdin = 0;
 my $i=0;
 while (<>) { $Astdin[$i++] = $_; }
 fisher_yates_shuffle(\@Astdin);
-print @Astdin; 
+print @Astdin;

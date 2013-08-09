@@ -5,9 +5,9 @@ SENTENCE="keepup{$HOSTNAME} "
 
 echo "One dot every $SLEEPTIME seconds... Useful on lame ssh connections to keep them up"
 echo -en "$SENTENCE"
-while true; do 
+while true; do
 	echo -en .
-	sleep $SLEEPTIME; 
+	sleep $SLEEPTIME;
 done
 
 echo Ciao by carlesso. You should never see this

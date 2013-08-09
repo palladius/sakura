@@ -69,7 +69,7 @@ def read_german_file(filename):
 
 if __name__ == '__main__':
   print "deb ARGV: ", sys.argv
-  if len(sys.argv) > 1: 
+  if len(sys.argv) > 1:
     print read_german_file(sys.argv[1])
   else:
     print '''Usage: {} <GERMAN_FILE>'''.format(sys.argv[0])

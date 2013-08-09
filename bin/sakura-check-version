@@ -15,14 +15,14 @@
 
   require 'optparse'       # http://ruby.about.com/od/advancedruby/a/optionparser.htm
   require 'open-uri'
-  
+
   $myconf = {
     :sakura_version_online            => 'https://raw.github.com/palladius/sakura/master/VERSION',
   }
 
   $PROG_VER = '0.9.1'
   $DEBUG    = false
-  
+
   def usage(comment=nil)
     puts "#{$0} v.#{$PROG_VER}"
     puts "Usage: #{File.basename $0} [-dhjv] [-l LOGFILE] <FOO> <BAR>"

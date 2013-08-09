@@ -25,7 +25,7 @@ usage () {
     echo "   [pl]aylist [<PLNAME>] = Show playlists saved in iTunes or play selected playlist ";
     echo "   [pr]ev     = Go to the previous track.";
     echo " q quit       = Quit iTunes.";
-    echo "   [sh]uf     = Shuffle current playlist"; 
+    echo "   [sh]uf     = Shuffle current playlist";
     echo "   [st]atus   = Shows iTunes' status, current artist and track.";
     echo "   st[o]p     = Stop iTunes.";
     echo "   [u]nmute   = Unmute iTunes' volume.";
@@ -77,12 +77,12 @@ while [ $# -gt 0 ]; do
             osascript -e 'tell application "iTunes" to set mute to false';
             break ;;
 
-        v|"vol"    ) 
+        v|"vol"    )
             vol=`osascript -e 'tell application "iTunes" to sound volume as integer'`;
             echo "Changing iTunes volume level: '$vol'";
             if [ "$2" = '' ]; then
               usage
-              break 
+              break
             fi
             if [ $2 = "up" ]; then
                 newvol=$(( vol+10 ));
@@ -99,20 +99,20 @@ while [ $# -gt 0 ]; do
         o|"stop"    ) echo "Stopping iTunes.";
             osascript -e 'tell application "iTunes" to stop';
             break ;;
-            
+
         q|"quit" ) echo "Quitting iTunes.";
             osascript -e 'tell application "iTunes" to quit';
             exit 1 ;;
-            
+
             #And the code for showing available playlists, if there is no parameter given.
-            
+
             ## addition playlist of choice
         "pl"|"playlist" )
             if [ -n "$2" ]; then
 	            shift
               PLAYLIST="$*"
               echo "Changing iTunes playlists to '$PLAYLIST'.";
-              osascript -e 'tell application "iTunes"' -e "set new_playlist to \"$PLAYLIST\" as string" -e "play playlist new_playlist" -e "end tell"; 
+              osascript -e 'tell application "iTunes"' -e "set new_playlist to \"$PLAYLIST\" as string" -e "play playlist new_playlist" -e "end tell";
               break ;
             else
               # Show available iTunes playlists.
@@ -122,12 +122,12 @@ while [ $# -gt 0 ]; do
             fi
             break;;
 
-         sh|"shuf" ) echo "Shuffle is ON."; 
-           osascript -e 'tell application "iTunes" to set shuffle of current playlist to 1'; 
+         sh|"shuf" ) echo "Shuffle is ON.";
+           osascript -e 'tell application "iTunes" to set shuffle of current playlist to 1';
            break ;;
-         
-         no|"noshuf" ) echo "Shuffle is OFF."; 
-           osascript -e 'tell application "iTunes" to set shuffle of current playlist to 0'; 
+
+         no|"noshuf" ) echo "Shuffle is OFF.";
+           osascript -e 'tell application "iTunes" to set shuffle of current playlist to 0';
            break ;;
 
          h|"help" | * ) echo "help:";
@@ -135,6 +135,6 @@ while [ $# -gt 0 ]; do
             break ;;
 
 
-						
+
     esac
 done

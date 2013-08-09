@@ -3,7 +3,7 @@
 FILE=`mktemp -t okidok`
 
 if [ "$1" = '-' ] ; then
- echo 'Called ok with -, assuming STDIN!'	
+ echo 'Called ok with -, assuming STDIN!'
  cat | ricnotify yellow "OK from STDIN '$*'"
  exit $?
 fi
@@ -18,7 +18,7 @@ if "$@"  2>&1 | tee "$FILE" ; then # |tee /tmp/ok1 ; then
 	exit 0
 else
 	RET=$?
-	rosso "NO(ret=$RET): $*" 
+	rosso "NO(ret=$RET): $*"
 	echo "`data` End (ERR) '$*'"
 	echo "There were some errors which returned: $RET" | ricnotify red "Err with '$*'"
 	exit $RET

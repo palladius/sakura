@@ -18,7 +18,7 @@
 =end
 
   require 'optparse'       # http://ruby.about.com/od/advancedruby/a/optionparser.htm
-  require 'socket'  
+  require 'socket'
   require ENV['SAKURALIB'] + '/ric_colors'
   require ENV['SAKURALIB'] + '/ric_strings'
 
@@ -30,18 +30,18 @@
     :app_name            => 'remember',
     :remember_dir        => '~/remember',
     :tail_len            => 20,
-		:description         => 'This script tries to remember what you just did on the CLI 
+		:description         => 'This script tries to remember what you just did on the CLI
    for future use. It does it by recording on a directory.
    Basically its a "persistent" history'
   }
 
   $PROG_VER = '0.9.3'
   $DEBUG    = false
-  
+
   def deb(str)
     puts "#DEB# #{str}" if $DEBUG #
   end
-  
+
   def debug_on(str)
     $DEBUG = true
   end
@@ -53,33 +53,33 @@
 		puts description
     #exit 11
   end
-  
+
   def init()
     $opts = {}
     optparse = OptionParser.new do |opts|
       # Set a banner, displayed at the top of the help screen.
       #opts.banner = "#{$0} v.#{$PROG_VER}\n Usage: #{File.basename $0} [options] file1 file2 ..."
-      $opts[:verbose] = $opts[:jabba] = $opts[:debug] = false  
+      $opts[:verbose] = $opts[:jabba] = $opts[:debug] = false
       $opts[:logfile] = $opts[:grep] = nil
 			$opts[:tail] = $myconf[:tail_len]
       opts.on( '-d', '--debug', 'enables debug (DFLT=false)' )  { $opts[:debug] = true}
-      opts.on( '-e', '--edit',  "edits file with vi" )          { $opts[:edit] = true  } 
+      opts.on( '-e', '--edit',  "edits file with vi" )          { $opts[:edit] = true  }
       opts.on( '-h', '--help',  'Display this screen' )         { puts(opts); exit 1   }
       opts.on( '-g', '--grep STRING', 'Searchs for STRING' )    {|str|  $opts[:grep] = str  }
       opts.on( '-l', '--logfile FILE', 'Write log to FILE' )    {|file| $opts[:logfile] = file }
       opts.on( '-t', '--tail', "Just tail argument (dflt tail length=#{$myconf[:tail_len]}" )  {|len| $opts[:tail] = len || $myconf[:tail_len]}
       opts.on( '-v', '--verbose', 'Output more information' )   { $opts[:verbose] = true}
     end
-    optparse.parse!  
+    optparse.parse!
     $DEBUG = $opts[:debug]
     debug_on('enabled via GetOpts') if $opts[:debug]
     puts "Being verbose" if $opts[:verbose]
     puts "Logging to file #{$opts[:logfile]}" if $opts[:logfile]
   end
-  
+
   def remember_and_execute_command(command,logfile,remember=true)
 		if remember
-			File.open(logfile, 'a') { |f| f.write "#{Time.now} #{Socket.gethostname} [#{ENV['USER']}] #{command}\n" } 
+			File.open(logfile, 'a') { |f| f.write "#{Time.now} #{Socket.gethostname} [#{ENV['USER']}] #{command}\n" }
 			puts "#Remembering:  '''#{command}'''"
 			puts "#Written file:  #{logfile}"
 		end
@@ -114,7 +114,7 @@
 	lines = %x{ #{mycommand} } # doesnt work in ruby1.9!
 	#lines = `#{mycommand}` # doesnt work in ruby1.9!
 	lines.split("\n").each do |line|
-            puts remember_color_regex(line) # "Line: #{line}" 
+            puts remember_color_regex(line) # "Line: #{line}"
         end
 	$stderr.puts "# Try also: cat #{logfile}"
   end

@@ -1,4 +1,4 @@
-#!/usr/bin/python 
+#!/usr/bin/python
 
 import datetime
 epoch = datetime.datetime.utcfromtimestamp(0)

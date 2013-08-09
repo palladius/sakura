@@ -16,7 +16,7 @@
 =end
 
   # http://ruby.about.com/od/advancedruby/a/optionparser.htm
-  require 'optparse'       
+  require 'optparse'
   # Sakura Ruby library :)
   require ENV['SAKURALIB'] + "/ric.rb"
 
@@ -52,18 +52,18 @@
      opts.on( '-l', '--logfile FILE', 'Write log to FILE' )    {|file| $opts[:logfile] = file }
      opts.on( '-v', '--verbose', 'Output more information' )   { $opts[:verbose] = true}
    end
-   optparse.parse!  
+   optparse.parse!
  end
 
   def real_program
       # Maybe you may want to check on ARGV
      unless ARGV.size == 2
-       usage "Give me 2 or more arguments!" 
+       usage "Give me 2 or more arguments!"
      end
     deb("Hello world from a templated '#{$0 }'")
     deb "+ Options are:  #{$opts}"
     deb "+ Depured args: #{ARGV}"
-    
+
     deb "PS Please find me in " + __FILE__
     deb "Maybe you forgot to do:
       git add #{__FILE__}       # add to GIT
@@ -75,7 +75,7 @@
 
   def main()
 		#init
-    #real_program 
+    #real_program
     puts "To be implemented yet, please bear with me when my gf leaves my house :)"
   end
 

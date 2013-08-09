@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# This finds everything which is in the current dir (and below) and looks for broken links. 
+# This finds everything which is in the current dir (and below) and looks for broken links.
 
 WHERE=${1:-.}
 CANCELLA=${2:-noncancellare}
@@ -19,7 +19,7 @@ if echo $2 | egrep -q '^--delete$' ; then
 	green "Done"
 else
 	yellow "# I look for symlinks from '$WHERE' downwards:" >&2
-	find $WHERE -type l ! -exec test -r {} \; -print 
+	find $WHERE -type l ! -exec test -r {} \; -print
 	usage
 #	echo "+ If you want to delete em, please type: '$0 $WHERE --delete'"
 fi

@@ -6,7 +6,7 @@ require 'rubygems'
 begin
   require 'filecache'           # gem install ruby-cache
 rescue Exception => e
-  puts 'gem filecache requires installation, sorry'  
+  puts 'gem filecache requires installation, sorry'
   puts 'gem filecache requires installation, sorry. trying to install myself, give me root password'
   system  'sudo gem install -r filecache'
   puts  'Try again now!'

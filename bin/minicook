@@ -1,4 +1,4 @@
-#!/usr/bin/ruby1.8 
+#!/usr/bin/ruby1.8
 
 =begin
 
@@ -9,7 +9,7 @@
   @language:  Ruby
   @synopsis:  Brief Description here
   @tags:      development, rcarlesso, test
-  @description: See description 
+  @description: See description
  ############################################################
 
 =end
@@ -17,7 +17,7 @@
   require 'optparse'       # http://ruby.about.com/od/advancedruby/a/optionparser.htm
   require 'yaml'
   require 'facter'
-  
+
   require ENV['SAKURADIR'] + '/lib/ric.rb'
 
   # Program constants, automagically picked up by RicLib
@@ -47,7 +47,7 @@ Tries to be more agile, to Get things Done (TM)",
 
 
 
-  TODO: locks in case many things access it 
+  TODO: locks in case many things access it
 
 =end
 class Recipe
@@ -67,14 +67,14 @@ class Recipe
       @yaml['prerequisites']['facter'].each do |k,wanted|
         deb "Checking facter: #{k} => #{wanted}"
         puts "I have this: #{Facter.send(k)}"
-	puts "I want this: #{wanted}" 
+	puts "I want this: #{wanted}"
       end
     end
   end
 
   def check_prerequisites
     deb @yaml['prerequisites'].inspect
-    # verify FACTER 
+    # verify FACTER
     check_facter_prerequisites
     # verify MODULES
     deb 'check module'
@@ -101,7 +101,7 @@ class Recipe
 	true
     rescue
 	false
-    end 
+    end
   end
 
 
@@ -111,7 +111,7 @@ class Recipe
 
   def install
     # manage code HERE
-    code = @yaml['code'] 
+    code = @yaml['code']
     # manage code FILE
     pred code.inspect
   end
@@ -128,7 +128,7 @@ class Recipe
   end
 
   def to_s(verbose=true)
-    ret = "MiniBookRecipe(#{name})" 
+    ret = "MiniBookRecipe(#{name})"
     return ret unless verbose
     ret += "\nName: #{name}"
     ret += "\nDescription: #{description}"
@@ -150,14 +150,14 @@ def init()    # see lib_autoinit in lib/util.rb
   $opts = {}
   $opts[:recipes_dir] = $myconf[:recipes_dir]
   $optparse = OptionParser.new do |opts|
-    opts.banner = "#{$0} v.#{$PROG_VER}\n Usage: #{File.basename $0} [directive] [...]\nDirectives are: #{ $myconf[:available_commands].join(',') }" 
+    opts.banner = "#{$0} v.#{$PROG_VER}\n Usage: #{File.basename $0} [directive] [...]\nDirectives are: #{ $myconf[:available_commands].join(',') }"
     opts.on( '-d', '--debug', 'enables debug (DFLT=false)' )  {  $opts[:debug] = true ; $DEBUG = true }
     opts.on( '-h', '--help', 'Display this screen' )          {  puts(opts); exit 1 }
     opts.on( '-n', '--dryrun', "Don't really execute code" ) { $opts[:dryrun] = true }
     opts.on( '-l', '--recipes-dir DIR', 'Recipes dir from DIR (dflt:)' )    {|dir| $opts[:recipes_dir] = dir }
     opts.on( '-v', '--verbose', 'Output more information' )   { $opts[:verbose] = true}
   end
-  $optparse.parse!  
+  $optparse.parse!
 end
 
 def list(dir)
@@ -169,7 +169,7 @@ end
 def apply(filename)
    puts("apply: #{azure filename}")
    recipe = Recipe.new(filename)
-   puts recipe.to_s(true) 
+   puts recipe.to_s(true)
    # prerequisites
    pwhite "1. Prerequisites"
    recipe.check_prerequisites
@@ -178,14 +178,14 @@ def apply(filename)
    pwhite "3. POSTREQUISITES"
    recipe.check_postrequisites
    pwhite "4. finished, reprinting object just for the craic"
-   puts recipe.to_s(true) 
+   puts recipe.to_s(true)
 end
 
   def real_program
     debug_on 'Just created script, presuming u need some debug. TODO REMOVE ME when everything works!' if $DEBUG
       # Maybe you may want to check on ARGV
     # unless ARGV.size == 2
-    #   usage "Give me 2 arguments!" 
+    #   usage "Give me 2 arguments!"
     # end
     deb("Hello world from a templated '#{yellow $0 }'")
     deb "+ Options are:  #{gray $opts}"
@@ -212,7 +212,7 @@ end
 
   def main()
     init
-    real_program 
+    real_program
   end
 
 main

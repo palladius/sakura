@@ -17,8 +17,8 @@ ll
 fi
 
 echo "Creating repo called '$REPODIR'"
-mkdir "$REPODIR" && 
-	cd "$REPODIR" && 
-	git init --bare 
+mkdir "$REPODIR" &&
+	cd "$REPODIR" &&
+	git init --bare
 
 echo -en "Tudo bem. Now please edit the file: \n    vim $REPODIR/description\n"

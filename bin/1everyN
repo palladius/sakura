@@ -1,22 +1,22 @@
 #!/usr/bin/perl -w
 
 # IN BASH You can simply do: sed -n 2~5p : rows 2 7 12 17...
-# i.e.: 
+# i.e.:
 # eq 1 100 | sed -n 2~5p
 # But on my Mac it doesnt work!
 
 my $DEBUG = 0;
 
 my $n=10; # default N=10
-if (defined($ARGV[0]) ) { $n=int($ARGV[0]); } 
+if (defined($ARGV[0]) ) { $n=int($ARGV[0]); }
 
 
 	# prints one line every n (default: n=10)
 my $i=0;
 while (<STDIN>) {
 	if ($DEBUG) { print "DEB $i/$n (".($i == 0)."): $_"; }
-	if ($i == 0) { print; } 
-	$i++; 
+	if ($i == 0) { print; }
+	$i++;
 	if ($i == $n) { $i = 0; }
 }
 

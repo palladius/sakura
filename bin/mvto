@@ -24,7 +24,7 @@ if [ ! -d "$DESTDIR" ] ; then
 fi
 
 for F in "$@" ; do
-	#echodo 
+	#echodo
 	mv -nv "$F" "$DESTDIR"
 done
 #	FILES="$FILES \"$FILENAME\""

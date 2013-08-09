@@ -5,7 +5,7 @@
 
 GZNAME='gsutil.tar.gz'
 GCURL='http://storage.googleapis.com/pub/'${GZNAME}
-#echo ${GCURL} 
+#echo ${GCURL}
 #echo ${GZNAME}
 
 sudo rm -fr /usr/local/gsutil
@@ -19,7 +19,7 @@ export FOLDERNAME=${GZNAME:0:$((${#GZNAME}-7))}
 
 
 #check if it was added to the path
-grep -q '/usr/local/gsutil' ~/.bashrc 
+grep -q '/usr/local/gsutil' ~/.bashrc
 if [ $? -ne 0 ]; then
   cat <<EOF >> ~/.bashrc
 

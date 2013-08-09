@@ -179,7 +179,7 @@ swift_hash_path_suffix = riccardo-sakura-swift-tutorial
 EOF
 
 # Pag 19: Account server
-cd /etc/swift/account-server 
+cd /etc/swift/account-server
 cat << EOF > 1.conf
 [DEFAULT]
 devices = /srv/1/node
@@ -200,7 +200,7 @@ sed -e "s/srv\/1/srv\/2/" -e "s/6012/6022/" -e "s/LOG_LOCAL2/LOG_LOCAL3/" 1.conf
 sed -e "s/srv\/1/srv\/3/" -e "s/6012/6032/" -e "s/LOG_LOCAL2/LOG_LOCAL4/" 1.conf > 3.conf
 sed -e "s/srv\/1/srv\/4/" -e "s/6012/6042/" -e "s/LOG_LOCAL2/LOG_LOCAL5/" 1.conf > 4.conf
 
-# Pag 20: Container 
+# Pag 20: Container
 cd /etc/swift/container-server
 cat << EOF > 1.conf
 [DEFAULT]
@@ -291,7 +291,7 @@ swift-ring-builder account.builder add z4-$SWIFT_IP:6042/sdb4 1
 swift-ring-builder account.builder rebalance
 EOF
 
-# Pag 24: 
+# Pag 24:
 cat << EOF > ~/bin/startmain
 #!/bin/bash
 

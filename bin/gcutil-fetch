@@ -8,7 +8,7 @@ GZNAME=`curl -s https://developers.google.com/compute/docs/gcutil/  | grep -o 'h
 
 GCURL='https://google-compute-engine-tools.googlecode.com/files/'${GZNAME}
 
-#echo ${GCURL} 
+#echo ${GCURL}
 #echo ${GZNAME}
 
 cd /usr/local/
@@ -23,7 +23,7 @@ sudo rm -f /usr/local/gcutil
 sudo ln -sf /usr/local/${FOLDERNAME} /usr/local/gcutil
 
 #check if it was added to the path
-grep -q '/usr/local/gcutil' ~/.bashrc 
+grep -q '/usr/local/gcutil' ~/.bashrc
 if [ $? -ne 0 ]; then
   cat <<EOF >> ~/.bashrc
 

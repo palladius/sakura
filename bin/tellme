@@ -26,6 +26,6 @@ function gestisci() {
 gestisci "$1"
 while shift; do
   if test ! -z "$1" ; then
-    gestisci $1 
+    gestisci $1
   fi
 done

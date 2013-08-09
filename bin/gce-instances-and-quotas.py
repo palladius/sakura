@@ -1,11 +1,11 @@
-#!/usr/bin/python2.7 
+#!/usr/bin/python2.7
 
 from gcelib import gce
 from gcelib import gce_util
 from gcelib import shortcuts
 
 # for python inspect()
-from pprint import pprint 
+from pprint import pprint
 
 # Inspired from:
 #  https://developers.google.com/compute/docs/gcelib/using

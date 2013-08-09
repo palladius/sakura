@@ -2,6 +2,6 @@
 
 (1..10).each {|i|
 	#print i, 'eseguo "' , ARGV , "\"\n"
-	system ARGV.join(' ') 
+	system ARGV.join(' ')
 }
-  	
+

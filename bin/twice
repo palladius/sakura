@@ -1,5 +1,5 @@
 #!/usr/bin/ruby
 
 (1..2).each {|i|
-	system ARGV.join(' ') 
+	system ARGV.join(' ')
 }

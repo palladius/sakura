@@ -2,17 +2,17 @@
 
 # for 64bit
 HAMACHI64=logmein-hamachi_2.1.0.17-1_amd64.deb
-HAMACHI32=logmein-hamachi_2.1.0.17-1_i386.deb 
+HAMACHI32=logmein-hamachi_2.1.0.17-1_i386.deb
 
 HAMACHI=$HAMACHI32
 
 echo Installing hamachi arch: $HAMACHI ...
 
-sudo add-apt-repository ppa:webupd8team/haguichi 
+sudo add-apt-repository ppa:webupd8team/haguichi
 wget https://secure.logmein.com/labs/$HAMACHI &&
  dpkg -i $HAMACHI &&
  echo This should try to install hamachi and fail but dont worry.
 sudo apt-get -f install &&
-sudo apt-get update && 
+sudo apt-get update &&
    sudo apt-get install -y hamachi haguichi
 

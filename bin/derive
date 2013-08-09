@@ -7,7 +7,7 @@ export PATH=$PATH:$SVNHOME/bin
 	# Email:  palladiusbonton@gmail.com
 	# Site:   www.palladius.it
 	#
-	# Questo programma e' cio' che ho sempre sognato, verifica se 
+	# Questo programma e' cio' che ho sempre sognato, verifica se
 	# cio' che segue cambia o meno. Se non cambia, non ha stdout, se no ce l'ha in formato mail...
 	# Quindi in sostanza fa la derivata di un output...
 	#########################################################
@@ -42,7 +42,7 @@ SEP="---------------------------------------------"
 INDENTSEP=" | "
 
 function indenta() {
-  while read LINE ; do 
+  while read LINE ; do
     echo "$1$LINE"
   done
 }
@@ -60,19 +60,19 @@ chmod 777 $PAZ 2>/dev/null
 touch $NEW	# cosi' al primo colpo va gia'
 
 # guarantees that now files get created with "rw-------"
-umask 066 
+umask 066
 
 mv $NEW $OLD
 eval "$@" 1>$NEW 2>$ERR
-if diff -q $NEW $OLD >/dev/null; then 
+if diff -q $NEW $OLD >/dev/null; then
 	touch $OK
 	echo -n + >> $CNT
 	exit 0
-else 
+else
 	#echo "NUOVO($(date))"
 	write_infos > $CNT
 	#echo "Subject: [varia] '"$*"'"
-	#echo 
+	#echo
 	echo "+ Differences on `date +"%Y%m%d-%H%M%S"`:"
 	diff $NEW $OLD | sed -e 's/^>/OLD /'|  sed -e 's/^</NEW /' | indenta "$INDENTSEP"
 	echo " --"
@@ -87,4 +87,4 @@ else
 	fi
 	echo "# More info here: $CNT"
 	exit 42
-fi 
+fi

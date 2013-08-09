@@ -1,2 +1,5 @@
+#!/bin/bash
 
- readlink -f .
+DIR=${1:-.}
+
+readlink -f "$DIR"

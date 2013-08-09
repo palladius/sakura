@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Usage: 
+# Usage:
 #   iphoto_big_files.sh 300M
 #   iphoto_big_files.sh 300M -print0
 #   iphoto_big_files.sh 300M -print0

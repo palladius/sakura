@@ -26,7 +26,7 @@ def usage
 	print "Usage: #{$0} <xpath>
 
 Example: #{$0} #{ $default_arg } # this will find your public IP from GCE metadata
-	(Try to use this in pipe with 'curl http://metadata.google.internal/0.1/meta-data/network' 
+	(Try to use this in pipe with 'curl http://metadata.google.internal/0.1/meta-data/network'
 "
 	exit(1)
 end
@@ -45,7 +45,7 @@ def process_args(dotted_arg)
 		io.write(myin)
 	end
 end
-	
+
 def main
 	usage unless ARGV[0]
 	process_args(ARGV[0])
