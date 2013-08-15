@@ -3,7 +3,12 @@
 ##
 ## Lettere strane:
 # é 
-# Umlaut: ä ö ü Ä  Ö Ü 
+# Umlaut: ä ö ü Ä  Ö Ü
+_conf:
+ colors:
+  title:    red
+  line_key: orange
+  line_val: gold
 Names:
  Objekte (objects):
   M:
@@ -615,3 +620,63 @@ Cucina 2 con Ralph:
     - (sitzen) Ich sitze auf dem Stuhl
     - (stehen) Ich stehe (stay) unter der Lampe
     - (haengen) Das Bild haengt an der Wand / Es hat an der Wand gehangen # cambia il passato!!!
+# passate alcune cose ...
+Lezione 15-8-2013 cazzo tutti al mare tranne me (ferragosto):
+  regola del ZU:
+     No Zu:
+       gehen: ich gehe ankaufen
+       #sehen: ich sehe das tram fahren (not important)
+       modals: Ich mochte essen
+     Mit Zu:
+       all other verbs: Ich freue mich darauf, heute im Restaurant zu essen
+  vocab:
+    sich freuen + ueber + Akk: to like something
+    sich frauen auf + Akk: looking fwd to sth (in the future)
+    treffen: to meet
+    "jemand(dat: en, akk: em)": someone
+    niemand: noone
+    klein geschriben: lowercase
+    grosse geschriben / kapitaliziert: uppercase
+    pro woche: per week
+    '1:0': Eins zu Null
+    ':': Doppel Punkt
+    Geheimnis: secret 
+    sekret: Secrezione # FALSE FRIEND! Dont use
+    ausgezeichnet: excellent
+  phrases:
+    - Sich freuen + ueber + Akk
+    - Freust du dich ueber das schoene Wetter?
+    - Ja, ich freue mich darueber.
+    
+    - Worueber freust du dich?
+    - Ich freue mich auf die Zukunft
+    
+    - Freust du dich auf den Winter?
+    - Neine, ich freue mich nicht darauf.
+    
+    - Ich freue mich nicht darueber, dass das Winter bald kommt.
+    - Ich freue mich darauf, dass ich heute im Restaurant esse (not elegant for double ICH).
+    - Ich freue mich darauf, heute im Restaurant zu essen (much better).
+    # zu: 
+    # NO ZU: modals, and gehen
+    - Wir sind weder in Bern noch in Basel, sondern in Zuerich. 
+   
+    - We spreche ueber Politiks/Shakespeare # ueber 
+    - Heaute Abend treffe ich meinen Bruder auf ein Bier # auf
+    
+    - Heute Abend, triffst du Jemand? Nein, ich treffe niemand.
+    
+    - Haben sie Familien in Ruissland? Wie oft seht Ihr euch?
+    
+    - Riccardo, woruber sprichst du mit deinen Freunden? 
+    - Normalerweise sprechen wir darueber, wann wir uns sehen koennen.
+
+  "Refleksiv f Verb (with ONESELF)": # tipo lavarsi le mani
+    - Ich kenne dich.
+    - Du kennst dich
+    - Er kennt sich
+  Reziprokes Verben (with EACH OTHER):
+    - Wir kennen uns (we know each other)
+    - Ihr kennt euch
+    - Sie kennen sich 
+    
