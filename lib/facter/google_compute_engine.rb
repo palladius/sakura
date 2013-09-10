@@ -17,12 +17,14 @@ end
 
 # if the first line contains this:
 # """domain c.discoproject.google.com.internal."""
-Facter.add("project_name") do
+Facter.add("project_name_from_dns_EXPERIMENTAL") do
   setcode do
     `cat /etc/resolv.conf`.split("\n")[0].split('.')[1]
   end
 end
 
+# This is taken from Metadata => good.
+# # Make sure it returns empty string if and only if the system is not a gce_enabled VM
 Facter.add("project_id") do
   setcode do
     `curl 'http://metadata/0.1/meta-data/project-id'`
