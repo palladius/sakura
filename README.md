@@ -50,6 +50,10 @@ Many people contributed to it. First place goes obviously to my mum (see below).
 
 - Riccardo Carlesso <riccardo.carlesso@gmail.com>
 
+For any comments, please subscribe to this User Group: <sakura-users@googlegroups.com>
+
+- <https://groups.google.com/forum/#!forum/sakura-users>
+
 Borrowed code:
 
 - Dmitry V Golovashkin <Dmitry.Golovashkin@sas.com>: `timeout3`
