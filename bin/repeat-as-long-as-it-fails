@@ -1,0 +1,13 @@
+#!/bin/bash
+
+echo "Repating every 2 secs until its true: $*"
+
+while true; do
+  if "$@" ; then
+      exit 0
+  else
+    echo "                  ~~~ ooo ~~~"
+    sleep 2
+  fi
+done
+
