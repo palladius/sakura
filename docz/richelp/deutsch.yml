@@ -4,6 +4,12 @@
 ## Lettere strane:
 # é 
 # Umlaut: ä ö ü Ä  Ö Ü
+
+# Berlitz: 
+# A1-2, B1: colloquial
+# B2: language of newspaprer, study
+# C1: very good.
+# C2: most people dont reach this (only professors)
 _conf:
  colors:
   title:    red
@@ -580,6 +586,12 @@ Cucina 2 con Ralph -  vocab:
     Zeit verbringen: spend time
     Geld aus|geben: spend money.
     Verstehen: understand
+
+    # bringen family
+    verbringen / verbracht: spend / spent
+    bringen / gebracht: to bring
+    mitbringen / mitgebracht: portar con se
+
 Cucina 2 con Ralph -  phrases:
     - Ich benutze den Marker zum Schreiben (n.) - (per il mangiare)
     - Ich benutze den Marker, um zu schreiben (v.) - (in order to).
@@ -999,3 +1011,55 @@ Sprichworts (proverbs):
   zwei paare Socken: two pairs of socks
   mieten: to rent
   vielleicht: maybe
+20131008 Florian vocab:
+    _class: "vocabulary:deutsch"
+    schatten: shadow
+    Schneefall: snow
+    Hagel: hail
+    der Sonnenschein: the sunshine
+    Regen: rain
+    steigen / fallen um X^ auf Y^: raise / fall (eg temperature) of X degrees up/down(doesnt matter, always AUF) to Y degrees
+    wechselhaft: variable weather
+    die Regenwahrscheinlichkeit: chances of rain
+    Das kommt auf (XXXX AKK) an: it depends on XXXX
+    Das kommt darauf an, wie das Wetter wird: it depends on this, how the weather gets.
+    # also on GTranslate:
+    Es hängt davon ab, ob Sie es wollen oder nicht: it depends on, whether I want or not.    
+    # future
+    (CH) ich gang go schwuemme: "I'm going to go swimming"
+    Ich gehe ankaufen/football spielen: I go shopping/playing football.
+20131008 Florian sentences: #!class/sentence
+  - Wenn das Wetter chlecht ist, gehe ich ins Kino
+  - Bei schlechtem Wetter, gehe ich ins Kino.
+  - Die Temperature faellt um 6^ auf 4^
+  - Die Temperature steigt um 6^ auf 16^
+  - Es soll geben # should be
+  
+  # structure: "it depends on XXX"
+  - Das kommt auf (XXXX AKK) an.
+  - Das kommt darauf an, wie das Wetter wird.
+  
+  # future/zukunft
+  - Ich werde (2nd) am Wochenende ins Kimno gehen (last).
+  # Swiss German intentional future: "ich gang go"
+  
+20131008 Riccardo prepositionen:
+  # di a da in con su per tra fra
+  auf: onto
+  aus: "?"
+  zwischen: between
+  mit: with
+20131008 Story Wetter in Italien (weather exercise): |
+  # put into my Uber Mich doc: https://docs.google.com/document/d/14cT5tNrTg_4Ui_CZZRIerPEztzeJJFcE2wsDOsxnRcU/edit#heading=h.weluv05mz9r9
+  Im Norden und im Sueden Scheint heute die Sonne (sonnig), ausser in Milan (wo se jetzt reignet).
+  Im Zentrum, ist es kalt mit regen: in Rome jettzt regt es. Durchschnitt
+  Temperature ist 15^. Morgen das Wetter soll schoener und trockener in Rome
+  sein. Termometer steigt dort auf 22^. 
+
+  Im Osten (Sardinia), es ist warm, und wird es etwas warmer: Das Thermometer 
+  steigt in Sassari auf 25^. Es gibt eine Regenwahrscheinlichkeit fur die
+  nechste tage: schlecht fur den Urlaub.
+
+  In die Alpen aber wird es morgen nass und kalt: bei starkem Schneefall fallen die
+  Temperaturen in Trento und Bolzano auf 2^ un 3^ (beziehungsweise). Temperaturen
+  fallen um 2-3^. #  (they fall by 2-3 grads).
