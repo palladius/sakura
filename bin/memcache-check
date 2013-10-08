@@ -1,0 +1,16 @@
+#! /usr/bin/env expect
+
+# Found here: http://stackoverflow.com/questions/631903/how-do-you-know-if-memcached-is-doing-anything
+
+# Usage: $0 <IP> <PORT>
+
+set timeout 1
+set ip [lindex $argv 0]
+set port [lindex $argv 1]
+spawn telnet $ip $port
+expect "Escape character is '^]'."
+send stats\r
+expect "END"
+send quit\r
+expect eof
+
