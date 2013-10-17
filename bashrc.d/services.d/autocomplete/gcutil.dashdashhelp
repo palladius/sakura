@@ -1,0 +1,9 @@
+--print_json --metadata --project --zone --image  
+ --machine_type --cache_flag_values --help 
+--nosynchronous_mode 
+# note that table is the default, hence its omitted
+--format  sparse json csv names
+--dump_request_response
+--credentials_file
+
+

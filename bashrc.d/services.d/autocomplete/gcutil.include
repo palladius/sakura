@@ -1,0 +1,5 @@
+# very simple one
+complete -W "`cat $SAKURADIR/bashrc.d/services.d/autocomplete/gcutil.list`" gcutil
+
+
+# gcutil help  | egrep -v '^$' | egrep '^\w+( )+ [A-Z]' | awk '{print $1}'

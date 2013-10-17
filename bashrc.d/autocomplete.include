@@ -1,0 +1,2 @@
+
+source $SAKURADIR/bashrc.d/services.d/autocomplete/*.include

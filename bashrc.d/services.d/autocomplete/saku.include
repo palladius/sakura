@@ -1,0 +1,2 @@
+# very simple one
+complete -W "`cat $SAKURADIR/bashrc.d/services.d/autocomplete/saku.list`" saku
