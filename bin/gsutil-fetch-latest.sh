@@ -23,7 +23,7 @@ grep -q '/usr/local/gsutil' ~/.bashrc
 if [ $? -ne 0 ]; then
   cat <<EOF >> ~/.bashrc
 
-export PATH=/usr/local/gsutil:\${PATH}
+export PATH=\${PATH}:/usr/local/gsutil
 
 EOF
   echo "Warning: Your .bashrc file was modified."
