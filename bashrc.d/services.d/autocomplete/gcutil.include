@@ -1,5 +1,11 @@
 # very simple one
-complete -W "`cat $SAKURADIR/bashrc.d/services.d/autocomplete/gcutil.list`" gcutil
 
+if [! -f $SAKURADIR/bashrc.d/services.d/autocomplete/gcutil.list ] ; then
+  echo "Building gcutil auto-completion styuff. Could take a few seconds... Thanks for your patience"
+  make gcutil.list
+fi
+
+complete -W "`cat $SAKURADIR/bashrc.d/services.d/autocomplete/gcutil.list`" gcutil
+complete -W "`cat $SAKURADIR/bashrc.d/services.d/autocomplete/gcutil.list`" gcutil-sakura
 
 # gcutil help  | egrep -v '^$' | egrep '^\w+( )+ [A-Z]' | awk '{print $1}'
