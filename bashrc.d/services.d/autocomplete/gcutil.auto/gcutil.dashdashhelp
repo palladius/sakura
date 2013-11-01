@@ -5,5 +5,3 @@
 --format  sparse json csv names
 --dump_request_response
 --credentials_file
-
-

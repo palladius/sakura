@@ -1,17 +1,18 @@
 
 # EVERYTHING except "gcutil.list.auto"
-ALL_FILES = gcutil.help.auto gcutil.dashdashhelp.auto gcutil.images.auto gcutil.zones.auto gcutil.version.auto
+ALL_FILES = gcutil.help.auto gcutil.dashdashhelp.auto gcutil.images.auto gcutil.zones.auto gcutil.version.auto gcutil.projects.auto
+MOCK_FILES = *.mock
 
-# TODO move all this stuff to gcutil.auto/
-
-all: $(ALL_FILES)
-	echo Building all
+all: $(ALL_FILES) mock
+	@echo Building ALL_FILES: $(ALL_FILES)
 
 gcutil.list: gcutil.list.auto
 	echo Explicitly copying automatic list into list.
 	cp gcutil.list.auto gcutil.list
+	cp gcutil.list.auto ../gcutil.list
 
-gcutil.list.auto: $(ALL_FILES) gcutil.help.auto gcutil.dashdashhelp.auto gcutil.images.auto
+gcutil.list.auto: $(ALL_FILES) 
+# gcutil.help.auto gcutil.dashdashhelp.auto gcutil.images.auto gcutil.zones.auto gcutil.version.auto gcutil.projects.auto
 #gcutil.list.auto: gcutil.help.auto gcutil.dashdashhelp.auto gcutil.images.auto
 	echo Merging all files: $(ALL_FILES)
 	cat $(ALL_FILES) > gcutil.list.auto
@@ -23,7 +24,7 @@ gcutil.help.auto:
 
 # ok
 gcutil.dashdashhelp.auto:
-	cat gcutil.dashdashhelp | egrep -v '^#' | gcutil.dashdashhelp.auto
+	cat gcutil.dashdashhelp | egrep -v '^#' | tee gcutil.dashdashhelp.auto
 
 # OK
 gcutil.images.auto:
@@ -32,9 +33,17 @@ gcutil.images.auto:
 gcutil.zones.auto:
 	gcutil listzones --format names |xargs | tee gcutil.zones.auto
 
+gcutil.projects.auto:
+	cat ~/.gcutil.flags | egrep -- '^--project=' | cut -f 2 -d= | tee gcutil.projects.auto
+
 # only works out of Google
 gcutil.version.auto:
 	gcutil version | tee gcutil.version.auto
+
+mock:
+	@echo Mocks:
+	cat *.mock | egrep -v '^#' | tee gcutil-mock.list
+	cp gcutil-mock.list ../gcutil-mock.list
 
 clean:
 	rm -f $(ALL_FILES) gcutil.list.auto

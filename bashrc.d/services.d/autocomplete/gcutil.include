@@ -8,5 +8,11 @@ if [ ! -f $DIR/gcutil.list ] ; then
     make gcutil.list
 fi
 
-complete -W "`cat $DIR/gcutil.list`" gcutil
-complete -W "`cat $DIR/gcutil.list`" gcutil-sakura
+_autocomplete_gcutil_refresh() {
+  complete -W "`cat $DIR/gcutil.list`" gcutil
+  complete -W "`cat $DIR/gcutil.list`" gcutil-sakura
+  # for mocking in ZERO time...
+  complete -W "`cat $DIR/gcutil-mock.list`" gcutil-mock    
+}
+
+_autocomplete_gcutil_refresh
