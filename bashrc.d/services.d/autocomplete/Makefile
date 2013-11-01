@@ -2,6 +2,8 @@
 # EVERYTHING except "gcutil.list.auto"
 ALL_FILES = gcutil.help.auto gcutil.dashdashhelp.auto gcutil.images.auto gcutil.zones.auto gcutil.version.auto
 
+# TODO move all this stuff to gcutil.auto/
+
 all: $(ALL_FILES)
 	echo Building all
 
