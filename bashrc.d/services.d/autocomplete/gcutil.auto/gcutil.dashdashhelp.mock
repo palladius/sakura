@@ -1,9 +1,0 @@
---print_json --metadata --project --zone --image  
- --machine_type --cache_flag_values --help 
---nosynchronous_mode 
---format  sparse json csv names
---dump_request_response
---credentials_file
-# to make sure you know its a mock
---mock
---yes-this-is-a-mock-dont-use-for-real

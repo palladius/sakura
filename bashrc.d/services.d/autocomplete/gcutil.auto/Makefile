@@ -1,6 +1,6 @@
 
 # EVERYTHING except "gcutil.list.auto"
-ALL_FILES = gcutil.help.auto gcutil.dashdashhelp.auto gcutil.images.auto gcutil.zones.auto  gcutil.projects.auto
+ALL_FILES = gcutil.help.auto gcutil.dashdashhelp.auto gcutil.images.auto gcutil.zones.auto  gcutil.projects.auto gcutil.firewalls.auto
 MOCK_FILES = *.mock
 
 all: mock gcutil
@@ -33,8 +33,13 @@ gcutil.images.auto:
 gcutil.zones.auto:
 	gcutil listzones --format names |xargs | tee gcutil.zones.auto
 
+gcutil.firewalls.auto:
+	gcutil listfirewalls --format names | tee gcutil.firewalls.auto
+
 gcutil.projects.auto:
 	cat ~/.gcutil.flags | egrep -- '^--project=' | cut -f 2 -d= | tee gcutil.projects.auto
+
+
 
 mock: gcutil.zones.mock
 
@@ -44,4 +49,4 @@ gcutil.zones.mock:
 	cp gcutil-mock.list ../gcutil-mock.list
 
 clean:
-	rm -f $(ALL_FILES) gcutil.list.auto
+	rm -f *.auto *.mock

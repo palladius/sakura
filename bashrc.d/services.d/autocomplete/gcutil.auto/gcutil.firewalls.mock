@@ -1,0 +1,6 @@
+allow-ping
+default-allow-internal
+default-ssh
+# fake
+my-firewall-mock1
+my-firewall-mock2
