@@ -41,14 +41,11 @@ gcutil.firewalls.auto:
 gcutil.projects.auto:
 	cat ~/.gcutil.flags | egrep -- '^--project=' | cut -f 2 -d= | tee gcutil.projects.auto
 
+mock: gcutil-mock.list
 
-
-mock: gcutil.zones.mock
-
-gcutil.zones.mock:
-	@echo Mocks:
-	cat *.mock | egrep -v '^#' | tee gcutil-mock.list
-	cp gcutil-mock.list gcutil-mock.list
+gcutil-mock.list:
+	@echo Merging Mocks into one file:
+	cat gcutil.*.mock | egrep -v '^#' | tee gcutil-mock.list
 
 clean:
-	rm -f *.auto *.mock
+	rm -f *.auto gcutil-mock.list
