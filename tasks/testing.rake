@@ -12,4 +12,4 @@ namespace :rictest do
 	end
 end
 
-task :default => :rictest
+# task :default => :rictest
