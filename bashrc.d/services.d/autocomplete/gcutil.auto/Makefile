@@ -6,8 +6,11 @@ MOCK_FILES = *.mock
 all: mock gcutil
 	@echo Building ALL_FILES: $(ALL_FILES)
 
-gcutil: gcutil.list.auto
+gcutil: gcutil.list
 	echo Explicitly copying automatic list into list.
+	cp gcutil.list.auto gcutil.list
+
+gcutil.list: gcutil.list.auto
 	cp gcutil.list.auto gcutil.list
 
 gcutil.list.auto: $(ALL_FILES) 
