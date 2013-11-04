@@ -1,6 +1,5 @@
 
 desc "Run tests hypothetically"
-task :default => :rictest
 
 namespace :rictest do
 	desc "Run mini tests"
@@ -13,3 +12,4 @@ namespace :rictest do
 	end
 end
 
+task :default => :rictest
