@@ -9,7 +9,6 @@ all: mock gcutil
 gcutil: gcutil.list.auto
 	echo Explicitly copying automatic list into list.
 	cp gcutil.list.auto gcutil.list
-	cp gcutil.list.auto ../gcutil.list
 
 gcutil.list.auto: $(ALL_FILES) 
 # gcutil.help.auto gcutil.dashdashhelp.auto gcutil.images.auto gcutil.zones.auto gcutil.projects.auto
@@ -46,7 +45,7 @@ mock: gcutil.zones.mock
 gcutil.zones.mock:
 	@echo Mocks:
 	cat *.mock | egrep -v '^#' | tee gcutil-mock.list
-	cp gcutil-mock.list ../gcutil-mock.list
+	cp gcutil-mock.list gcutil-mock.list
 
 clean:
 	rm -f *.auto *.mock

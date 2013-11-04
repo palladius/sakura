@@ -1,6 +1,6 @@
 # very simple one
 
-DIR=$SAKURADIR/bashrc.d/services.d/autocomplete/
+DIR=$SAKURADIR/bashrc.d/services.d/autocomplete/gcutil.auto/
 
 if [ ! -f $DIR/gcutil.list ] ; then
   echo "Building gcutil auto-completion styuff. Could take a few seconds... Thanks for your patience"
@@ -9,7 +9,9 @@ if [ ! -f $DIR/gcutil.list ] ; then
 fi
 
 _autocomplete_gcutil_refresh() {
+  # production one, but could conflict with my other repos
   complete -W "`cat $DIR/gcutil.list`" gcutil
+  # to play with, and make sure there 's no other completer
   complete -W "`cat $DIR/gcutil.list`" gcutil-sakura
   # for mocking in ZERO time...
   complete -W "`cat $DIR/gcutil-mock.list`" gcutil-mock    
