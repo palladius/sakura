@@ -1,0 +1,10 @@
+#!/bin/bash
+
+if [ -f ~/.gcutil_auth ] ; then
+	cat ~/.gcutil_auth |  ./json-xpath.rb data.0.credential.id_token.email
+	exit 0
+else
+	echo "You haven't setup your account yet. Please run 'gcutil auth'"
+	exit 42
+fi
+
