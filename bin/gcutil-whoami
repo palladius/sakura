@@ -1,10 +1,12 @@
 #!/bin/bash
 
+# parses out 'email' field from auth token for Google Compute Engine file
+
 if [ -f ~/.gcutil_auth ] ; then
-	cat ~/.gcutil_auth |  ./json-xpath.rb data.0.credential.id_token.email
+	cat ~/.gcutil_auth | json-xpath.rb data.0.credential.id_token.email
 	exit 0
 else
-	echo "You haven't setup your account yet. Please run 'gcutil auth'"
+	echo "Cant find ~/.gcutil_auth. Maybe you haven't setup your account yet. If so, please run 'gcutil auth'"
 	exit 42
 fi
 
