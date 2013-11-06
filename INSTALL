@@ -2,7 +2,14 @@
 Do the following:
 
   cat templates/bashrc.inject  >> ~/.bashrc
+  source ~/.bashrc
 
 Or simply:
 
   sudo gem install sakuric    # sakura was already taken :-(
+
+Also remember that this package requires a few packages to work:
+
+  make
+  git
+  ..
