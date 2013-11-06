@@ -6,7 +6,13 @@ Do the following:
 
 Or simply:
 
+  # this doesnt work so well: it install everything as ruby
+  # so shell scripts are screwed.
   sudo gem install sakuric    # sakura was already taken :-(
+
+Third chjoice (experimental):
+
+  make install
 
 Also remember that this package requires a few packages to work:
 
