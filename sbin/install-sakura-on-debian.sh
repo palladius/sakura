@@ -4,8 +4,7 @@
 set -e
 
 VER=1.6
-PKGS='vim polygen cowsay ruby1.8-dev ruby1.8 ri1.8 rdoc1.8 irb1.8 rake rubygems libxml2 libxml2-dev libxslt1-dev 
-libxslt-dev libxml2-dev libreadline-ruby1.8 libruby1.8 libopenssl-ruby git googlecl'
+DEBIAN_PKGS='vim polygen cowsay ruby1.8-dev ruby1.8 ri1.8 rdoc1.8 irb1.8 rake rubygems libxml2 libxml2-dev libxslt1-dev libxslt-dev libxml2-dev libreadline-ruby1.8 libruby1.8 libopenssl-ruby git googlecl make'
 GEMS='xmpp4r-simple xmpp4r ric bundler nokogiri google_drive rubygems-update'
 
 
@@ -13,7 +12,7 @@ GEMS='xmpp4r-simple xmpp4r ric bundler nokogiri google_drive rubygems-update'
 cd
 echo Trying to install $0 v$VER...
 set -x
-sudo apt-get install -y $PKGS
+sudo apt-get install -y $DEBIAN_PKGS
 sudo gem install --no-ri --no-rdoc $GEMS
 sudo sudo /var/lib/gems/1.8/bin/update_rubygems
 
