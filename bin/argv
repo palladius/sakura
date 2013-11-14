@@ -1,0 +1,7 @@
+#!/bin/sh
+
+# Amazing, taken from here: http://mywiki.wooledge.org/WordSplitting
+
+printf "%d args:" $#
+printf " <%s>" "$@"
+echo
