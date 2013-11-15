@@ -1,3 +1,6 @@
+########################################################################################
+# This is static, mantained by Riccardo. You should use the .auto instead.
+########################################################################################
 --print_json --metadata --project --zone --image  
  --machine_type --cache_flag_values --help 
 --nosynchronous_mode 

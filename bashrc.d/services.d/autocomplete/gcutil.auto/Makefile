@@ -48,4 +48,4 @@ gcutil-mock.list:
 	cat gcutil.*.mock | egrep -v '^#' | tee gcutil-mock.list
 
 clean:
-	rm -f *.auto gcutil-mock.list
+	rm -f *.auto gcutil-mock.list gcutil.list

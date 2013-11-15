@@ -2,13 +2,15 @@
 
 DIR=$SAKURADIR/bashrc.d/services.d/autocomplete/gcutil.auto/
 
+echo sourcing dir: $DIR
+
 if [ ! -f $DIR/gcutil.list ] ; then
-  echo "Building gcutil auto-completion styuff. Could take a few seconds... Thanks for your patience"
-  cd $DIR &&
-    make gcutil.list
+  echo "Building gcutil auto-completion stuff. Could take a few seconds... Thanks for your patience"
+  cd $DIR && make gcutil.list
 fi
 
 _autocomplete_gcutil_refresh() {
+  echo "Running _autocomplete_gcutil_refresh(). Feel free to re-run it if you are refreshing stuff."
   # production one, but could conflict with my other repos
   complete -W "`cat $DIR/gcutil.list`" gcutil
   # to play with, and make sure there 's no other completer
