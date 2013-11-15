@@ -1,0 +1,9 @@
+#!/bin/bash
+
+DIR=${1:-/usr/local/}
+
+echo Fiuxing permissions on DIR: $DIR
+
+set -x
+sudo chmod -R o-w "$DIR"
+
