@@ -1,6 +1,6 @@
 
 # EVERYTHING except "gcutil.list.auto"
-ALL_FILES = gcutil.help.auto gcutil.dashdashhelp.auto gcutil.images.auto gcutil.zones.auto  gcutil.projects.auto gcutil.firewalls.auto gcutil.machinetypes.auto gcutil.kernels.auto
+ALL_FILES = gcutil.help.auto gcutil.dashdashhelp.auto gcutil.images.auto gcutil.zones.auto  gcutil.projects.auto gcutil.firewalls.auto gcutil.machinetypes.auto gcutil.kernels.auto gcutil.networks.auto
 MOCK_FILES = *.mock
 
 all: mock gcutil
@@ -37,6 +37,9 @@ gcutil.kernels.auto:
 
 gcutil.machinetypes.auto:
 	gcutil listmachinetypes --format names |xargs | tee gcutil.machinetypes.auto
+
+gcutil.networks.auto:
+	gcutil listnetworks --format names |xargs | tee gcutil.networks.auto
 
 gcutil.zones.auto:
 	gcutil listzones --format names |xargs | tee gcutil.zones.auto
