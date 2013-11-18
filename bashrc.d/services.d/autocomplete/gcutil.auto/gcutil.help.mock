@@ -1,16 +1,10 @@
+## fake ones
 addfoo
 deletefoo
 listfoos
-
 teleportinstance
 mockinstance
-
 addmock deletemock listmocks
-
-## fake ones
-aaa
-rrr
-zzz
 get_answer_to_universe_and_everything
-42
-_im_a_mock
+list_stars_in_the_sky
+get_star_in_the_sky

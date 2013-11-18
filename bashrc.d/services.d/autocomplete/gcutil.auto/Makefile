@@ -1,6 +1,6 @@
 
 # EVERYTHING except "gcutil.list.auto"
-ALL_FILES = gcutil.help.auto gcutil.dashdashhelp.auto gcutil.images.auto gcutil.zones.auto  gcutil.projects.auto gcutil.firewalls.auto
+ALL_FILES = gcutil.help.auto gcutil.dashdashhelp.auto gcutil.images.auto gcutil.zones.auto  gcutil.projects.auto gcutil.firewalls.auto gcutil.machinetypes.auto gcutil.kernels.auto
 MOCK_FILES = *.mock
 
 all: mock gcutil
@@ -31,7 +31,13 @@ gcutil.dashdashhelp.auto:
 # OK
 gcutil.images.auto:
 	gcutil listimages --format names |xargs | tee gcutil.images.auto
- 
+
+gcutil.kernels.auto:
+	gcutil listkernels --format names |xargs | tee gcutil.kernels.auto
+
+gcutil.machinetypes.auto:
+	gcutil listmachinetypes --format names |xargs | tee gcutil.machinetypes.auto
+
 gcutil.zones.auto:
 	gcutil listzones --format names |xargs | tee gcutil.zones.auto
 
@@ -41,6 +47,14 @@ gcutil.firewalls.auto:
 gcutil.projects.auto:
 	cat ~/.gcutil.flags | egrep -- '^--project=' | cut -f 2 -d= | tee gcutil.projects.auto
 
+
+clean:
+	rm -f *.auto gcutil-mock.list gcutil.list
+
+
+#############################################################
+# Mocks
+
 mock: gcutil-mock.list
 	@echo Making gcutil-mock.list..
 
@@ -48,5 +62,3 @@ gcutil-mock.list:
 	@echo Merging Mocks into one file:
 	cat gcutil.*.mock | egrep -v '^#' | tee gcutil-mock.list
 
-clean:
-	rm -f *.auto gcutil-mock.list gcutil.list
