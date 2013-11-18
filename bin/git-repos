@@ -11,6 +11,11 @@ default_git_basedir = os.path.expandvars("$HOME/git/")
 debug = False
 valid_commands = [ 'list', 'dump','help']
 
+def require_file(cmd):
+  """Requires if the file is existant (responds to which).
+   Otherwise exists.
+  """
+  pass
 
 def deb(*args):
   if (debug):
@@ -62,6 +67,7 @@ def dumprepos(mybasedir,dump_basedir):
 
 def main():
 	(parser,opts, args) = parse_python_26()
+	require_file('git')
 	if args[0] == 'list':
 	  deb( "Listing your local Git Repos:")
 	  for repo in gitrepos(opts.gitdir):
