@@ -1,3 +1,6 @@
 #!/bin/sh
 
-cat ~/.gcutil_auth |grep -i access_token | cut -d '"' -f 4
+# I only take one
+cat ~/.gcutil_auth | grep access_token | grep ya29 | head -1 | cut -f 4 -d'"'
+
+#cat ~/.gcutil_auth |grep -i access_token | cut -d '"' -f 4
