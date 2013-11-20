@@ -46,6 +46,7 @@ gcutil.zones.auto:
 
 gcutil.instances.auto:
 	# this should be LESS cached (eg 30')
+	@echo "DEBUG Populating instances with gcutil listinstances... pleas ebe patient" >&2
 	gcutil listinstances --format names | cut -d/ -f 3 | tee gcutil.instances.auto
 
 gcutil.projects.auto:

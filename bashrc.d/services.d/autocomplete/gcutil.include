@@ -17,6 +17,8 @@ _autocomplete_gcutil_refresh() {
   complete -W "`cat $DIR/gcutil.list`" gcutil-sakura
   # for mocking in ZERO time...
   complete -W "`cat $DIR/gcutil-mock.list`" gcutil-mock    
+  # completing instances
+  complete -W "`cat $DIR/gcutil.instances.auto`" gcutil--ssh
 }
 
 _autocomplete_gcutil_refresh
