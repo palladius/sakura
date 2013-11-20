@@ -5,6 +5,7 @@ MOCK_FILES = *.mock
 
 all: mock gcutil
 	@echo Building ALL_FILES: $(ALL_FILES)
+	@echo you can clean up stuff by this: make clean-badauto
 
 gcutil: gcutil.list
 	echo Explicitly copying automatic list into list.
@@ -56,6 +57,9 @@ gcutil.projects.auto:
 clean:
 	rm -f *.auto gcutil-mock.list gcutil.list
 
+clean-badauto:
+	@echo Looking for files which have 2 bytes or less: deleting them
+	find . -name \*.auto -size -2c -print0 | xargs -0 rm
 
 #############################################################
 # Mocks
