@@ -1,6 +1,6 @@
 
 # EVERYTHING except "gcutil.list.auto"
-ALL_FILES = gcutil.help.auto gcutil.dashdashhelp.auto gcutil.images.auto gcutil.zones.auto  gcutil.projects.auto gcutil.firewalls.auto gcutil.machinetypes.auto gcutil.kernels.auto gcutil.networks.auto
+ALL_FILES = gcutil.help.auto gcutil.dashdashhelp.auto gcutil.images.auto gcutil.zones.auto  gcutil.projects.auto gcutil.firewalls.auto gcutil.instances.auto gcutil.machinetypes.auto gcutil.kernels.auto gcutil.networks.auto
 MOCK_FILES = *.mock
 
 all: mock gcutil
@@ -20,15 +20,15 @@ gcutil.list.auto: $(ALL_FILES)
 	cat $(ALL_FILES) > gcutil.list.auto
 	echo "Try: cp gcutil.list.auto gcutil.list"
 
-#OK
 gcutil.help.auto:
 	gcutil help |  egrep -v '^$$' | egrep '^\w+( )+ [A-Z]' | awk '{print $$1}' | sort | xargs | tee gcutil.help.auto
 
-# ok
 gcutil.dashdashhelp.auto:
 	cat gcutil.dashdashhelp | egrep -v '^#' | tee gcutil.dashdashhelp.auto
 
-# OK
+gcutil.firewalls.auto:
+	gcutil listfirewalls --format names | tee gcutil.firewalls.auto
+
 gcutil.images.auto:
 	gcutil listimages --format names |xargs | tee gcutil.images.auto
 
@@ -40,12 +40,13 @@ gcutil.machinetypes.auto:
 
 gcutil.networks.auto:
 	gcutil listnetworks --format names |xargs | tee gcutil.networks.auto
-
+ 
 gcutil.zones.auto:
 	gcutil listzones --format names |xargs | tee gcutil.zones.auto
 
-gcutil.firewalls.auto:
-	gcutil listfirewalls --format names | tee gcutil.firewalls.auto
+gcutil.instances.auto:
+	# this should be LESS cached (eg 30')
+	gcutil listinstances --format names | cut -d/ -f 3 | tee gcutil.instances.auto
 
 gcutil.projects.auto:
 	cat ~/.gcutil.flags | egrep -- '^--project=' | cut -f 2 -d= | tee gcutil.projects.auto
