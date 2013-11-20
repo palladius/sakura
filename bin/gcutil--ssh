@@ -1,0 +1,4 @@
+#!/bin/bash
+
+gcutil ssh "$@"
+
