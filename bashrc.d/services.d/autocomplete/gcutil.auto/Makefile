@@ -36,7 +36,7 @@ gcutil.kernels.auto:
 	gcutil listkernels --format names |xargs | tee gcutil.kernels.auto
 
 gcutil.machinetypes.auto:
-	gcutil listmachinetypes --format names |xargs | tee gcutil.machinetypes.auto
+	gcutil listmachinetypes --format names | cut -f 3 -d/ | tee gcutil.machinetypes.auto
 
 gcutil.networks.auto:
 	gcutil listnetworks --format names |xargs | tee gcutil.networks.auto
