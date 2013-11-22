@@ -8,7 +8,7 @@ MOCK_FILES = *.mock
 
 all: mock gcutil
 	@echo Building ALL_FILES: $(ALL_FILES)
-	@echo you can clean up stuff by this: make clean-badauto
+	@echo you can clean up stuff by this: make clean-bad-files
 
 gcutil: gcutil.list
 	echo Explicitly copying automatic list into list.
