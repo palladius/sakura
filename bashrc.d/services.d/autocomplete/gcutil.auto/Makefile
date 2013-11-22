@@ -71,3 +71,7 @@ gcutil-mock.list:
 	@echo Merging Mocks into one file:
 	cat gcutil.*.mock | egrep -v '^#' | tee gcutil-mock.list
 
+cache-invalidate:
+	@echo Invalidating cached values older than a day:
+	find . -name \*.auto -cmin +1440 -print0 | xargs -0 rm
+
