@@ -1,0 +1,9 @@
+#!/bin/bash
+
+HOWMANY=${1:-1}
+DIR='.'
+# dflts to 1
+
+ls -lart $DIR |egrep -v ^d | ripulisci | tail -n "$HOWMANY" | while read A B C D E F G H NOME ; do
+  echo $NOME
+done

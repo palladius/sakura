@@ -1,0 +1,6 @@
+gcutil:
+  ssh: _INSTANCES
+  --project: _PROJECTS
+  deleteinstance: _INSTANCES
+commands:
+  _INSTANCES: gcutil listinstances --format names

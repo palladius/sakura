@@ -1,5 +1,10 @@
 #!/bin/bash
 
-ls -lart $* |egrep -v ^d | ripulisci | tail -1 | while read A B C D E F G H NOME ; do
-	echo $NOME
+set -x
+#HOWMANY=${1:-1}
+HOWMANY=1
+# dflts to 1
+
+ls -lart $* |egrep -v ^d | ripulisci | tail -n "$HOWMANY" | while read A B C D E F G H NOME ; do
+  echo $NOME
 done
