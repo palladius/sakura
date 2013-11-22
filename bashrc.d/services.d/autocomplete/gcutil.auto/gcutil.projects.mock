@@ -1,3 +1,10 @@
+############################################
+# Please edit gcutil.projects.auto manually
+# adding your projects. then the system will
+# autocomplete them for you.
+############################################
+
+
 # True
 google.com:discoproject
 palladiusbonton
@@ -6,3 +13,4 @@ palladiusbonton
 myproject1
 myproject2
 palladius.it:iwishihadone
+

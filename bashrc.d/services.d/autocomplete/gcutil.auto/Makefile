@@ -1,6 +1,9 @@
 
 # EVERYTHING except "gcutil.list.auto"
-ALL_FILES = gcutil.help.auto gcutil.dashdashhelp.auto gcutil.images.auto gcutil.zones.auto  gcutil.projects.auto gcutil.firewalls.auto gcutil.instances.auto gcutil.machinetypes.auto gcutil.kernels.auto gcutil.networks.auto
+ALL_FILES = gcutil.help.auto gcutil.dashdashhelp.auto gcutil.images.auto gcutil.zones.auto \
+ gcutil.projects.auto gcutil.firewalls.auto gcutil.instances.auto gcutil.machinetypes.auto \
+ gcutil.kernels.auto gcutil.networks.auto gcutil.service_versions.auto
+
 MOCK_FILES = *.mock
 
 all: mock gcutil
@@ -24,8 +27,13 @@ gcutil.list.auto: $(ALL_FILES)
 gcutil.help.auto:
 	gcutil help |  egrep -v '^$$' | egrep '^\w+( )+ [A-Z]' | awk '{print $$1}' | sort | xargs | tee gcutil.help.auto
 
+
+#####################################################################################3
+# entity completion: Start
+#####################################################################################3
+
 gcutil.dashdashhelp.auto:
-	cat gcutil.dashdashhelp | egrep -v '^#' | tee gcutil.dashdashhelp.auto
+	cat gcutil.dashdashhelp.mock | egrep -v '^#' | tee gcutil.dashdashhelp.auto
 
 gcutil.firewalls.auto:
 	gcutil listfirewalls --format names | tee gcutil.firewalls.auto
@@ -52,6 +60,13 @@ gcutil.instances.auto:
 
 gcutil.projects.auto:
 	cat ~/.gcutil.flags | egrep -- '^--project=' | cut -f 2 -d= | tee gcutil.projects.auto
+
+gcutil.service_versions.auto:
+	cat gcutil.service_versions.mock  | egrep -v '^#' | sort >  gcutil.service_versions.auto
+
+#####################################################################################3
+# /entity completion
+#####################################################################################3
 
 
 clean:

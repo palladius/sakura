@@ -1,10 +1,25 @@
 ########################################################################################
 # This is static, mantained by Riccardo. You should use the .auto instead.
 ########################################################################################
---print_json --metadata --project --zone --image  
- --machine_type --cache_flag_values --help 
+--print_json 
+--metadata 
+--project 
+--project_id
+--zone
+--image  
+ --machine_type 
+ --cache_flag_values 
+ --help 
 --nosynchronous_mode 
 # note that table is the default, hence its omitted
 --format  sparse json csv names
 --dump_request_response
 --credentials_file
+--service_version
+--concurrent_operations
+# It would be nice to change a line like this automagically as:
+# --[no]print_json
+# 1. --print_json
+# 2. --print_json
+--noprint_json
+--print_json
