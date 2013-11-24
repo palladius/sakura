@@ -4,18 +4,20 @@ import glob
 import os
 import sys
 import subprocess
-default_git_basedir = os.path.expandvars("$HOME/git/")
+from optparse import OptionParser
 
-valid_commands = [ 'list', 'dump','help']
-debug = False
 version = '1.1'
+default_git_basedir = os.path.expandvars("$HOME/git/")
+debug = False
+valid_commands = [ 'list', 'dump','help']
+
 
 def deb(*args):
-	if (debug):
-		print "#DEB", ' '.join(arg.__str__() for arg in args)
+  if (debug):
+    print "#DEB", ' '.join(arg.__str__() for arg in args)
 
 def parse_python_26():
-	from optparse import OptionParser
+	'''There's a better parser with python2.7 but that's what I have in 2.6..'''
 	parser = OptionParser(usage = """Usage: %prog v{1} [Options] <COMMAND>
 COMMAND: {0}
 
@@ -43,9 +45,9 @@ Examples:
 
 def dumprepos(mybasedir,dump_basedir):
 	'''Prints adump of all your repo in such a way that you can reconstruct them: cool!'''
+	from subprocess import Popen,PIPE
 	deb( "Dumping to STDOUT your local Git Repos within {0} (dumpdir='{1}'):".format(mybasedir,dump_basedir))
 	dump = ''
-	from subprocess import Popen,PIPE
 	for repo in gitrepos(mybasedir):
 		url_cmd = 'git config --get remote.origin.url'
 		p = Popen([url_cmd], cwd = repo, stdout=PIPE,shell=True, env = {'PATH': '/usr/local/bin/'}) # .wait() #stdout.read()
@@ -55,9 +57,6 @@ def dumprepos(mybasedir,dump_basedir):
 			sys.stderr.write( "Skipping '{0}': ERR={1} URL='{2}'\n".format(repo,err,url) )
 		else:
 			desturl= repo
-			#dump += "git clone '{0}' '{1}'\n".format(url,desturl)
-			#dump += "git clone '{0}' '{1}'\n".format(url,mybasedir)
-			#dump += "git clone '{0}' '{1}'\n".format(url,dump_basedir)
 			dump += "git clone '{0}' '{1}'\n".format(url,desturl.replace(mybasedir,dump_basedir))
 	return dump
 
