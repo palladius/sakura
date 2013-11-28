@@ -63,6 +63,7 @@ Borrowed code:
 - Micha Niskin <micha@thinkminimo.com>: `jsawk`
 - A. Iurlano <http://github.com/aiurlano>: `gcutil-fetch`, `gsutil-fetch`
 - Ian Bicking <http://blog.ianbicking.org/>: virtualenv
+- Gina Trapani <https://github.com/ginatrapani/todo.txt-cli>: todo.sh
 
 Thanks for who believed in me:
 
