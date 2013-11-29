@@ -29,3 +29,5 @@ predeploy:
 # deploys gem
 deploy:
 	rake manifest && rake build_gemspec && rake release && rake publish_docs && verde Correctly deployed
+autocomplete:
+	make -C bashrc.d/services.d/autocomplete/gcutil.auto/

@@ -4,14 +4,13 @@ declare -a icao
 
 icao[32]="spazio"
 
-
 icao[65]="MAIUSCOLO ANCONA"
 icao[66]="MAIUSCOLO BOLOGNA"
 icao[67]="MAIUSCOLO COMO"
 icao[68]="MAIUSCOLO DOMODOSSOLA"
 icao[69]="MAIUSCOLO EMPOLI"
 icao[70]="MAIUSCOLO FIRENZE"
-icao[71]="MAIUSCOLO Genova"
+icao[71]="MAIUSCOLO GENOVA"
 icao[72]="MAIUSCOLO HOTEL"
 icao[73]="MAIUSCOLO IMOLA"
 icao[74]="MAIUSCOLO JOLLY"
@@ -32,7 +31,7 @@ icao[88]="MAIUSCOLO XILOFONO"
 icao[89]="MAIUSCOLO YORK"
 icao[90]="MAIUSCOLO ZARA"
 
-icao[97]="minuscolo ancona"
+icao[97]="minuscolo Ancona"
 icao[98]="minuscolo Bologna"
 icao[99]="minuscolo Como"
 icao[100]="minuscolo Domodossola"
