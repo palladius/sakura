@@ -1,0 +1,7 @@
+#!/bin/bash
+
+DIR=$SAKURADIR/bashrc.d/services.d/autocomplete/gcutil.auto/
+
+cat  $DIR/gcutil.list
+# mock: cat $DIR/gcutil-mock.list for gcutil-mock
+

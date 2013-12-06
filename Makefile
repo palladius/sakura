@@ -4,6 +4,7 @@ help:
 	@echo 'install:       Installs software'
 	@echo 'test:          Runs tests'
 	@echo 'deploy:        Creates manifest, gemspecs, .. and deploys to rubygem'
+	@echo 'autocomplete:  Fills the autocomplete scripts (eg gcutil)'
 
 clean:
 	echo TODO cleanup

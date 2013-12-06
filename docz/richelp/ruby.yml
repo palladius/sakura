@@ -79,3 +79,6 @@ rvm:
  _cheat: http://cheat.errtheblog.com/s/rvm/
  nice commands: 
   - rvm use --default 1.9.3
+ubuntu debian:
+  reconfigure alternatives (default): sudo update-alternatives --config ruby 
+
