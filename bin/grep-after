@@ -1,0 +1,12 @@
+#!/bin/bash
+
+# from:
+# http://stackoverflow.com/questions/18166552/grep-a-print-everything-after-match
+
+REGEX=${1:-FROMHERE}
+
+awk "/$REGEX/{y=1}y"
+
+# with sed:
+#sed "1,/$REGEX/d"
+
