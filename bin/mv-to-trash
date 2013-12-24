@@ -1,0 +1,11 @@
+#!/bin/bash
+
+DIR=~/.Trash/
+
+if [ ! -d $DIR ] ; then
+  echo Creating dir: $DIR
+  mkdir -p $DIR 2>/dev/null
+fi
+
+set -x
+mv "$@" $DIR/
