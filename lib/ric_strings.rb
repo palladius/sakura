@@ -9,7 +9,7 @@ class String
   
   def left(length,padding)
     mylen = self.length
-    padding_char = padding[0] # troppo difficile fare che paddi "abc" su 8 fa "abcabcab" checcavolo :)
+    #padding_char = padding[0] # troppo difficile fare che paddi "abc" su 8 fa "abcabcab" checcavolo :)
     mylen < length ?
       self + padding * (length - mylen) :
       self 
@@ -91,9 +91,9 @@ class String
   
   alias :right :left
   
-  def flag(nation)
-    flag(self, flag = '')
-  end
+  #def flag(nation)
+  #  flag(self, flag = '')
+  #end
   
     # enclose string in single quotes..
   def quote(sep = nil)
@@ -106,7 +106,7 @@ class String
     gsub(/[\/: \.]/ , '_')
   end
 
-  def prepend(str)
+  def prepend2(str)
     str.to_s+self
   end
   def append(str)
@@ -151,7 +151,7 @@ class String
      else
        self
      end
-   end
+  end
 #   alias :excerpt :shorten
 # no dai, in realta excerpt sarebbe con SEARCH di parola e ci orla intorno...
 
