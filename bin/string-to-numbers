@@ -1,0 +1,39 @@
+#!/usr/bin/python
+
+import socket
+import sys
+
+VERSION = '0.9a'
+VERBOSE = False
+
+min_number = 1025
+max_number = 65535
+
+dflt_argv1 = socket.gethostname()
+
+# http://stackoverflow.com/questions/2511058/persistent-hashing-of-strings-in-python
+def string_to_int(s):
+	'''This random algorithm is SHITE... try between 10 and 12 and you'll see.
+	redo it!'''
+	ord3 = lambda x : '%.3d' % ord(x)
+	return int(''.join(map(ord3, s))) + 1
+
+def main():
+	"""prints a hased random number based on ARGV[1], dflts to HOSTNAME.
+
+	TODO: parametrixze also the port numbers.
+	"""
+	if len(sys.argv) < 2:
+	    my_string = dflt_argv1
+	else:
+		my_string = sys.argv[1]
+	randomone = string_to_int(my_string)
+	random_tcp_port = randomone % (max_number+1-min_number) + min_number
+
+	if VERBOSE:
+		print "Random seed for '{}': {}".format(my_string, randomone)
+		print "TCP Port [{}..{}]: {}".format(min_number, max_number, random_tcp_port)
+	else:
+		print random_tcp_port
+
+main()
