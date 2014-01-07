@@ -107,11 +107,7 @@ class String
     gsub(/[\/: \.]/ , '_')
   end
 
-<<<<<<< HEAD
-  def prepend2(str) # already definied elsewhere! TODO(ricc) find it
-=======
   def prepend2(str)
->>>>>>> 52397b48c9203441aadc60c47242dd63453e9126
     str.to_s+self
   end
   def append(str)
