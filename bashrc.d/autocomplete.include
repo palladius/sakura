@@ -1,2 +1,4 @@
 
-source $SAKURADIR/bashrc.d/services.d/autocomplete/*.include
+# if RIC_AUTOCOMPLETE ; then
+#   source $SAKURADIR/bashrc.d/services.d/autocomplete/*.include
+# fi
