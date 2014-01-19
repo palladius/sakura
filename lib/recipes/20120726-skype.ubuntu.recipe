@@ -1,7 +1,7 @@
 prechecks:
 prerequisites:
   facter: # needs that facter by KEY equals VALUE
-    lsbdistid: Ubuntuzzz
+    lsbdistid: Ubuntu
 description: This try to install skype on Ubuntu!
 name: skype
 install:

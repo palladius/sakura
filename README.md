@@ -64,6 +64,7 @@ Borrowed code:
 - A. Iurlano <http://github.com/aiurlano>: `gcutil-fetch`, `gsutil-fetch`
 - Ian Bicking <http://blog.ianbicking.org/>: virtualenv
 - Gina Trapani <https://github.com/ginatrapani/todo.txt-cli>: todo.sh
+- Richard van den Berg <richard@vdberg.org>: TcpPing
 
 Thanks for who believed in me:
 
