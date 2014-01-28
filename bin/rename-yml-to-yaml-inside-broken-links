@@ -1,0 +1,9 @@
+#!/bin/bash
+
+DIR=${1:-.}
+
+cd "$DIR" || exit 1
+
+find .  -type l ! -exec test -r {} \; -print | while read F; do echo ln -sf $(basename $(readlink $F) .yml).yaml $F; done | tee t.rename
+
+giallo created file: t.rename

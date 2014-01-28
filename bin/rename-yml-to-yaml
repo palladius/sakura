@@ -1,0 +1,9 @@
+#!/bin/bash
+
+DIR=${1:-.}
+
+cd "$DIR" || exit 1
+
+for i in *.yml ; do
+    echo mv $i $(basename $i .yml).yaml;
+done
