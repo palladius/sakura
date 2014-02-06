@@ -1,0 +1,6 @@
+#!/bin/bash
+
+set -x
+
+curl --write-out '\nHTTP CODE: %{http_code}\n' --silent --output /dev/null "$@"
+

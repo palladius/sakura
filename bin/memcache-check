@@ -2,6 +2,8 @@
 
 # Found here: http://stackoverflow.com/questions/631903/how-do-you-know-if-memcached-is-doing-anything
 
+# @depends: debian/telnet, debian/expect
+
 # Usage: $0 <IP> <PORT>
 
 set timeout 1
