@@ -1,11 +1,13 @@
 
+WGET='wget --no-check-certificate' 
+
 if [ -f /usr/bin/facter ] ; then
   if facter architecture | grep -q 64 ; then
     echo Architecture 64bit found: installing Dropbox 64 bit 
-    cd ~ && wget -O - "https://www.dropbox.com/download?plat=lnx.x86_64" | tar xzf -
+    cd ~ && $WGET -O - "https://www.dropbox.com/download?plat=lnx.x86_64" | tar xzf -
   else
     echo Architecture 32bit found: installing Dropbox 32 bit 
-    cd ~ && wget -O - "https://www.dropbox.com/download?plat=lnx.x86" | tar xzf -
+    cd ~ && $WGET -O - "https://www.dropbox.com/download?plat=lnx.x86" | tar xzf -
   fi
   echo Now you have to do this: ~/.dropbox-dist/dropboxd
 else
