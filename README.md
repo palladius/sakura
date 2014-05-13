@@ -2,7 +2,7 @@
 
 [![Build Status](https://secure.travis-ci.org/palladius/sakura.png)](http://travis-ci.org/palladius/sakura)
 
-Sakura stands for Swiss Army Knife Uncanny Repository and Awesome :)
+Sakura stands for "Swiss Army Knife Unnecessary Repository yet Awesome" :)
 
  <img src='https://github.com/palladius/sakura/raw/master/images/sakura.jpg' height='200' align='right' />
  

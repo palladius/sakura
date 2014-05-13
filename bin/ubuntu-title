@@ -1,0 +1,4 @@
+#!/bin/bash
+
+# sets the Ubuntu Terminal title
+echo -ne "\033]0;$@\007"
