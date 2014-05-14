@@ -1,0 +1,71 @@
+#!/bin/bash
+
+MIN_ARGS=2
+MAX_ARGS=3
+
+_usage() {
+  echo "Usage: `basename $0` [-s <COMMA_SEPARATED_SERVICES> ] <disk-name> <disk-path> [snapshot-name]"
+  echo "  eg:  `basename $0` -s mysqld,apache2 my-disk /mnt/my-disk"
+  echo "Error: $1"
+}
+service_stop() {
+  echo sudo service stop $*
+}
+service_start() {
+  echo sudo service start $*
+}
+
+
+SERVICES=""
+
+while getopts "hs:" opt; do
+  case $opt in
+    h) 
+      _usage "Help option called"
+      shift;;
+    s) 
+      SERVICES="$OPTARG"; 
+      echo "SERVICES changed: $SERVICES ($OPTARG)" 
+      shift 2;; 
+    \?) echo "Invalid option: -"$OPTARG"" >&2
+      exit 1;;
+    : ) echo "Option -"$OPTARG" requires an argument." >&2
+      exit 1;;
+  esac
+done
+
+if [ $# -lt $MIN_ARGS -o $# -gt $MAX_ARGS ]; then
+  _usage "DEB: ARGS=$# (not in $MIN_ARGS..$MAX_ARGS)"
+  exit 11
+fi
+
+DISK="$1"
+DISK_PATH="${2:-/mnt/$DISKNAME}"
+SNAPSHOT_NAME="${3:-$DISK-SNAPSHOT}"
+
+# MAIN
+echo "# The following script takes a snapshot of disk '$DISK' (in '$DISK_PATH')"
+echo "# preventively stopping '$SERVICES' which potentially affect that disk"
+echo
+
+# die at first error
+echo set -e
+echo "$SERVICES" | sed -e "s/,/\n/g" | while read S ; do
+  service_stop $S
+done
+echo sudo sync
+echo sudo fsfreeze -f $DISK_PATH
+echo gcutil addsnapshot --source_disk=my-disk $SNAPSHOT_NAME --nosynchronous_mode
+
+echo "while gcutil getsnapshot '$SNAPSHOT_NAME' | grep 'status' | egrep -v 'UPLOADING|READY' ; do"
+echo "  echo 'Waiting for Snapshot to be uploading or finished.'"
+echo "  sleep 0.5"
+echo "done"
+echo "# Snapshot '$SNAPSHOT_NAME' appears to have been created"
+
+echo sudo fsfreeze -u $DISK_PATH
+echo "$SERVICES" | sed -e "s/,/\n/g" | while read S ; do
+  service_start $S
+done
+echo echo Done.
+
