@@ -1,8 +1,9 @@
 
-HELLO_ORIG="ciAo DA mE!"
-HELLO_CAPITALIZE="Ciao da me!"
-HELLO_UP="CIAO DA ME!"
-HELLO_DOWN="ciao da me!"
+HELLO_ORIG="ciAo DA mE! proviamo qui"
+# expected results
+HELLO_CAPITALIZE="Ciao da me! proviamo qui"
+HELLO_UP="CIAO DA ME! PROVIAMO QUI"
+HELLO_DOWN="ciao da me! proviamo qui"
 
 # According to wikipedia, capitalize of "ciao" is "Ciao", not "CIAO"!!!
 
