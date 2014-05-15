@@ -1,1 +1,5 @@
-capitalize
+#!/bin/bash
+
+tr [:lower:] [:upper:]
+#sed 's/.*/\u&/g'
+

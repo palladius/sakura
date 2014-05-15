@@ -1,10 +1,21 @@
 
-HELLO_ORIG="Ciao da me!"
+HELLO_ORIG="ciAo DA mE!"
+HELLO_CAPITALIZE="Ciao da me!"
 HELLO_UP="CIAO DA ME!"
 HELLO_DOWN="ciao da me!"
 
-UPPED="`echo "$HELLO_ORIG" | capitalize`"      # or "to_upper"
-DOWNIZED="`echo "$HELLO_ORIG" | decapitalize`" # or "to_lower"
+# According to wikipedia, capitalize of "ciao" is "Ciao", not "CIAO"!!!
+
+CAPITALIZED="`echo "$HELLO_ORIG" | capitalize`"      # or "to_upper"
+UPPED="`echo "$HELLO_ORIG" | uppercase`"    # or "to_upper"
+DOWNIZED="`echo "$HELLO_ORIG" | lowercase`" # or "to_lower"
+
+if [ "$CAPITALIZED" != "$HELLO_CAPITALIZE" ] ; then
+  echo "capitalize not good: '$CAPITALIZED' <> '$HELLO_CAPITALIZE'"
+  exit 41
+else
+  echo capitalize good
+fi
 
 if [ "$UPPED" != "$HELLO_UP" ] ; then
   echo "to_upper not good: '$UPPED' <> '$HELLO_UP'"
