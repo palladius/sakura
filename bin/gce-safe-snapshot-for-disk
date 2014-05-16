@@ -1,11 +1,27 @@
 #!/bin/bash
 
-# This script accepts 2 or 3 args. It's freely inspired by this great article by F. Voznika.
+################################################################################
+# This script is freely inspired by this great article by F. Voznika: [1].
+# It tries to take a snapshot from a live VM by stopping the services that most
+# likely impact its disk usage. Please remember that a safe bit-a-bit copy of a
+# disk is guaranteed only on an unattached sik (or disk attached to a VM which
+# is not in state RUNNING).
+# To give you full control, it just outputs qwhat it would do, so you can cut/paste
+# and maybe add additional scripts to the naive "service start/stop" provided here.
+#
+# *** ACHTUNG ***
+# THIS SCRIPT IS PROVIDED AS IS. USE AT YOUR OWN RISK.
+# (However, this tries its best to get your Snapshot data from a live vm)
+#
+# [1] http://googlecloudplatform.blogspot.ch/2013/10/persistent-disk-backups-using-snapshots.html
+################################################################################
 # Author: Riccardo Carlesso <palladiusbonton+sakura@gmail.com>
 # Contributors:
 # - Francisco Voznika
 # - Andy Wua
-# Version: 0.2
+################################################################################
+
+VERSION=0.3
 
 set -e
 
@@ -22,7 +38,7 @@ service_start() {
 }
 
 
-local SERVICES=""
+SERVICES=""
 
 while getopts "hs:" opt; do
   case $opt in
@@ -31,7 +47,6 @@ while getopts "hs:" opt; do
       shift;;
     s) 
       SERVICES="$OPTARG"; 
-      echo "SERVICES changed: $SERVICES ($OPTARG)" 
       shift 2;; 
     \?) echo "Invalid option: -"$OPTARG"" >&2
       exit 1;;
@@ -40,32 +55,40 @@ while getopts "hs:" opt; do
   esac
 done
 
-# ARG1: disk (mandatory)
-# ARG2: DISK_PATH (mandatory)
-# ARG3: SNPASHOT_NAME *optional)
-local MIN_ARGS=2
-local MAX_ARGS=3
+################################################################################
+# Main function
+################################################################################
+# ARG1: disk          (mandatory)
+# ARG2: DISK_PATH     (mandatory)
+# ARG3: SNPASHOT_NAME (optional)
+MIN_ARGS=2
+MAX_ARGS=3
 if [ $# -lt $MIN_ARGS -o $# -gt $MAX_ARGS ]; then
-  _usage "DEB: ARGS=$# (not in $MIN_ARGS..$MAX_ARGS)"
+  _usage "ARGS=$# (not in $MIN_ARGS..$MAX_ARGS)"
   exit 11
 fi
 
-local DISK="$1"
-local DISK_PATH="${2:-/mnt/$DISKNAME}"
-local SNAPSHOT_NAME="${3:-$DISK-SNAPSHOT}"
+DISK="$1"
+DISK_PATH="${2:-/mnt/$DISKNAME}"
+SNAPSHOT_NAME="${3:-$DISK-SNAPSHOT}"
 
 # MAIN
+echo "#!/bin/bash"
+echo
 echo "# The following script takes a snapshot of disk '$DISK' (in '$DISK_PATH')"
 echo "# preventively stopping '$SERVICES' which potentially affect that disk"
+echo "# and creates a snapshot called '$SNAPSHOT_NAME'. Feel free to copy this"
+echo "# output to a file and edit according to your needs."
 echo
 
 # die at first error
 echo set -e
+echo set -x
 echo "$SERVICES" | sed -e "s/,/\n/g" | while read S ; do
   service_stop $S
 done
 echo sudo sync
-echo "trap 'sudo fsfreeze =f $DISK_PATH' 0"
+echo "trap 'sudo fsfreeze -f $DISK_PATH' 0 # guarantees this will be executed anyway.."
 echo sudo fsfreeze -f $DISK_PATH
 echo gcutil addsnapshot --source_disk=my-disk $SNAPSHOT_NAME --nosynchronous_mode
 
