@@ -35,8 +35,8 @@ _usage() {
   echo "Usage: `basename $0` [-s <COMMA_SEPARATED_SERVICES> ] <disk-name> <disk-path> [snapshot-name]"
   echo "  eg:  `basename $0` -s mysqld,apache2 my-disk /mnt/my-disk"
   echo 
-  echo "DiskName: the disk name which appears in 'gcutil listdisks'"
-  echo "DiskPath: physical disk mount-path (NOT root: '/')"
+  echo " disk-name:   The disk name which appears in 'gcutil listdisks'"
+  echo " disk-path:   Physical disk mount-path (NOT root: '/')"
   echo
   echo "Disks in /dev/disk/by-id/google-*:"
   ls -l /dev/disk/by-id/google-* 2>/dev/null | while read D; do echo "- $D"; done 
@@ -104,6 +104,19 @@ DISK="$1"
 DISK_PATH="$2"
 SNAPSHOT_NAME="${3:-$DISK-safe-snapshot}"
 OUTFILE=/tmp/gce-safe-snapshot-of-disk.$DISK.sh
+
+# verifying that the disk exists
+if gcutil listdisks --format csv | egrep "^$DISK," ; then
+  echo "# disk '$1' found."
+else
+  _usage "Disk '$1' not found with 'gcutil listdisks'"
+fi
+
+# TODO(ricc)
+# verify that mountpoint exists
+
+#####################################################################################
+# All good here. Starting to execute
 
 #exec >$OUTFILE 2>&1
 exec > >(tee $OUTFILE)
