@@ -29,9 +29,14 @@ set -e
 _usage() {
   echo "Usage: `basename $0` [-s <COMMA_SEPARATED_SERVICES> ] <disk-name> <disk-path> [snapshot-name]"
   echo "  eg:  `basename $0` -s mysqld,apache2 my-disk /mnt/my-disk"
+  echo 
+  echo "DiskName: the disk name which appears in 'gcutil listdisks'"
+  echo "DiskPath: physical place where the disk is, eg '/'"
+  echo
   echo "Disks in /dev/disk/by-id/:"
-  ls -al /dev/disk/by-id/
-  echo "Error: $1"
+  ls -l /dev/disk/by-id/
+  echo
+  echo "FATAL: $1"
 }
 
 service_stop() {
@@ -109,7 +114,7 @@ manage_services service_stop
 echo sudo sync
 echo "trap 'sudo fsfreeze -u $DISK_PATH' 0          # the UNFREEZE will be executed anyway"
 echo sudo fsfreeze -f $DISK_PATH
-echo gcutil addsnapshot --source_disk=my-disk $SNAPSHOT_NAME --nosynchronous_mode
+echo gcutil addsnapshot --source_disk=$DISK $SNAPSHOT_NAME --nosynchronous_mode
 
 echo "while gcutil getsnapshot '$SNAPSHOT_NAME' | grep 'status' | egrep -v 'UPLOADING|READY' ; do"
 echo "  echo 'Waiting for Snapshot to be uploading or finished. Please be patient'"
