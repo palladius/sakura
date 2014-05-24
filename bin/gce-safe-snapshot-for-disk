@@ -31,7 +31,7 @@ _usage() {
   echo "  eg:  `basename $0` -s mysqld,apache2 my-disk /mnt/my-disk"
   echo 
   echo "DiskName: the disk name which appears in 'gcutil listdisks'"
-  echo "DiskPath: physical place where the disk is (NOT '/')"
+  echo "DiskPath: physical disk mount-path (NOT root: '/')"
   echo
   echo "Disks in /dev/disk/by-id/:"
   ls -l /dev/disk/by-id/
@@ -116,6 +116,7 @@ echo
 # die at first error
 echo set -e
 echo set -x
+echo "gcutil whoami                                 # checks that gcutil is installed and working"
 manage_services service_stop
 echo sudo sync
 echo "trap 'sudo fsfreeze -u $DISK_PATH' 0          # the UNFREEZE will be executed anyway"
