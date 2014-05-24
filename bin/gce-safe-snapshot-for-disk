@@ -29,6 +29,8 @@ set -e
 _usage() {
   echo "Usage: `basename $0` [-s <COMMA_SEPARATED_SERVICES> ] <disk-name> <disk-path> [snapshot-name]"
   echo "  eg:  `basename $0` -s mysqld,apache2 my-disk /mnt/my-disk"
+  echo "Disks in /dev/disk/by-id/:"
+  ls -al /dev/disk/by-id/
   echo "Error: $1"
 }
 
