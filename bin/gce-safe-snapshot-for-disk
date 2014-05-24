@@ -39,7 +39,7 @@ _usage() {
   echo " disk-path:   Physical disk mount-path (NOT root: '/')"
   echo
   echo "Disks in /dev/disk/by-id/google-*:"
-  ls -l /dev/disk/by-id/google-* 2>/dev/null | sed -e "s:/dev/disk/by-id/google-::" | while read D; do echo "- $D"; done 
+  ls /dev/disk/by-id/google-* 2>/dev/null | sed -e "s:/dev/disk/by-id/google-::" | while read D; do echo "- $D"; done 
   echo
   echo "FATAL: $1"
 }
