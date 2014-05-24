@@ -107,9 +107,9 @@ OUTFILE=/tmp/gce-safe-snapshot-of-disk.$DISK.sh
 
 # verifying that the disk exists
 if gcutil listdisks --format csv | egrep "^$DISK," ; then
-  echo "# disk '$1' found."
+  echo "# disk '$DISK' found."
 else
-  _usage "Disk '$1' not found with 'gcutil listdisks'"
+  _usage "Disk '$DISK' not found with 'gcutil listdisks'"
 fi
 
 # TODO(ricc)
@@ -129,6 +129,9 @@ echo "# The following script takes a snapshot of disk '$DISK' (in '$DISK_PATH')"
 echo "# preventively stopping some services ('$SERVICES') which potentially affect"
 echo "# that disk and creates a snapshot called '$SNAPSHOT_NAME'. Feel free to"
 echo "# copy this output to a file and edit according to your needs."
+echo
+echo "# Disk Name: '$DISK'"
+echo "# Disk Path: '$DISK_PATH'"
 echo
 
 # die at first error
