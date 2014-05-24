@@ -11,12 +11,17 @@
 # To give you full control, it just outputs what it would do, so you can cut/paste
 # and maybe add additional scripts to the naive "service start/stop" provided here.
 #
+# Note that so far the '/' is prohibited, as this would require part of the code to
+# be executed on another machine (freezing I/O on root disk makes the VM unusable
+# until a reboot is issued)
+#
 # *** ACHTUNG ***
 # THIS SCRIPT IS PROVIDED AS IS. USE AT YOUR OWN RISK.
 #
 # [1] http://googlecloudplatform.blogspot.ch/2013/10/persistent-disk-backups-using-snapshots.html
 ################################################################################
 # Author: Riccardo Carlesso <palladiusbonton+sakura@gmail.com>
+#
 # Contributors:
 # - Francisco Voznika
 # - Andy Wua
@@ -33,8 +38,8 @@ _usage() {
   echo "DiskName: the disk name which appears in 'gcutil listdisks'"
   echo "DiskPath: physical disk mount-path (NOT root: '/')"
   echo
-  echo "Disks in /dev/disk/by-id/:"
-  ls -l /dev/disk/by-id/
+  echo "Disks in /dev/disk/by-id/google-*:"
+  ls -l /dev/disk/by-id/google-* 2>/dev/null | while read D; do echo "- $D"; done 
   echo
   echo "FATAL: $1"
 }
