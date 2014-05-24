@@ -2,16 +2,17 @@
 
 ################################################################################
 # This script is freely inspired by this great article by F. Voznika: [1].
+#
 # It tries to take a snapshot from a live VM by stopping the services that most
 # likely impact its disk usage. Please remember that a safe bit-a-bit copy of a
-# disk is guaranteed only on an unattached sik (or disk attached to a VM which
+# disk is guaranteed only on an unattached disk (or disk attached to a VM which
 # is not in state RUNNING).
-# To give you full control, it just outputs qwhat it would do, so you can cut/paste
+#
+# To give you full control, it just outputs what it would do, so you can cut/paste
 # and maybe add additional scripts to the naive "service start/stop" provided here.
 #
 # *** ACHTUNG ***
 # THIS SCRIPT IS PROVIDED AS IS. USE AT YOUR OWN RISK.
-# (However, this tries its best to get your Snapshot data from a live vm)
 #
 # [1] http://googlecloudplatform.blogspot.ch/2013/10/persistent-disk-backups-using-snapshots.html
 ################################################################################
@@ -21,7 +22,7 @@
 # - Andy Wua
 ################################################################################
 
-VERSION=0.3
+VERSION=0.4
 
 set -e
 
@@ -30,6 +31,7 @@ _usage() {
   echo "  eg:  `basename $0` -s mysqld,apache2 my-disk /mnt/my-disk"
   echo "Error: $1"
 }
+
 service_stop() {
   echo sudo service stop $*
 }
@@ -37,6 +39,18 @@ service_start() {
   echo sudo service start $*
 }
 
+manage_services() {
+  # accept in $1 the function to start or stop services..
+  CMD="$1"
+  if [ '' != "$SERVICES" ] ; then
+    # I have some services...
+    echo "$SERVICES" | sed -e "s/,/\n/g" | while read S ; do
+      $CMD "$S"
+    done
+  else
+    echo echo No $CMD required. Make sure this is what you want.
+  fi 
+}
 
 SERVICES=""
 
@@ -69,38 +83,44 @@ if [ $# -lt $MIN_ARGS -o $# -gt $MAX_ARGS ]; then
 fi
 
 DISK="$1"
-DISK_PATH="${2:-/mnt/$DISKNAME}"
-SNAPSHOT_NAME="${3:-$DISK-SNAPSHOT}"
+DISK_PATH="${2:-/mnt/$DISK}"
+SNAPSHOT_NAME="${3:-$DISK-safe-snapshot}"
+OUTFILE=/tmp/gce-safe-snapshot-of-disk.$DISK.sh
+
+#exec >$OUTFILE 2>&1
+exec > >(tee $OUTFILE)
+
 
 # MAIN
 echo "#!/bin/bash"
 echo
 echo "# The following script takes a snapshot of disk '$DISK' (in '$DISK_PATH')"
-echo "# preventively stopping '$SERVICES' which potentially affect that disk"
-echo "# and creates a snapshot called '$SNAPSHOT_NAME'. Feel free to copy this"
-echo "# output to a file and edit according to your needs."
+echo "# preventively stopping some services ('$SERVICES') which potentially affect"
+echo "# that disk and creates a snapshot called '$SNAPSHOT_NAME'. Feel free to"
+echo "# copy this output to a file and edit according to your needs."
 echo
 
 # die at first error
 echo set -e
 echo set -x
-echo "$SERVICES" | sed -e "s/,/\n/g" | while read S ; do
-  service_stop $S
-done
+manage_services service_stop
 echo sudo sync
-echo "trap 'sudo fsfreeze -f $DISK_PATH' 0 # guarantees this will be executed anyway.."
+echo "trap 'sudo fsfreeze -u $DISK_PATH' 0          # the UNFREEZE will be executed anyway"
 echo sudo fsfreeze -f $DISK_PATH
 echo gcutil addsnapshot --source_disk=my-disk $SNAPSHOT_NAME --nosynchronous_mode
 
 echo "while gcutil getsnapshot '$SNAPSHOT_NAME' | grep 'status' | egrep -v 'UPLOADING|READY' ; do"
-echo "  echo 'Waiting for Snapshot to be uploading or finished.'"
+echo "  echo 'Waiting for Snapshot to be uploading or finished. Please be patient'"
 echo "  sleep 0.5"
 echo "done"
 echo "# Snapshot '$SNAPSHOT_NAME' appears to have been created"
 
 echo sudo fsfreeze -u $DISK_PATH
-echo "$SERVICES" | sed -e "s/,/\n/g" | while read S ; do
-  service_start $S
-done
-echo echo Done.
+manage_services service_start
+echo echo Snapshot done. Services restarted. All seems good.
+echo
+echo "# File also written here for your convenience: '$OUTFILE'"
+chmod 755 "$OUTFILE"
+
+exit 0
 
