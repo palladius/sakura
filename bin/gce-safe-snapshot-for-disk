@@ -94,16 +94,14 @@ if [ $# -lt $MIN_ARGS -o $# -gt $MAX_ARGS ]; then
   exit 11
 fi
 
-if [ "$2" = '/' ] ; then
-  _usage "root file system is not possible. fsfreeze would cause everything to freeze."
-   # TODO(ricc): implement a --no-freeze option or alternatively restructure this way:
-   #             allow local freeze, then from other machine create snapshot and resetinstance
-fi
 
 DISK="$1"
 DISK_PATH="$2"
 SNAPSHOT_NAME="${3:-$DISK-safe-snapshot}"
 OUTFILE=/tmp/gce-safe-snapshot-of-disk.$DISK.sh
+
+echo DEB DISK=$DISK
+echo DEB DISKP=$DISK_PATH
 
 # verifying that the disk exists
 if gcutil listdisks --format csv | egrep "^$DISK," ; then
@@ -114,6 +112,12 @@ fi
 
 # TODO(ricc)
 # verify that mountpoint exists
+
+if [ "$2" = '/' ] ; then
+  _usage "root file system is not possible. fsfreeze would cause everything to freeze."
+   # TODO(ricc): implement a --no-freeze option or alternatively restructure this way:
+   #             allow local freeze, then from other machine create snapshot and resetinstance
+fi
 
 #####################################################################################
 # All good here. Starting to execute
