@@ -6,8 +6,9 @@ import sys
 import subprocess
 from optparse import OptionParser
 
-version = '1.1'
-default_git_basedir = os.path.expandvars("$HOME/git/")
+version = '1.1a'
+DEFAULT_DIR = "$HOME/git/"
+default_git_basedir = os.path.expandvars(DEFAULT_DIR)
 debug = False
 valid_commands = [ 'list', 'dump','help']
 
@@ -18,15 +19,17 @@ def deb(*args):
 
 def parse_python_26():
 	'''There's a better parser with python2.7 but that's what I have in 2.6..'''
-	parser = OptionParser(usage = """Usage: %prog v{1} [Options] <COMMAND>
-COMMAND: {0}
+	parser = OptionParser(usage = """Usage: %prog v{version} [Options] <COMMAND>
+COMMAND: {valid_commands}
 
 Examples:
   %prog list --gitdir ~/Desktop/myrepos/                  # lists all git repos in it
   %prog dump --dumpdir ~/Dropbox/dump/of/my/repos/        # dumps a command to clone those repos all at once!
   %prog dump --dumpdir ~/Dropbox/tmp/myreposbackups/ | sh # executes it ;)
 
-""".format(valid_commands,version))
+Default Dir: {DEFAULT_DIR}
+
+""".format(valid_commands=valid_commands,version=version,DEFAULT_DIR=DEFAULT_DIR))
 	parser.add_option("-d", "--dumpdir", dest="dumpdir", default=default_git_basedir,
 	  help="alternate dump dir (default: '{0}')".format(default_git_basedir), metavar="DIR")
 	parser.add_option("-g", "--gitdir", dest="gitdir", default=default_git_basedir,
