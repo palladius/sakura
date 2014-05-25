@@ -6,7 +6,7 @@ import sys
 import subprocess
 from optparse import OptionParser
 
-version = '1.1'
+version = '1.1a'
 DEFAULT_DIR = "$HOME/git/"
 default_git_basedir = os.path.expandvars(DEFAULT_DIR)
 debug = False
