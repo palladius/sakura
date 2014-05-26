@@ -1,0 +1,8 @@
+#!/bin/bash
+
+INSTANCE="$1"
+
+# If you dont have BQ, download it here: http://stedolan.github.io/jq/
+
+gcutil --format=json --service_version=v1 getinstance $INSTANCE | jq '.metadata.items'
+
