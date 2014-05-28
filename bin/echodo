@@ -4,4 +4,4 @@
 
 (echo -en 'SachoDo: ' ; echo "$@" )>&2
 
-$@
+"$@"
