@@ -4,112 +4,120 @@
   
 module RicColorsObsolete
   
-$debug_pad_colors = nil # try: [ '(',')']
-$colors_active = false
+  $debug_pad_colors = nil # try: [ '(',')']
+  $colors_active = false
 
-$color_db = [
-  %w{ normal  black2 black   dkblack  red     green brown   blue midngihtblue purple  cyan  lgray   gray     lred    lgreen  yellow lblue violet azure   white  orange   orange2  orangey  magenta lyellow  pink     dkpink   gold     dkgreen carminio vermiglio bordeaux kawasaki azure2   indigo } , # english word
-  %w{ normale nero2  nero    nerone   rosso   verde marrone blu  bluenotte    porpora ciano grigino grigione rossino verdino giallo lblu  viola  azzurro bianco arancio  arancio2 arancino magenta giallino rosa     rosino   oro      verdone carminio vermiglio bordo    kawasaki azzurro2 indaco } , # italian word
-  %w{ 0;37    0;30  38;5;233 38;5;236 0;31    1;32  38;5;94 0;34 38;5;17      1;35    0;36  0;37    1;30     1;31    1;32    1;33   1;34  1;35   1;36    1;37   38;5;208 38;5;166 38;5;222 0;35    38;5;229 38;5;204 38;5;203 38;5;214 38;5;28 38;5;196 38;5;125  38;5;89  38;5;119 38;5;45  38;5;57 } ,
-  %w{ 000     000    111     222      f00     0f0           00f  191970       ff0     0ff   aaa     888      f00     afa     ff0                                                                    eebb00 } # HEX RGB
-  ]
+  $color_db = [
+    %w{ normal  black2 black   dkblack  red     green brown   blue midngihtblue purple  cyan  lgray   gray     lred    lgreen  yellow lblue violet azure   white  orange   orange2  orangey  magenta lyellow  pink     dkpink   gold     dkgreen carminio vermiglio bordeaux kawasaki azure2   indigo } , # english word
+    %w{ normale nero2  nero    nerone   rosso   verde marrone blu  bluenotte    porpora ciano grigino grigione rossino verdino giallo lblu  viola  azzurro bianco arancio  arancio2 arancino magenta giallino rosa     rosino   oro      verdone carminio vermiglio bordo    kawasaki azzurro2 indaco } , # italian word
+    %w{ 0;37    0;30  38;5;233 38;5;236 0;31    1;32  38;5;94 0;34 38;5;17      1;35    0;36  0;37    1;30     1;31    1;32    1;33   1;34  1;35   1;36    1;37   38;5;208 38;5;166 38;5;222 0;35    38;5;229 38;5;204 38;5;203 38;5;214 38;5;28 38;5;196 38;5;125  38;5;89  38;5;119 38;5;45  38;5;57 } ,
+    %w{ 000     000    111     222      f00     0f0           00f  191970       ff0     0ff   aaa     888      f00     afa     ff0                                                                    eebb00 } # HEX RGB
+    ]
 
-def colors_on
-  set_color :on #(true)
-end
-def colors_off
-  set_color(false)
-end
+  def colors_on
+    set_color :on #(true)
+  end
+  def colors_off
+    set_color(false)
+  end
   
-  # TODO support a block (solo dentro l blocco fai il nocolor)
-def set_color(bool)
-  b = bool ? true : false
-  deb "Setting color mode to: #{yellow bool} --> #{white b.to_s}"
-  b = false if bool.to_s.match( /(off|false)/ )
-  deb "Setting color mode to: #{yellow bool} --> #{white b.to_s}"
-  if block_given?
-    puts "TODO!!! scolara qui"
-    yield
-    puts "TODO ricolora qui"
+    # TODO support a block (solo dentro l blocco fai il nocolor)
+  def set_color(bool)
+    b = bool ? true : false
+    deb "Setting color mode to: #{yellow bool} --> #{white b.to_s}"
+    b = false if bool.to_s.match( /(off|false)/ )
+    deb "Setting color mode to: #{yellow bool} --> #{white b.to_s}"
+    if block_given?
+      puts "TODO!!! scolara qui"
+      yield
+      puts "TODO ricolora qui"
+    end
+    $colors_active = bool
   end
-  $colors_active = bool
-end
-alias :set_colors :set_color
+  alias :set_colors :set_color
 
-def bash_color(n, str  )
-  "\033[#{n}m#{str}\033[0m"
-end
-
-def pcolor(color_name='red',str='COLOR: please define a string')
-  if $colors_active
-    puts colora(color_name,str)
-  else
-    puts str
+  def bash_color(n, str  )
+    "\033[#{n}m#{str}\033[0m"
   end
-end
 
-def visible_color(s)
-  !( s.match(/nero|black/) )
-end
-
-
-def colora(color_name='greenpurpureo',str='colora_test_str2', opts={})
-  color_name = color_name.to_s
-  str = $debug_pad_colors ? $debug_pad_colors.join(str) : str                    # Adding '(2πi)'
-  return str unless $colors_active
-  return str if opts[:nocolor]
-  if ix = $color_db[0].index(color_name) 
-    bash_color($color_db[2][ix],str)
-  elsif ix = $color_db[1].index(color_name)
-    bash_color($color_db[2][ix],str)
-  else
-    debug "Sorry, unknown color '#{color_name}'. Available ones are: #{$color_db[0].join(',') }"
+  def pcolor(color_name='red',str='COLOR: please define a string')
+    if $colors_active
+      puts colora(color_name,str)
+    else
+      puts str
+    end
   end
-end
 
-alias :p :puts
-
-def color_test(with_italian = false)
-  i=0
-  palette = $color_db[0].map { |c|
-    inglese  = c
-    italiano = $color_db[1][i]
-    i = i+1
-    colora( c, with_italian ? [c,italiano].join(','): c )
-  }
-  puts( (1..257).map{|c| bash_color( "38;5;#{c}", c) }.join(', ') )
-  puts( palette.sort{|a,b| a.to_s.gsub(/[^a-z]/,'') <=> b.to_s.gsub(/[^a-z]/,'') }.join(' ')) # sort on a-z chars only (no color)
-  _flag_nations.sort.each{|nation|
-    puts "- Flag sample for #{nation}:\t" + flag("ThisIsAFlaggedPhraseBasedOnNation:#{nation}",nation)
-  }
-end
-alias :colortest :color_test
-
-# carattere per carattere...
-def rainbow(str)
-  i=0
-  ret = '' 
-  str=str.to_s
-  while(i < str.length)
-    ch = str[i]
-    palette = $color_db[0][i % $color_db[0].length ]
-    ret << (colora(palette,str[i,1]))
-    i += 1
+  def visible_color(s)
+    !( s.match(/nero|black/) )
   end
-  ret
-end
-alias  :arcobaleno :rainbow
 
 
+  def colora(color_name='green',str='string to be coloured', opts={})
+    color_name = color_name.to_s
+    str = $debug_pad_colors ? $debug_pad_colors.join(str) : str                    # Adding '(2πi)'
+    return str unless $colors_active
+    return str if opts[:nocolor]
+    if ix = $color_db[0].index(color_name) 
+      bash_color($color_db[2][ix],str)
+    elsif ix = $color_db[1].index(color_name)
+      bash_color($color_db[2][ix],str)
+    else
+      debug "Sorry, unknown color '#{color_name}'. Available ones are: #{$color_db[0].join(',') }"
+    end
+  end
+
+  alias :p :puts
+
+  def color_test(with_italian = false)
+    i=0
+    palette = $color_db[0].map { |c|
+      inglese  = c
+      italiano = $color_db[1][i]
+      i = i+1
+      colora( c, with_italian ? [c,italiano].join(','): c )
+    }
+    puts( (1..257).map{|c| bash_color( "38;5;#{c}", c) }.join(', ') )
+    puts( palette.sort{|a,b| a.to_s.gsub(/[^a-z]/,'') <=> b.to_s.gsub(/[^a-z]/,'') }.join(' ')) # sort on a-z chars only (no color)
+    _flag_nations.sort.each{|nation|
+      puts "- Flag sample for #{nation}:\t" + flag("ThisIsAFlaggedPhraseBasedOnNation:#{nation}",nation)
+    }
+  end
+  alias :colortest :color_test
+
+  # carattere per carattere...
+  def rainbow(str)
+    i=0
+    ret = '' 
+    str=str.to_s
+    while(i < str.length)
+      ch = str[i]
+      palette = $color_db[0][i % $color_db[0].length ]
+      ret << (colora(palette,str[i,1]))
+      i += 1
+    end
+    ret
+  end
+  alias  :arcobaleno :rainbow
+
+
+=begin
 #########################################
 # Dynamic functions
 #########################################
 #assert(color_db[0].length == color_db[1].length,"English and italian colors must be the same cardinality!!!")
 # TODO ripeti con , $color_db[1] 
+
+  This created for every color three fucntions, for instance something like this:
+  
+  def get_yellow(str='...')
+
+=end
 ( $color_db[0] + $color_db[1] ).each { |colorname|
    dyn_func = "
    
-  def get_#{colorname} (str='colors.rb: get_COLOR dynamically generated ENGLISH COLOR ')
+  #def get_$colorname(str= 'colors.rb: get_color() dynamically generated ENGLISH COLOR but you forgot to give a string')
+  def get_#{colorname}(str='colors.rb: get_color() dynamically generated ENGLISH COLOR but you forgot to give a string')
     return colora('#{colorname}',str)
   end
   
@@ -285,8 +293,27 @@ end
       @color = mycol
     end
   
+    # should this work at all?!?
     def to_s
       'RicColor: ' + self.send(@color)
+    end
+    
+    def print(s)
+      #"RicColor.print(): #{ self.send('get_' + @color, s) }"
+      print render(s)
+    end
+    
+    def render(str, opts={})
+      color_name = @color
+      #return str unless $colors_active
+      #return str if opts[:nocolor]
+      if ix = $color_db[0].index(color_name) 
+        bash_color($color_db[2][ix],str)
+      elsif ix = $color_db[1].index(color_name)
+        bash_color($color_db[2][ix],str)
+      else
+        debug "Sorry, unknown color '#{color_name}'. Available ones are: #{$color_db[0].join(',') }"
+      end
     end
   
     def to_html
@@ -299,10 +326,8 @@ end
   end
 
   def daltonic_terminal?()
-    #deb( "Terminal is: " + terminal )
     return !! terminal.to_s.match( /Apple_Terminal/ )
   end
-
 
 end # /module
 

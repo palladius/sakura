@@ -3,13 +3,15 @@
 =begin
 
   Welcome to Riccardo Carlesso first (private) library..
+  This seems to be broken with Ruby v2.0.. trying to fix it now.
 
 =end
 
 require File.expand_path(File.dirname(__FILE__) + '/sakuric')
+require File.expand_path(File.dirname(__FILE__) + '/classes/debug_ric')
 
-#$SAKURA_DFLTDIR = '~/git/sakura/'
-$SAKURADIR      = Sakuric.BASEDIR # File.expand_path(ENV['SAKURADIR'] || $SAKURA_DFLTDIR)
+
+$SAKURADIR      = Sakuric.BASEDIR
 $RICLIB_VERSION = Sakuric.VERSION
 
 #DOESNT work on some machines! Nescio cur! require 'rubygems'     # necessary for other gems
@@ -42,24 +44,18 @@ end
  # @description: try instead
  ################################################################################
 
-def reload_doesnt_work_properly!(first_time=false,enable_debug=false)
-  puts "[#{$$}] reload_doesnt_work_properly!(#{$0},#{first_time},#{enable_debug},#{$RELOADED_ONCE}) being called" if $RELOAD_DEBUG
-  $RELOADED_ONCE += 1
-  npass = $RICLIB['nreloaded']
-  if npass > 1
-    $stderr.puts "[ERR] More than first pass (pass=#{npass}): Should be quitting checcacchio!"
-    #return 
-  end
-  debug_on("reload_doesnt_work_properly called with debug enabled!") if enable_debug
-  str = "Reloaded Riclibs v#{$RICLIB_VERSION} -- per la #{$RICLIB['nreloaded']} a volta"
-  first_time = false if $RICLIB['nreloaded'] > 1 
-  modules_to_be_included = $RIC_LIB_MODULES + Sakuric.get_auto_files("classes/") 
-  modules_to_be_included.each{ |cls| 
-    was_necessary = require "#{$SAKURADIR}/lib/#{cls}.rb"
-    deb "Pass[#{npass}] Loading: #{cls} (necessary: #{was_necessary})" rescue puts("nil #{$!}")
-  }
-  npass += 1
-end
+
+ def load_sakura_modules!(enable_debug=false)
+   debug_on("load_sakura_modules() called with debug enabled!") if enable_debug
+   str = "Reloaded Riclibs v#{$RICLIB_VERSION} -- per la #{$RICLIB['nreloaded']} a volta"
+   modules_to_be_included = $RIC_LIB_MODULES + Sakuric.get_auto_files("classes/") 
+   modules_to_be_included.each{ |cls| 
+     deb "Loading class: '#{cls}'..", :color => 'yellow'
+     was_necessary = require "#{$SAKURADIR}/lib/#{cls}.rb"
+     deb("Loading: #{cls} (necessary: #{was_necessary})") rescue puts("Error: #{$!}")
+   }
+ end
+
 
 
 =begin
@@ -71,7 +67,6 @@ end
 def _init(explaination='no explaination given', initial_debug_state = false)
   $RELOAD_DEBUG = false # 
   deb "pre init '#{explaination}'" if $RELOAD_DEBUG
-  #$USER          = 'riccardo'
   $INIT_DEBUG    = false   # dice se debuggare la mia intera infrastruttura o no...
   $RELOADED_ONCE = 0    # aiuta a capuire quante volte includo sta cazo di lib! Sempre 2!!!
   $RIC_LIB_MODULES = %w{ classes/debug_ric } # to be explicitly included in this order.
@@ -100,12 +95,14 @@ def _init(explaination='no explaination given', initial_debug_state = false)
   $RICLIB['nreloaded'] += 1  
   $RICLIB['help'] =<<-BURIDONE
 This library contains all my enciclopedic knowledge (that is, notionistic). :
-Finally solved the bug of double inclusion (cribsio, files included this!)
+Finally solved the bug of double inclusion (crisbio, files included this!)
 BURIDONE
-  reload_doesnt_work_properly!(true) 
-  $CONF = RicConf.new
+
+  load_sakura_modules!(true)
+  $CONF = RicConf.new()
   pyellow( riclib_info ) if debug?  
   puts "post init delle #{Time.now}" if $RELOAD_DEBUG
+  print "Sakuric.n_called(): #{ Sakuric.n_called() }"
 end
 
 =begin
