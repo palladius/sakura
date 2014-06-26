@@ -10,6 +10,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/sakuric')
 require File.expand_path(File.dirname(__FILE__) + '/classes/debug_ric')
 
+$DEBUG_INIT = false
 
 $SAKURADIR      = Sakuric.BASEDIR
 $RICLIB_VERSION = Sakuric.VERSION
@@ -64,7 +65,7 @@ end
   
   $RELOAD_DEBUG serve a debuggare il tutto.
 =end
-def _init(explaination='no explaination given', initial_debug_state = false)
+def _init(explaination='no explaination given', initial_debug_state = $DEBUG_INIT)
   $RELOAD_DEBUG = false # 
   deb "pre init '#{explaination}'" if $RELOAD_DEBUG
   $INIT_DEBUG    = false   # dice se debuggare la mia intera infrastruttura o no...
@@ -98,9 +99,9 @@ This library contains all my enciclopedic knowledge (that is, notionistic). :
 Finally solved the bug of double inclusion (crisbio, files included this!)
 BURIDONE
 
-  load_sakura_modules!(true)
+  load_sakura_modules!(initial_debug_state)
   $CONF = RicConf.new()
-  pyellow( riclib_info ) if debug?  
+  pyellow($CONF.info()) if debug?()  
   puts "post init delle #{Time.now}" if $RELOAD_DEBUG
   print "Sakuric.n_called(): #{ Sakuric.n_called() }"
 end

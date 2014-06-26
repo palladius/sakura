@@ -3,8 +3,8 @@ hooks:
   after_all: 
   - echo ciao
   before_all:
-  - echo 
-templates: # TODO link me from programs
+  - echo Im going to start
+templates:
   rtcommon: #&rtcommon
   - pink "This is a common task for RT"
 # This is the REAL configuration, per label.
@@ -14,20 +14,20 @@ sviluppanda: # here are the real confs!
   - "iterm-session.scpt eccentrica"
   riclife: 
   - mate ~/riclife
-  rt: *rtcommon
-  - iterma -- 'ssh lasagna tail -f /var/log/apache2/*.log'
-  - hwiki Ticketing Install
-  - open ~/Desktop/doc1.rtf 
-  - open /Users/riccardo/Desktop/doc2.rtf
-  - h -m rt
-  - open ~/Dropbox/lavoro/
-  snippets:
-   AddressBookListPeople: echo osascript -e 'tell app "Address Book" to get the name of every person' | perl -pe 's/, /\n/g' 
+  # rt: *rtcommon
+  # - iterma -- 'ssh lasagna tail -f /var/log/apache2/*.log'
+  # - hwiki Ticketing Install
+  # - open ~/Desktop/doc1.rtf 
+  # - open /Users/riccardo/Desktop/doc2.rtf
+  # - h -m rt
+  # - open ~/Dropbox/lavoro/
+#  snippets:
+#   AddressBookListPeople: echo osascript -e 'tell app "Address Book" to get the name of every person' | perl -pe 's/, /\n/g' 
   swdev: 
-  - mate ~/swdev/lib/ ~/swdev/bin/
-  - open /Users/riccardo/Desktop/sysadmin.rtf
-  - "iterm-session.scpt devotchka"
-  - "iterm-session.scpt eccentrica"
+  #- mate ~/swdev/lib/ ~/swdev/bin/
+  #- open /Users/riccardo/Desktop/sysadmin.rtf
+  #- "iterm-session.scpt devotchka"
+  #- "iterm-session.scpt eccentrica"
   test:
     - verde ciao test devel
     - ls -al

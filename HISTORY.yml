@@ -1,6 +1,7 @@
 ########################################################################
 # This file tries to keep the changelog in a YMLtastic way! :)
 ########################################################################
+2.2.0: Fixed include to work also with ruby2.0 on my work Mac. Speregn it doesnt break the ohters...
 2.1.7: Changed Makefile to add autocompletion for gcutil which now kinda rocks
 2.1.6: Updated to ruby1.9.3 by Chris for tests. Also maybe fixed the shell test script
 2.1.5: Better testing

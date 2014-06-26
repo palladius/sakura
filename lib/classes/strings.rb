@@ -125,10 +125,10 @@ class String
     arr['_meta']  = Hash.new
     arr['_meta']['description'] = description
     arr['_meta']['time'] = Time.now
-    self.split("\n").each{|line| 
+    self.to_s().split("\n").each do |line|
       k,v = line.split(': ') 
-      arr[k.strip] = v.strip 
-      } rescue arr['_meta']['errors'] = $! 
+      arr[k.to_s().strip] = v.to_s().strip 
+      end rescue arr['_meta']['errors'] = $! 
     arr
   end
   
