@@ -1,0 +1,12 @@
+#!/bin/bash
+
+VMNAME=${1-test-windows-vm}
+
+PASSWORD="A$( echo "ChangeThisSeed-$(date)" | md5sum | cut -b 1-10 )+Z!"
+echo "$PASSWORD" > /tmp/initial-pwd
+
+
+echo "Creating GCE VM with name $VMNAME (password is '$PASSWORD'):"
+# --metadata=gce-initial-windows-user:$USER
+gcutil addinstance "$VMNAME" --image=windows-server-2008-r2-dc --machine_type n1-standard-1 --metadata_from_file=gce-initial-windows-password:/tmp/initial-pwd
+
