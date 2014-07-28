@@ -1,0 +1,32 @@
+#!/usr/bin/perl
+
+	# Author: Riccardo Carlesso
+	# License: GPL
+	# Computes sum, avg, sigma^2 and cardinality of a series.
+  # Amazing yet simple script/
+  #
+  # eg: echo -en "40\n44\n" | avg
+
+use List::Util qw[min max];
+
+my $n=0; # contatore
+my $t=0; # somma
+my $V=0; # somma quadrati
+my $max; # massimo
+
+while (<>) {
+ $n++; 
+ $t += $_;
+ $V += $_ * $_;
+ $max=max($max,$_);
+}
+
+my $mu=sprintf("%.9f",$t/$n);
+my $sigma;
+if ($V/$n-$mu*$mu < 0) { # impossibile matematicamente ma computazionalmente ahime'...
+	$sigma=0;
+} else {
+	$sigma=sprintf("%.9f",sqrt($V/$n-$mu*$mu));
+}
+chomp $max;
+print "sum: $t\navg: $mu\nsig: $sigma\nmax: $max\nTOT: $n\n";
