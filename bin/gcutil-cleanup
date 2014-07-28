@@ -1,0 +1,7 @@
+#!/bin/bash
+
+echo Deleting all instanc es containing DELETEME in the name...
+set -x
+gcutil listinstances --filter "name eq '.*deleteme.*'" --format=names | xargs gcutil deleteinstance --force --delete_boot_pd
+
+
