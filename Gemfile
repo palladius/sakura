@@ -3,6 +3,7 @@
 source 'https://rubygems.org'
 
 gem 'echoe'
+gem 'facter'
 gem 'ric'
 
 group :test do
