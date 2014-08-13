@@ -28,3 +28,4 @@ done
 #. $SAKURADIR/bashrc.d/01-sakura_checks
 #. $SAKURADIR/bashrc.d/all/_common
 #. $SAKURADIR/bashrc.d/all/aliases
+sakura-check-version
