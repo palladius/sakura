@@ -1,0 +1,11 @@
+#!/bin/bash
+
+echo -en "Pacific: "
+export TZ=America/Los_Angeles ; date
+
+echo -en "Rome:    "
+export TZ=Europe/Rome ; date
+
+echo -en "Sydney:  "
+export TZ=Australia/Sydney ; date
+
