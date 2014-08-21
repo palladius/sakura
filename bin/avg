@@ -20,7 +20,7 @@ my $max; # max
 
 # while processing
 while (<>) {
- $n++; 
+ $n++; # opinable if I should increment this over non-numeric strings...
  $t += $_;
  $V += $_ * $_;
  # if not a number, I have to skip this... or MIN is angry
