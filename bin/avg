@@ -8,6 +8,8 @@
   # eg: echo -en "40\n44\n" | avg
 
 use List::Util qw[min max];
+use Scalar::Util qw(looks_like_number);
+
 use strict;
 
 my $n=0; # contatore
@@ -21,8 +23,11 @@ while (<>) {
  $n++; 
  $t += $_;
  $V += $_ * $_;
- if (! $min) { $min=$_; } else { $min=min($min,$_); }
- if (! $max) { $max=$_; } else { $max=max($max,$_); }
+ # if not a number, I have to skip this... or MIN is angry
+ if(looks_like_number($_)) {
+   if (! $min) { $min=$_; } else { $min=min($min,$_); }
+   if (! $max) { $max=$_; } else { $max=max($max,$_); }
+ }
 }
 
 # post processing
