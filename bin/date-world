@@ -1,11 +1,9 @@
 #!/bin/bash
 
-echo -en "Pacific: "
-export TZ=America/Los_Angeles ; date
+# Down under generated with:
+# Generated: http://www.sunnyneo.com/upsidedowntext.php?word=Down+Under
 
-echo -en "Rome:    "
-export TZ=Europe/Rome ; date
-
-echo -en "Sydney:  "
-export TZ=Australia/Sydney ; date
-
+echo -en "UTC (God time):        "; export TZ=UTC; date
+echo -en "Pacific (Google time): "; export TZ=America/Los_Angeles ; date
+echo -en "Rome (Caesar):         "; export TZ=Europe/Rome ; date
+echo -en "Sydney: (ɹəpun uʍop)   "; export TZ=Australia/Sydney ; date
