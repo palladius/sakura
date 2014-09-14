@@ -45,10 +45,17 @@ def debug(s, opts = {} )
   tag = opts.fetch(:tag, '_DFLT_')
   really_write = opts.fetch(:really_write, true) # you can prevent ANY debug setting this to false
   write_always = opts.fetch(:write_always, false)
+  coloured_debug = opts.fetch(:coloured_debug, true) # color by gray by default
+  color = opts.fetch(:color, 'gray')
 
   raise "ERROR: ':tags' must be an array in debug(), maybe you meant to use :tag?" if ( opts[:tags] && opts[:tags].class != Array )
-  final_str = "#RDeb#{write_always ? '!' : ''}[#{opts[:tag] || '-'}] #{s}"
-  final_str = "\033[1;30m" +final_str + "\033[0m" if opts.fetch(:coloured_debug, true) # color by gray by default
+  first_part = "#RDeb#{write_always ? '!' : ''}[#{opts[:tag] || '-'}]"
+  if coloured_debug
+    final_str = "\033[1;30m#{first_part}\033[0m#{RicColor.new(color).render(s) }" 
+    # gray the beginning, correct color then
+  else
+    final_str = first_part + " " + s
+  end
   if (debug_tags_enabled? ) # tags
     puts( final_str ) if debug_tag_include?( opts )
   else # normal behaviour: if NOT tag

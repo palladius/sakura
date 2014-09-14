@@ -1,0 +1,28 @@
+#!/bin/bash
+
+VMNAME=${1-riccardo-test-windows-vm}
+DFLT_USER="$(whoami)"
+DFLT_ZONE="us-central1-a"
+
+# safe password
+PASSWORD="A$( echo -en "ChangeThisSeed-$(date)" | md5sum | cut -b 1-10 )+Z!"
+UNSAFE_PASSWORD="Uns4f€"
+
+
+echo "$PASSWORD" > /tmp/initial-pwd
+
+if echo "$0" | grep unsafe ; then
+  echo "WARNING! This VM is unsafe. The password is unsafe. Actually the password is '$UNSAFE_PASSWORD'"
+  PASSWORD="$UNSAFE_PASSWORD"
+fi
+
+
+echo "Creating GCE VM with name '$VMNAME' (password is '$PASSWORD'):"
+# --metadata=gce-initial-windows-user:$USER
+gcutil addinstance "$VMNAME" --image=windows-server-2008-r2-dc \
+  --zone "$DFLT_ZONE" --machine_type n1-standard-1 \
+  --metadata=gce-initial-windows-user:$DFLT_USER \
+  --metadata_from_file=gce-initial-windows-password:/tmp/initial-pwd
+
+echo "Secret Pwd should be: '''$(cat /tmp/initial-pwd)''' but you can retrieve it with 'gcutil getinstance $VMNAME'"
+echo "to get into this, try: rdesktop VM_IP -u ricc -p '$PASSWORD' -g 1600x1000"

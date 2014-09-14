@@ -1,0 +1,19 @@
+#!/bin/bash
+
+PROJECT_NUMBER=${1:-676534805680}
+MAX_RESULTS=42
+FIELDS='items(id%2Clocation)'
+
+echo Listing buckets and their location for project $PROJECT_NUMBER:
+echo Note that you need to give me some token in WEBTOKEN or Im useless or shall I say authless
+
+if [ "" = "$WEBTOKEN" ] ; then
+  echo Sorry no WEBTOKEN present. Export a WEBTOKEN then Ill do the rest.
+  echo You might want to try this once manually then export WEBTOKEN into the token which starts with ya29:
+  echo https://developers.google.com/storage/docs/json_api/v1/buckets/list
+  exit 1
+else
+  set -x
+  curl "https://www.googleapis.com/storage/v1/b?project=$PROJECT_NUMBER&maxResults=$MAX_RESULTS&fields=$FIELDS" --header "Authorization: Bearer $WEBTOKEN"
+fi
+

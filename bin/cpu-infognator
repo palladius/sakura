@@ -1,0 +1,24 @@
+#!/bin/bash
+
+# requires 'fio'
+echo Beware this might use all your CPU
+
+dpkg -l  | grep fio || sudo apt-get install fio
+# change this for CentOS or other distros.
+
+cat > /tmp/marain-fio.conf <<THX_MATE
+[global]
+ directory=.
+ direct=1
+
+[readwrite]
+ iodepth=8
+ numjobs=8
+ size=64k
+ readwrite=randrw
+ time_based
+ runtime=7200
+ ioengine=libaio
+THX_MATE
+
+fio /tmp/marain-fio.conf

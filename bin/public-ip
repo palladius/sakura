@@ -1,0 +1,6 @@
+#!/bin/bash
+
+#  http://unix.stackexchange.com/questions/22615/how-can-i-get-my-external-ip-address-in-bash
+
+# alias wanip='dig +short myip.opendns.com @resolver1.opendns.com'
+dig +short myip.opendns.com @resolver1.opendns.com

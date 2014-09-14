@@ -1,5 +1,9 @@
 #!/bin/bash
 
-tr [:lower:] [:upper:]
-#sed 's/.*/\u&/g'
+# this is uppercase, not what I want:
+#tr [:lower:] [:upper:]
 
+# see this on capitalization: http://english.stackexchange.com/questions/14575/is-there-an-antonym-for-capitalize-as-in-letter-case
+
+# thx to http://ubuntuforums.org/showthread.php?t=2202818
+ruby -e 'puts gets.split(/\s*\.\s*/).map(&:capitalize).join(". ") '

@@ -1,3 +1,3 @@
 
-puts 'Test that shnould FAIL.. (exit 1)'
-exit 1
+#puts 'Test that should FAIL.. (exit 1)'
+#exit 1
