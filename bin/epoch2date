@@ -2,4 +2,15 @@
 
 #set -x
 DATE=${1:-0}
+
+MAXDATE="1499648460" # Mon Jul 10 03:01:00 2017
+
+#                   1395828642
+if test "$DATE" -gt "$MAXDATE" ; then
+  echo "it seems to me your date ($DATE) is in millisec. Calling with 1/1000 of what you ask me"
+  DIVIDED=$(( $DATE / 1000 ))
+  $0 "$DIVIDED"
+  exit 0
+fi
+
 perl -e 'print scalar(localtime('$DATE')), "\n"'
