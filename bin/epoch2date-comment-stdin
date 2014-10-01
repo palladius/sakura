@@ -6,13 +6,12 @@
 # 16 digits: 1345743678759123456    (Sat Dec  3 01:32:39, usecs, but still.. I like doing lots of secs)
 # 16 digits: 1345743678759123456789 (Sat Dec  3 01:32:39, nanosecs)
 #
-my $VER = '1.1';
+my $VER = '1.2';
 
 while (<>) {
 	chomp;
-	#print "#LINE: " , $_, "\n";
 	my @words = split / /, $_;
-	my @ret=[];
+	my @ret = ();
 	my $i=0;
 	foreach (@words) {
 		if (/^1[34](\d){11}$/) { # millisec
@@ -37,5 +36,8 @@ while (<>) {
 		$i++;
 	}
 	#print Dumper @ret;
+	#print scalar @ret ;
+	#if (@ret) {		print "0!";	}
+	#print "# ret size: '${ @ret }'\n";
 	print join(' ', @ret), "\n";
 }
