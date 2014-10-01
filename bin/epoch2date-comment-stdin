@@ -5,6 +5,8 @@
 # 13 digits: 1345743678759123       (Sat Dec  3 01:32:39, millisecs)
 # 16 digits: 1345743678759123456    (Sat Dec  3 01:32:39, usecs, but still.. I like doing lots of secs)
 # 16 digits: 1345743678759123456789 (Sat Dec  3 01:32:39, nanosecs)
+#
+my $VER = '1.1';
 
 while (<>) {
 	chomp;
@@ -35,6 +37,5 @@ while (<>) {
 		$i++;
 	}
 	#print Dumper @ret;
-	print " #RET: ", join(' ', @ret), "\n";
-	#print scalar(localtime('$DATE')), "\n"
+	print join(' ', @ret), "\n";
 }
