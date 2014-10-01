@@ -1,9 +1,10 @@
 #!/usr/bin/perl
 
 # this takes STDIN and move all timestamps into string thing by autodetecting the following:
-# 10 digits: 1345743678759       (Sat Dec  3 01:32:39, seconds)
-# 13 digits: 1345743678759123    (Sat Dec  3 01:32:39, millisecs)
-# 16 digits: 1345743678759123456 (Sat Dec  3 01:32:39, usecs, but still.. I like doing lots of secs)
+# 10 digits: 1345743678759          (Sat Dec  3 01:32:39, seconds)
+# 13 digits: 1345743678759123       (Sat Dec  3 01:32:39, millisecs)
+# 16 digits: 1345743678759123456    (Sat Dec  3 01:32:39, usecs, but still.. I like doing lots of secs)
+# 16 digits: 1345743678759123456789 (Sat Dec  3 01:32:39, nanosecs)
 
 while (<>) {
 	chomp;
@@ -15,14 +16,19 @@ while (<>) {
 		if (/^1[34](\d){11}$/) { # millisec
 			chomp;
 			my $date_mantissa = scalar(localtime($_ / 1000));
-			#my $msec = $_ % 1000 ;
-			$ret[$i] = "$_ (10.3: $date_mantissa)";
+			my $msec = $_ % 1000 ;
+			$ret[$i] = "$_ ($date_mantissa ${msec}ms)";
 		} elsif (/^1[34](\d){14}$/) { #  microsecs (16 digits)
 			chomp;
-			$ret[$i] = "$_ (10.6: ". scalar(localtime($_ / 1000000)). ")"; # usecs
+			my $usec = $_ % 1000000 ;
+			$ret[$i] = "$_ (". scalar(localtime($_ / 1000000)). " ${usec}us)"; # usecs
+		} elsif (/^1[34](\d){17}$/) { #  nanosecs (19 digits)
+			chomp;
+			my $nanosec = $_ % 1000000000 ;
+			$ret[$i] = "$_ (". scalar(localtime($_ / 1000000000)). " ${nanosec}ns)"; # usecs
 		} elsif (/^1[34](\d){8}$/) { # 13 457 436 78
 			chomp;
-			$ret[$i] = "$_ (10: '" . scalar(localtime($_)) ."' )";
+			$ret[$i] = "$_ (" . scalar(localtime($_)) .")";
 		} else {
 			$ret[$i] = $words[$i];
 		}
