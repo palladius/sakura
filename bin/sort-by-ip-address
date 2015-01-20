@@ -1,0 +1,10 @@
+#!/bin/bash
+
+# found here: http://larsmichelsen.com/open-source/quickie-sort-ip-addresses-on-linux-command-line-bash/
+# # jelps sorting out IP addresses correctly, like:
+# 8.1.2.3
+# 20.1.2.3
+# 190.1.2.3
+
+sort -t . -k 1,1n -k 2,2n -k 3,3n -k 4,4n addresses
+
