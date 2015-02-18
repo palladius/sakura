@@ -91,8 +91,9 @@ class String
   
   alias :right :left
   
+  # sembra non andare! Ricorsiva..
   #def flag(nation)
-  #  flag(self, flag = '')
+  #  return flag(self,flag='')
   #end
   
     # enclose string in single quotes..

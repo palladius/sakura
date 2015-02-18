@@ -1,0 +1,7 @@
+#!/usr/bin/python
+
+import sys
+import urllib
+url = sys.argv[1]
+deccoded=urllib.unquote(url).decode('utf8')
+print deccoded

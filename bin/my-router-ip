@@ -1,0 +1,4 @@
+#!/bin/bash
+
+# to show Toffolino
+route -n | grep UG | awk '{print $2}'

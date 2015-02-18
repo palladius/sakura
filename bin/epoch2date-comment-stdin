@@ -1,0 +1,44 @@
+#!/usr/bin/perl
+
+# this takes STDIN and move all timestamps into string thing by autodetecting the following:
+# 10 digits: 1345743678759          (Sat Dec  3 01:32:39, seconds)
+# 13 digits: 1345743678759123       (Sat Dec  3 01:32:39, millisecs)
+# 16 digits: 1345743678759123456    (Sat Dec  3 01:32:39, usecs, but still.. I like doing lots of secs)
+# 16 digits: 1345743678759123456789 (Sat Dec  3 01:32:39, nanosecs)
+#
+my $VER = '1.2';
+
+while (<>) {
+	chomp;
+	my @words = split /\s/, $_;
+	my @ret = ();
+	my $i=0;
+	foreach (@words) {
+		if (/^1[34](\d){11}$/) { # 13 digits: millisec
+			chomp;
+			my $date_mantissa = scalar(localtime($_ / 1000));
+			my $msec = $_ % 1000 ;
+			$ret[$i] = "$_ ($date_mantissa ${msec}ms)";
+		} elsif (/^1[34](\d){14}$/) { #  microsecs (16 digits)
+			chomp;
+			my $usec = $_ % 1000000 ;
+			$ret[$i] = "$_ (". scalar(localtime($_ / 1000000)). " ${usec}us)"; # usecs
+		} elsif (/^1[34](\d){17}$/) { #  nanosecs (19 digits)
+			chomp;
+			my $nanosec = $_ % 1000000000 ;
+			$ret[$i] = "$_ (". scalar(localtime($_ / 1000000000)). " ${nanosec}ns)"; # usecs
+		} elsif (/^1[34](\d){8}$/) { # 10 digits: 13 457 436 78
+			chomp;
+			$ret[$i] = "$_ (" . scalar(localtime($_)) .")";
+		} else {
+			$ret[$i] = $words[$i];
+			#print "NOMATCH: '".$words[$i]."'";
+		}
+		$i++;
+	}
+	#print Dumper @ret;
+	#print scalar @ret ;
+	#if (@ret) {		print "0!";	}
+	#print "# ret size: '${ @ret }'\n";
+	print join(' ', @ret), "\n";
+}
