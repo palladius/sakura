@@ -1,5 +1,7 @@
 # Should be parsed automagically by echoe gem :)
 # This file tries to keep the changelog in a YMLtastic way! :)
+v2.2.1. Added Dockerfile and finalizing the package to go docker!
+
 v2.0.2. Signed the gem!
 
 v2.0.0a. Made a ruby gem called 'sakuric'

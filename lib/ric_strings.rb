@@ -73,7 +73,7 @@ class String
 =end
   def grep_color(regex, opts={} )
     deb "string grep_color(regex: '#{regex}')"
-    color   = opts[:color]   || true # false
+    #color   = opts[:color]   || true # false
     verbose = opts[:verbose] || true # TODO false
     return red(self) if self.match(regex)
     return verbose ?

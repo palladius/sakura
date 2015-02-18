@@ -32,3 +32,8 @@ deploy:
 	rake manifest && rake build_gemspec && rake release && rake publish_docs && verde Correctly deployed
 autocomplete:
 	make -C bashrc.d/services.d/autocomplete/gcutil.auto/
+
+docker-build:
+	docker build -t=palladius/sakura:latest .
+docker-push: docker-build
+	docker push palladius/sakura:latest
