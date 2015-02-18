@@ -5,6 +5,9 @@ help:
 	@echo 'test:          Runs tests'
 	@echo 'deploy:        Creates manifest, gemspecs, .. and deploys to rubygem'
 	@echo 'autocomplete:  Fills the autocomplete scripts (eg gcutil)'
+	@echo docker-build:   Builds latest Docker image locally
+	@echo docker-push:    Pushes Docker images to palladius/sakura:latest
+	@echo docker-run:     Runs locally in bash for testing
 
 clean:
 	echo TODO cleanup
@@ -37,3 +40,5 @@ docker-build:
 	docker build -t=palladius/sakura:latest .
 docker-push: docker-build
 	docker push palladius/sakura:latest
+docker-run:
+	docker run -it -p 22080:80 palladius/sakura:latest bash
