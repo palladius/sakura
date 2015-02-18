@@ -40,5 +40,10 @@ docker-build:
 	docker build -t=palladius/sakura:latest .
 docker-push: docker-build
 	docker push palladius/sakura:latest
+# doesnt work
 docker-run:
-	docker run -it -p 22080:80 palladius/sakura:latest bash
+	docker run -it -p 22180:80 --name sakura-on-apache2-local22180 palladius/sakura:latest # service apache2 start
+docker-run2:
+	docker run -P --name sakura-on-apache2-anyport49k palladius/sakura:latest
+docker: docker-build docker-run
+	echo Building and running... on port 22180
