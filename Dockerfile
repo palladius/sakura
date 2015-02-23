@@ -12,20 +12,23 @@ env APACHE_RUN_DIR     /var/run/apache2
 env APACHE_LOCK_DIR    /var/lock/apache2
 env APACHE_LOG_DIR     /var/log/apache2
 env LANG               C
+env SAKURA_DOCKER_VAR  2.2.1-20150219
 
 RUN apt-get update
 RUN DEBIAN_FRONTEND=noninteractive apt-get -y install apache2 libapache2-mod-php5 php5-mysql php5-gd php-pear php-apc php5-curl curl lynx-cur
 #RUN apt-get install -y facter
 RUN apt-get install -y netcat vim bash-completion
 RUN sed -i /etc/apache2/sites-enabled/000-default.conf -e 's/#ServerName www.example.com/ServerName sakura.palladius.eu/'
-RUN mkdir -p /usr/local/palladius-sakura/
+RUN update-rc.d apache2 enable
 #RUN service apache2 start
-#RUN service apache2 status
+RUN mkdir -p /usr/local/palladius-sakura/
+RUN echo ${SAKURA_DOCKER_VAR} > /root/SAKURA_DOCKER_VERSION
 
 # Testing these two...
 #ONBUILD ADD . /var/www/palladius-onbuild-sakura/
 #ONBUILD RUN cd /var/www/palladius-onbuild-sakura/ && make
 ADD . /var/www/html/
+ADD . /usr/local/palladius-sakura/
 
 CMD ["apache2", "-D", "FOREGROUND"]
 #CMD service apache2 start
