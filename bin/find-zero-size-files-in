@@ -1,0 +1,9 @@
+#!/bin/bash
+
+DIR=${1:-.}
+
+echo "#0KB size files in $DIR:"
+
+find "$DIR" -type f -size 0 -exec ls {} \;
+
+
