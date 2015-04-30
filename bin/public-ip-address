@@ -1,4 +1,1 @@
-#!/bin/bash
-
-curl http://bot.whatismyipaddress.com
-echo
+get-public-ip
