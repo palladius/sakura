@@ -1,0 +1,13 @@
+#!/bin/bash
+
+WEBSITE=${1:-www.google.com}
+OUTFILE=/tmp/$WEBSITE.cert
+
+echo Downloading certificate into: $OUTFILE
+echo -n | openssl s_client -connect $WEBSITE:443 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' > $OUTFILE
+
+echo -en "Expires on: "
+yellow $(openssl x509 -enddate -noout -in "$OUTFILE" )
+
+# http://serverfault.com/questions/139728/how-to-download-the-ssl-certificate-from-a-website
+
