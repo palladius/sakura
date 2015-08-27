@@ -1,0 +1,10 @@
+#!/bin/bash
+
+echo $#
+
+if [ '' = "$1" ] ; then
+	echo Try this: $0 https://www.googleapis.com/userinfo/v2/me
+	exit 1
+fi
+
+curl -H "Authorization: Bearer $(gcloud auth print-access-token)" "$@"
