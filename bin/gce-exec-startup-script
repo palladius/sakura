@@ -1,0 +1,3 @@
+#!/bin/bash
+
+curl http://metadata/0.1/meta-data/attributes/startup-script | sh
