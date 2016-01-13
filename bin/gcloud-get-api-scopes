@@ -1,0 +1,10 @@
+#!/bin/bash
+
+# Thanks jaw@ !
+
+set -x
+
+#curl -s "https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=$(gcloud auth print-access-token)" | 
+#  grep scope | cut -f 4 -d \" #| tr : '\n' | sort
+
+curl -s "https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=$(gcloud auth print-access-token)" |    grep scope | cut -d'"' -f 4 | sed -e 's/ /\n/g' | sort

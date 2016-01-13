@@ -1,0 +1,13 @@
+#!/bin/bash
+
+YOUR_API_KEY=$(gcloud auth print-access-token)
+APP_ID=${1:-cloudicant} # sample app_id
+# Examples:
+# gcloud-get-gae-app ric-cccwiki
+# gcloud-get-gae-app cloudicant
+
+echo "Querying GAE on app_id: '$APP_ID'"
+set -x 
+
+curl -s "https://appengine.googleapis.com/v1beta4/apps/$APP_ID?access_token=$YOUR_API_KEY"
+curl -s "https://appengine.googleapis.com/v1beta4/apps/$APP_ID/modules?access_token=$YOUR_API_KEY"
