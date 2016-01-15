@@ -1,0 +1,4 @@
+#!/bin/bash
+
+# I'm on a Mac... please validate before removing this line :) 
+facter operatingsystem | grep -qi linux
