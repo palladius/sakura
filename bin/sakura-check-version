@@ -20,7 +20,7 @@
     :sakura_version_online            => 'https://raw.github.com/palladius/sakura/master/VERSION',
   }
 
-  $PROG_VER = '0.9.1'
+  $PROG_VER = '0.9.2'
   $DEBUG    = false
 
   def usage(comment=nil)
@@ -34,7 +34,12 @@
   def main
     debug_on 'Just created script, presuming u need some debug. TODO REMOVE ME when everything works!' if $DEBUG
     current_version = File.open(ENV['SAKURADIR'] + "VERSION").read.to_s.chomp
-    online_version = open($myconf[:sakura_version_online]).read.chomp rescue "1.2.3 err(#{$!})"
+    online_version = open($myconf[:sakura_version_online]).read.chomp rescue "InternetUnavailableItSeems$ #{$!}" # "1.2.3 err(#{$!})"
+    if (online_version =~ /^InternetUnavailableItSeems/ )
+      #$stderr.puts "Internet seems unavailable: #{online_version.split('$')[1]}"  # ugly seprator... TODO make it better
+      $stderr.puts "[ERR] Remote Sakura version unavailable, I'm happy with current version: #{current_version}"
+      exit 0
+    end
     if (online_version == current_version)
       puts "Your Sakura system is up to date: '#{online_version}'"
       exit 0
