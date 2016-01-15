@@ -1,5 +1,3 @@
 #!/bin/bash
 
-
 facter operatingsystem | grep -q Darwin
-
