@@ -1,5 +1,11 @@
 #!/usr/bin/env ruby
 
+#def NilClass
+#  def strip(whatever)
+#    return :strip_on_ric_strings
+#  end
+#end
+
 class String
   RICVERSION = '1.1'
 
@@ -124,7 +130,7 @@ class String
     arr['_meta']['time'] = Time.now
     self.split("\n").each{|line| 
       k,v = line.split(': ') 
-      arr[k.strip] = v.strip 
+      arr[k.strip] = v.strip if not v.is_a?(NilClass)
       } rescue arr['_meta']['errors'] = $! 
     arr
   end
