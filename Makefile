@@ -27,6 +27,10 @@ test:
 		echo "Making2 subdir (pwd=`pwd`): $(MAKE) -C $$dir"; \
   done
 
+test-ruby:
+	gem install echoe
+	rake test
+
 # pre deploys gem
 predeploy:
 	(rake manifest && rake build_gemspec ) | tee .predeploy.out && verde Correctly built manifests and dependencies. Now commit and run deploy
