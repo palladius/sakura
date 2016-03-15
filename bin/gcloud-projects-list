@@ -1,0 +1,7 @@
+#!/bin/bash
+
+alias curl-oauth='curl -H "Authorization: Bearer $(gcloud auth print-access-token)"'
+#curl-oauth https://cloudresourcemanager.googleapis.com/v1beta1/projects
+echo "# Project lists via CRM API:"
+curl-oauth https://cloudresourcemanager.googleapis.com/v1beta1/projects | egrep '"projectId":' | cut -d'"' -f 4 | sort
+
