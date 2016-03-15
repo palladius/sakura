@@ -1,0 +1,3 @@
+#!/bin/bash
+
+curl -H "Authorization: Bearer $(gcloud auth print-access-token)" "$@"
