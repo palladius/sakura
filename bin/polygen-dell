@@ -4,4 +4,4 @@ PATH=$PATH:/usr/games
 # To install: sudo apt-get install polygen polygen-data
 
 NARG=${1:-10}
-polygen $SAKURADIR/doc/polygen/dell.grm -X $NARG | uniq
+polygen $SAKURADIR/docz/polygen/dell.grm -X $NARG | uniq
