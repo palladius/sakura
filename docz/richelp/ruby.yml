@@ -7,7 +7,10 @@ _conf:
  mantain_crlf: true
 Strings:
  upper/lower case: UPCASE(), downcase, Capitalize,  singularize/pluralize()
- REGEX:    "reads conf file, regex+memorize:    subject = (/^Subject\: (.+)$/).match(email)[1]"
+ #REGEX: "reads conf file, regex+memorize:    subject = (/^Subject\: (.+)$/).match(email)[1]"
+ REGEX: |
+    reads conf file, regex+memorize:    
+    subject = (/^Subject\: (.+)$/).match(email)[1]
 Arrays:
  flatten: 'flattens [ [a,b],c] into [a,b,c]'
  compact: removes nil (not to confuse with flatten)
@@ -68,7 +71,8 @@ heroku:
 tricks n tips:
   # On my Mac I have a lot of libs in 777 mode!!!
   fix permissions:  "find /usr/local/lib/ruby/  -type d -print0 | xargs -0 -s 1000 sudo chmod 755 "
-  rails server more clean: "rails server | egrep --line-buffered -v '^Rendered|Load \(' "
+  rails server more clean: |
+    rails server | egrep --line-buffered -v '^Rendered|Load \('
   trace_vars: 'trace_var( :$_, proc{|v| pgray "$_ is now #{v}" }) # super cool!'
   bugs yaml ruby193 in psych:  require 'yaml'; YAML::ENGINE.yamler = 'syck'
 Rails:
