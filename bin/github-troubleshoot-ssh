@@ -1,0 +1,6 @@
+
+set -x
+ssh -vT git@github.com
+
+# https://help.github.com/articles/error-permission-denied-publickey/
+
