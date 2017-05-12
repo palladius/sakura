@@ -1,0 +1,37 @@
+#!/bin/bash
+
+function dateizza() {
+	FILE="$1"
+	#echo "# TODO dateizza: $FILE"
+	#stat -r "$FILE" # on Max
+	#echo "creation_date: $creation_date"
+	#creation_date=$(stat -r "$FILE" | awk '{print $10}') # 1441013647 works on Mac not sure on linus
+	#DATA_YYMMDD=$(date -r "$creation_date" +%Y%m%d-%H%M%S)
+	eval $(stat -s $FILE) # st_dev=16777220 st_ino=1309372 st_mode=0100755 st_nlink=1 st_uid=164825 st_gid=499 st_rdev=0 st_size=140 st_atime=1461599843 st_mtime=1441013647 st_ctime=1441013647 st_birthtime=1441013647 st_blksize=4096 st_blocks=8 st_flags=0
+	echo "#Accessed $FILE: $st_atime"
+	echo "#ModifidT $FILE: $st_mtime"
+	echo "#CreatedT $FILE: $st_ctime"
+	
+	#ACCESSED_YYMMDD=$(date -r "$st_atime" +%Y%m%d-%H%M%S)
+	#echo TODO_ACCESSED mv "$FILE" "$ACCESSED_YYMMDD-$FILE"
+	CREATED_YYMMDD=$(date -r "$st_ctime" +%Y%m%d-%H%M%S)
+	echo TODO_CREATED mv "$FILE" "$CREATED_YYMMDD-$FILE"
+	#MODIFIED_YYMMDD=$(date -r "$st_mtime" +%Y%m%d-%H%M%S)
+	#echo TODO_MODIFIED mv "$FILE" "$MODIFIED_YYMMDD-$FILE"
+}
+
+if [ "0" -eq $# ]; then
+	echo "Io necessito INPUT!"
+	exit 1
+fi
+
+echo
+echo "# DATEIZZA (tested on Mac)...."
+for FILE in "$@" ; do
+	if [ -f "$FILE" ]; then
+  		dateizza "$FILE"
+	else
+		echo "File not-existing: '$FILE'" >&2
+	fi
+done
+echo "Done. TODO(ricc): use basename to avoid shit like: 'mv ./dateize 20170512-115556-./dateize'"
