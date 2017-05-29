@@ -1,6 +1,6 @@
 #!/bin/bash
 
-function dateizza() {
+function dateizza_mac() {
 	FILE="$1"
 	#echo "# TODO dateizza: $FILE"
 	#stat -r "$FILE" # on Max
@@ -15,10 +15,22 @@ function dateizza() {
 	#ACCESSED_YYMMDD=$(date -r "$st_atime" +%Y%m%d-%H%M%S)
 	#echo TODO_ACCESSED mv "$FILE" "$ACCESSED_YYMMDD-$FILE"
 	CREATED_YYMMDD=$(date -r "$st_ctime" +%Y%m%d-%H%M%S)
-	echo TODO_CREATED mv "$FILE" "$CREATED_YYMMDD-$FILE"
+	echo TODO_CREATED_MAC mv "$FILE" "$CREATED_YYMMDD-$FILE"
 	#MODIFIED_YYMMDD=$(date -r "$st_mtime" +%Y%m%d-%H%M%S)
 	#echo TODO_MODIFIED mv "$FILE" "$MODIFIED_YYMMDD-$FILE"
 }
+function dateizza_Linux() {
+	FILE="$1"
+	echo "# TODO dateizza: $FILE"
+
+	# https://stackoverflow.com/questions/4774358/bash-get-mtime-of-specific-file
+	file_mtime=$( stat -c %Y "$FILE" ) 
+	#ACCESSED_YYMMDD=$(date -r "$st_atime" +%Y%m%d-%H%M%S)
+	#echo file_mtime: "$file_mtime"
+	MODIFIED_YYMMDD=$(date --date='@'"$file_mtime" +%Y%m%d-%H%M%S)
+	echo TODO_MODIFIED_LINUX: mv "$FILE" "$MODIFIED_YYMMDD"-"$FILE"
+}
+
 
 if [ "0" -eq $# ]; then
 	echo "Io necessito INPUT!"
@@ -26,10 +38,13 @@ if [ "0" -eq $# ]; then
 fi
 
 echo
-echo "# DATEIZZA (tested on Mac)...."
+echo "# DATEIZZA (tested on Mac but not on Linux yet)...."
 for FILE in "$@" ; do
 	if [ -f "$FILE" ]; then
-  		dateizza "$FILE"
+
+  		dateizza_$(uname) "$FILE" 
+  		# dateizza_linux
+  		# dateizza_darwin
 	else
 		echo "File not-existing: '$FILE'" >&2
 	fi
