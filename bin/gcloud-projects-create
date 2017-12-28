@@ -1,0 +1,15 @@
+
+!/bin/bash
+
+PROJECT_ID=${1:-ricc-foobar-baz}
+
+echo "Create project '$PROJECT_ID':"
+set -x
+(
+ echo "projectId=$PROJECT_ID"
+ echo "mylabel=prod"
+ echo "name=Il mio progettillo"
+ echo
+) | POST -H "Authorization: Bearer $(gcloud auth print-access-token)" https://cloudresourcemanager.googleapis.com/v1beta1/projects/
+
+# echo "RET=$?"
