@@ -27,3 +27,5 @@ workspace enable 2x2 desktops:
 - gsettings set org.compiz.core:/org/compiz/profiles/unity/plugins/core/ vsize 2
 Unity:
   disable sticky edges: dconf write /org/compiz/profiles/unity/plugins/unityshell/launcher-capture-mouse false # true to reenable them
+Utilities:
+  baobab: baobab . to get insight on local disk
