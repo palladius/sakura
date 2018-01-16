@@ -1,0 +1,17 @@
+#!/bin/bash
+
+WORD=${1:_WORD_TO_HASH_}
+
+echo "+ Hasing word: '$WORD'"
+
+echo "#### 1. MD5 (without then with trailing \n)"
+echo -en "$WORD" | md5sum
+echo "$WORD" | md5sum
+
+echo "#### 2. WC (without then with trailing \n)"
+echo -en "$WORD" | wc
+echo "$WORD" | wc
+
+echo "#### 3. SHA256 (without then with trailing \n)"
+echo -en "$WORD" | sha256sum
+echo "$WORD" | sha256sum
