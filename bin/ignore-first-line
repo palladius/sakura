@@ -1,0 +1,7 @@
+#!/bin/bash
+
+# https://stackoverflow.com/questions/7318497/omitting-the-first-line-from-any-linux-command-output
+
+# awk '{if(NR>1)print}'
+sed -n '1!p'
+
