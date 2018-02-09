@@ -1,0 +1,7 @@
+#!/bin/sh
+
+# from 'ripulisci' in GIC. Removes comments from most bash and other scripts.
+# Since its no context-depoendent enforces the start of page, so wont catch comments in the middle of the line.
+
+egrep -v '^$|^\W*#|^%|^;|^//|^-- '
+
