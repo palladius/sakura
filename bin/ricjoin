@@ -1,0 +1,83 @@
+#!/usr/bin/ruby -w
+
+  ############################################################
+  # $Id: script.rb 4233 2010-05-24 17:16:26Z riccardo $
+  ############################################################
+  # @author     Riccardo Carlesso
+  # @email      riccardo.carlesso@gmail.com
+  # @tags	development
+  # @maturity	development
+  # @language   Ruby
+  $PROG_VER = '0.9.2'
+  ############################################################
+  # @description:
+  #  Generic script in RUBY...
+	# @tags: development, rcarlesso
+	# @history:
+	#  1.3: Using OptParse for arguments
+	#  1.2: mangled thru header and confs
+	#  1.1: added -d support for debug_on e -h usage
+	#  1.0: base script
+  ############################################################
+
+  # figosissimo: http://ruby.about.com/od/advancedruby/a/optionparser.htm
+  # http://ruby.about.com/od/advancedruby/a/optionparser2.htm
+require 'optparse'       
+require ENV['GIC'] + '/lib/ruby/_init.rb'
+
+def usage()
+  puts 'Usage'
+  puts $opts
+  exit 11
+end
+
+def init()
+  $opts = {}
+  #debug_on 'assd'
+  optparse = OptionParser.new do |opts|
+    # Set a banner, displayed at the top of the help screen.
+    opts.banner = "#{$0} v.#{$PROG_VER}\n Usage: #{File.basename $0} [options] file1 file2 ..."
+    # Define the options, and what they do
+    $opts[:debug]   = false
+    $opts[:logfile] = nil
+    $opts[:opt] = false
+    $opts[:float] = 0.0
+    opts.on( '-d', '--debug', 'enables debug (DFLT=false)' ) {  $opts[:debug] = true  }
+    opts.on( '-f', '--float NUM', Float, "Convert to float" ){|f| $opts[:float] = f}
+    opts.on( '-h', '--help', 'Display this screen' )         {  puts(opts); exit 1 }
+    opts.on( '-l', '--logfile FILE', 'Write log to FILE' )   {|file| $opts[:logfile] = file }
+    opts.on( '-o', '--optional [OPT]', "Optional argument" ) {|f| options[:opt] = f || "nothing"}
+    opts.on( '-v', '--verbose', 'Output more information' )  { $opts[:verbose] = true}
+  end
+  # Parse the command-line. Remember there are two forms
+  # of the parse method. The 'parse' method simply parses
+  # ARGV, while the 'parse!' method parses ARGV and removes
+  # any options found there, as well as any parameters for
+  # the options. What's left is the list of files to resize.
+  optparse.parse!
+  debug_on('enabled via GetOpts') if $opts[:debug]
+  puts "Being verbose" if $opts[:verbose]
+  puts "Logging to file #{$opts[:logfile]}" if $opts[:logfile]
+end
+
+def real_program
+	separator = ARGV[0] rescue ' '
+	deb "joining with: " + separator.quote
+	joint_lines = STDIN.read.split("\n").join(separator)
+	puts joint_lines
+end
+
+def main()
+  init
+  real_program
+end
+
+def automain(verbose=false)
+  if $0 ==  __FILE__
+    main
+  else
+    pviola 'Thanks for INCLUDING me, I suspect on IRB. Fa di me cio che vuoi.' if verbose
+  end
+end
+
+automain()
