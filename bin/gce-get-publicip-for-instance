@@ -6,4 +6,5 @@ ZONE="$2"
 
 #gcutil --format=json --service_version=v1 getinstance $INSTANCE | jq '.metadata.items'
 
-gcloud compute instances describe "$INSTANCE" --format json --zone "$ZONE" | jq '.metadata.items'
+gcloud compute instances describe "$INSTANCE" --format json --zone "$ZONE" | jq .networkInterfaces[0].accessConfigs[0].natIP
+
