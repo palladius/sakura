@@ -1,0 +1,27 @@
+#!/bin/bash
+resolve_include() {
+    BLOCK="${1}"
+    RES=$(nslookup -q=TXT ${BLOCK} 8.8.8.8 | awk -F "spf1 " '{print $2}' | sed -e "s/ip4:/\n/g;s/?all\"//g" | grep -v "^ip6:" | grep -v ^$)
+    echo "${RES}"
+}
+
+RES="_cloud-netblocks.googleusercontent.com"
+cont=true
+while [[ ${cont} != "false" ]]; do
+    NEW_RES=""
+    CNT=0
+    for r in ${RES}; do
+        blocks="${r}"
+        grep -q "include" <<< "${r}" && r=$(cut -d: -f 2 <<< "${r}")
+        grep -q "googleusercontent.com$" <<< "${r}" && { blocks="$(resolve_include ${r})"; CNT=$((CNT+1)); }
+        NEW_RES="${NEW_RES} ${blocks}"
+    done
+    if [[ ${CNT} -eq 0 ]]; then
+        cont="false"
+    fi
+    RES="${NEW_RES}"
+done
+echo "${RES}" | sed 's/ /\n/g' | sort -u -n
+
+# from: https://gist.github.com/feczo/eae831a08c98a94e6fd9
+
