@@ -5,10 +5,18 @@ Sample usage:
 
    $ python get-machinetypes-for-region.py --project-id=YOUR_PROJECT_ID --regions us-central1,europe-west2 --min-ram-mb 999000
 
+This scripts provides all the machine types within ALL zones within regions provided.
+It calls two APIs, which are for 'normal' and 'accellerated' machine types.
+
+Bugs:
+- Zones are tried lexigographically, like manually a-f. Sorry about that.
+- RAM filter only works for normal machines. accellerated MT are not filtered by "--min-ram-mb"
+- Unfortunately the APIs don't provide support for custom APIs.
+
 BEFORE RUNNING:
 ---------------
 1. If not already done, enable the Compute Engine API
-   and check the quota for your project at
+   and check the quota for your project_id at
    https://console.developers.google.com/apis/api/compute
 2. This sample uses Application Default Credentials for authentication.
    If not already done, install the gcloud CLI from
@@ -30,6 +38,7 @@ from googleapiclient.errors import HttpError
 
 DEFAULT_REGIONS = "europe-west1,us-central1,asia-east1"
 DEFAULT_MIN_RAM_MB = 1024
+VERSION = "1.0_20181006"
 
 """
 {u'creationTimestamp': u'1969-12-31T16:00:00.000-08:00',
