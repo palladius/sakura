@@ -12,6 +12,13 @@ Bugs:
 - Zones are tried lexigographically, like manually a-f. Sorry about that.
 - RAM filter only works for normal machines. accellerated MT are not filtered by "--min-ram-mb"
 - Unfortunately the APIs don't provide support for custom APIs.
+- Currently the YAML provides TWO trees for every zone (normal vs accellerated). It would be
+  nice to collect all info in two hashes, marge them, and visualize with different details
+  depending on verbose vs quiet.
+
+APIs called:
+- Normal machine types: https://cloud.google.com/compute/docs/reference/rest/v1/machineTypes/list
+- Accelerated machine types: https://cloud.google.com/compute/docs/reference/rest/v1/acceleratorTypes/list
 
 BEFORE RUNNING:
 ---------------
@@ -74,7 +81,7 @@ def print_accellerators_per_zone(prepend, project_id, zone):
             #machine_type_count += 1
         request = service.acceleratorTypes().list_next(previous_request=request, previous_response=response)
   except KeyError:
-    print "- GPU EMPTY SEARCH (might have smaller machines)"
+    print "- GPU EMPTY SEARCH (probably none are here!)"
   except HttpError as e:
     #pprint(e)
     match_unknown_zone = re.search('Unknown zone.', "{}".format(e))
