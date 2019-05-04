@@ -11,6 +11,7 @@ notifications:
     - palladiusbonton+github@gmail.com
 before_install:
   - gem install bundler --pre
+  - bundle install
 env:
   - RICCARDO_MESSAGE="Modestamente sono un figo"
 #  - PUPPET_VERSION=2.6.14
@@ -22,7 +23,9 @@ env:
 #  - gem install bundler --pre
 #before_script:
 #  - "cp config/database.example.yml config/database.yml"
-script: "RAILS_ENV=test bundle exec rake test:ci --trace"
+#script: "RAILS_ENV=test bundle exec rake test:ci --trace"
+script: 
+- bundle exec rake --trace
 #notifications:
 #  irc: "irc.freenode.org#travis"
 #  campfire:
