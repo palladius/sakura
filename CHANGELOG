@@ -1,5 +1,7 @@
 # Should be parsed automagically by echoe gem :)
 # This file tries to keep the changelog in a YMLtastic way! :)
+v2.3.0. 20190504 Better travis test
+
 v2.2.2. Accepted my second push request from TWO people! Thanks lucmult@ and davidn@
 
 v2.2.1. Added Dockerfile and finalizing the package to go docker!

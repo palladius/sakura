@@ -25,7 +25,9 @@ env:
 #  - "cp config/database.example.yml config/database.yml"
 #script: "RAILS_ENV=test bundle exec rake test:ci --trace"
 script: 
+- bin/rublurb
 - bundle exec rake --trace
+- make test
 #notifications:
 #  irc: "irc.freenode.org#travis"
 #  campfire:
