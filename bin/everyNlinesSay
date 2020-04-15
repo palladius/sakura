@@ -1,0 +1,25 @@
+#!/usr/bin/perl -w
+
+# Every N lines I want to add some kind of reminder, so if your STDIN is 10 lines with
+# 10 numbers, the output should be:
+# 
+my $DEBUG = 0;
+
+my $n=5; # default N=5
+my $phrase="You forgot - next time set up something on ARGV2"; # reminder phrase
+if (defined($ARGV[0]) ) { $n=int($ARGV[0]); }
+if (defined($ARGV[1]) ) { $phrase=$ARGV[1]; }
+
+# prints all lines, plus every n adds the reminder
+my $i=0;
+while (<STDIN>) {
+	if ($DEBUG) { print "DEB $i/$n (".($i == 0)."): $_"; }
+	print ; # prints line
+	#if ($i == 0) { 	}
+	$i++;
+	if ($i == $n) { 
+		print "-- $phrase --\n";
+		$i = 0; 
+	}
+}
+

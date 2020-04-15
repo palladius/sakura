@@ -1,0 +1,7 @@
+
+# from: https://linuxconfig.org/check-what-debian-version-you-are-running-on-your-linux-system
+
+lsb_release -a
+cat /etc/debian_version
+cat /etc/os-release
+hostnamectl

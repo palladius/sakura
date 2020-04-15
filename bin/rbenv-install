@@ -1,0 +1,9 @@
+#!/bin/bash
+
+git clone https://github.com/rbenv/rbenv.git ~/.rbenv
+~/.rbenv/bin/rbenv init
+git clone https://github.com/rbenv/ruby-build.git "$(rbenv root)"/plugins/ruby-build
+
+echo "now add this to ~/.bash_profile:"
+echo ' eval "$(rbenv init -)" '
+

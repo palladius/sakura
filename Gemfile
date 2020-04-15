@@ -16,8 +16,8 @@ group :test do
     gem 'rmagick'
   end
 
-  platform :jruby do
-    gem 'rmagick4j'
-  end
+#  platform :jruby do
+#    gem 'rmagick4j'
+#  end
 end
 

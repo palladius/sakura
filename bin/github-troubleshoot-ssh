@@ -1,4 +1,5 @@
 
+yellow open https://github.com/settings/keys and copy RSA pub key from ~/.ssh/ if it fails
 set -x
 ssh -vT git@github.com
 
