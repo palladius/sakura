@@ -1,0 +1,4 @@
+#!/bin/bash
+
+ gcloud config set account "$@"
+

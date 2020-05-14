@@ -1,0 +1,7 @@
+#!/bin/bash
+
+seq 100 | awk 'BEGIN{OFS="\t"; print "x","sin(x)","cos(x)"}{x=$1/10; print x,sin(x),cos(x)}' | termeter
+
+# brew install termeter
+# go get github.com/atsaki/termeter/cmd/termeter
+
