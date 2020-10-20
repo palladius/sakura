@@ -1,10 +1,12 @@
 # Scopiazzed from Gruff gem
+# Messo ruby 2.5.3. Speriamo!
 
 source 'https://rubygems.org'
 
 gem 'echoe'
 gem 'facter'
 gem 'ric'
+#gem 'psych'
 
 group :test do
   gem 'rake'
