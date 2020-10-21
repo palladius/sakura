@@ -2,7 +2,7 @@
 language: ruby
 rvm: 
 # - 1.8.7
-# - 1.9.3
+ - 1.9.3
  - 2.5.3
 branches:
   only:
@@ -11,7 +11,9 @@ notifications:
   email:
     - palladiusbonton+github@gmail.com
 before_install:
-  - gem install bundler --pre
+  - make install 
+    #- gem install bundler --pre
+  - gem install bundler 
   - bundle install
 env:
   - RICCARDO_MESSAGE="Modestamente sono un figo e ascolto volentieri i Travis in formato YAML"
