@@ -1,0 +1,18 @@
+#!/bin/bash
+
+# See https://stackoverflow.com/questions/55139575/how-to-rename-existing-named-configurations-using-gcloud-cli-in-gcp
+
+#echo "#DEB# Welcome to contextual gcloud Giargiana! Lets see if it works! TODO(ricc): removeme"
+
+#TODO(ricc): if .gcloudconfig/.gitignore doesnt exist, create one wich ignores:
+# logs/
+# credentials.db 
+# legacy_credentials/
+# access_tokens.db
+
+if [ -d .gcloudconfig/ ]; then
+    echo "[$0] .gcloudconfig/ directory detected: using that dir for configs instead of default."
+    CLOUDSDK_CONFIG=./.gcloudconfig/ \gcloud "$@"
+else
+    \gcloud "$@"
+fi
