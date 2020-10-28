@@ -1,0 +1,9 @@
+#!/bin/bash
+
+yellow 'Lets see if it pings first...'
+if ping -c 2 "$@" ; then
+    verde OK. Now sshing..
+    ssh riccardo@aspirina
+else
+    rosso ERROR. dont even bother ssh-ing.
+fi
