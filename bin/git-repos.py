@@ -98,7 +98,6 @@ def remove_prefix(text, prefix):
     return text
 
 def print_list_repos(git_dir, is_long):
-	print("list_repos(): is_long: {}".format(is_long))
 	deb( "Listing your local Git Repos:")
 	for repo in gitrepos(git_dir):
 		if is_long:
