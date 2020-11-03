@@ -11,7 +11,7 @@
 # access_tokens.db
 
 if [ -d .gcloudconfig/ ]; then
-    echo "[$0] .gcloudconfig/ directory detected: using that dir for configs instead of default."
+    echo "# [$(basename $0)] .gcloudconfig/ directory detected: using that dir for configs instead of default. Make sure to .git ignore credentials before adding to source control" >&2
     CLOUDSDK_CONFIG=./.gcloudconfig/ \gcloud "$@"
 else
     \gcloud "$@"
