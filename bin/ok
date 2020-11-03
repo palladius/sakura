@@ -30,11 +30,11 @@ RET=$PIPESTATUS
 MSG=_NONE_
 
 if [ 0 = $RET ] ; then
-	verde "OK: $*"
+	verde "👍 OK: $*"
 	tail -20 "$FILE" | ricnotify green "OK '$*'"
 	echo "`data` End OK"
 else
-	rosso "NO(ret=$RET): $*"
+	rosso "👎 NO(ret=$RET): $*"
 	echo "`data` End (ERR) '$*'"
 	echo "There were some errors which returned: $RET" | ricnotify red "Err with '$*'"
 fi
