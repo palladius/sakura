@@ -6,6 +6,8 @@ source 'https://rubygems.org'
 gem 'echoe'
 gem 'facter'
 gem 'ric'
+gem 'google-cloud-logging'
+
 #gem 'psych'
 
 group :test do
