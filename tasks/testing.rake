@@ -1,7 +1,7 @@
 
-desc "Run tests hypothetically"
+desc "Run tests but it doesnt work :/"
 
-namespace :rictest do
+namespace :test do
 	desc "Run mini tests"
 	puts 'Rake test being executed...'
 	Dir['test/*.rb'].each do |file|
