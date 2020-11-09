@@ -1,7 +1,9 @@
 #!/bin/bash
 
 DIMMIPATH="$SAKURADIR/sounds/"
-SUONA=/usr/bin/ogg123
+SUONA=/usr/local/bin/ogg123
+# oppure /usr/local/bin/ogg123
+
 
 if [ ! -f $SUONA ] ; then
 	echo "Ogg123 not installed, try: sudo apt-get install vorbis-tools"

@@ -138,17 +138,15 @@ Emojis for fruit, vegetables, meals, beverages and utensils.
 🥄 Spoon
 
 # random
-🦃 
-🍂 
+🦃  ??
+🍂 ??
 🔥 Fire
 🍽 Plate
-🥧 
+🥧 ??
 👪 Family
 🍗 Chicken
 
 EOF
-
-
 }
 
 show_icons | egrep -v "^$"
