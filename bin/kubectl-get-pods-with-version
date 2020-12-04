@@ -1,0 +1,6 @@
+#!/bin/bash
+
+#yellow kubectl get pods,namespaces,service,deployments
+#kubectl get pods,namespaces,service,deployments
+kubectl get pods -o jsonpath --template='{range .items[*]}{.metadata.name}{"\t"}{"\t"}{.spec.containers[0].image}{"\n"}{end}'
+
