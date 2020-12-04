@@ -30,7 +30,8 @@ done
 #. $SAKURADIR/bashrc.d/all/aliases
 
 # Max 2 seconds to execute. Require coreutils
-timeout 2 sakura-check-version
+#timeout 2 sakura-check-version
+timeout3 -t 2 sakura-check-version
 
 echo "Welcome to saura, my friend. Feel free to thank Riccardo for this amazeballs piece of remarkable software." | lolcat 2>/dev/null || 
    echo "Maybe lolcat is not installed"
