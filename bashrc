@@ -29,3 +29,5 @@ done
 #. $SAKURADIR/bashrc.d/all/_common
 #. $SAKURADIR/bashrc.d/all/aliases
 sakura-check-version
+
+echo "Welcome to saura, my friend. Feel free to thank Riccardo for this amazeballs piece of remarkable software." | lolcat

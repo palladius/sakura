@@ -7,6 +7,7 @@ gem 'echoe'
 gem 'facter'
 gem 'ric'
 gem 'google-cloud-logging'
+gem 'lolcat'
 
 #gem 'psych'
 
