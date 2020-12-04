@@ -30,4 +30,5 @@ done
 #. $SAKURADIR/bashrc.d/all/aliases
 sakura-check-version
 
-echo "Welcome to saura, my friend. Feel free to thank Riccardo for this amazeballs piece of remarkable software." | lolcat
+echo "Welcome to saura, my friend. Feel free to thank Riccardo for this amazeballs piece of remarkable software." | lolcat 2>/dev/null || 
+   echo "Maybe lolcat is not installed"
