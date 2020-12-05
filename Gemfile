@@ -18,6 +18,7 @@ group :test do
   gem 'nitpick'
 
   platform :ruby do
+    # requires in Ubuntu: sudo apt-get install libmagick++-dev
     gem 'rmagick'
   end
 
