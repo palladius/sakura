@@ -19,6 +19,7 @@ require 'ric'       # http://ruby.about.com/od/advancedruby/a/optionparser.htm
 require('net/ping') rescue fatal( "requires: gem install net-ping")
 require "net/http"
 require "uri"
+require "socket"
 
 # Program constants, automagically picked up by RicLib
 # More configuration could be written in:
@@ -30,7 +31,7 @@ $myconf = {
   :sample_hosts   => "www.google.com www.facebook.com doesnt.exist.com"
 }
 
-$PROG_VER = '1.0.0'
+$PROG_VER = '1.0.1'
 $DEBUG    = false
 $ThreadedArray = [] # will contains responses. PS SEems to be thread-safe! More here: https://www.jstorimer.com/blogs/workingwithcode/8085491-nobody-understands-the-gil
 
@@ -45,8 +46,13 @@ end
 # include it in main if you want a custome one
 def init()    # see lib_autoinit in lib/util.rb
   $opts = {}
+  # defaults
+  $opts[:color] = true
+  $opts[:debug] = false
+  
   $optparse = OptionParser.new do |opts|
     opts.banner = "#{$0} v.#{$PROG_VER}\n Usage: #{File.basename $0} [options] host1 host2 host3 ...\n\nExample: pinger #{$myconf[:sample_hosts]}"
+    opts.on( '-c', '--color', 'Enables colors (dflt: TRUE)' )   { $opts[:color] = true}
     opts.on( '-d', '--debug', 'enables debug (DFLT=false)' )  {  $opts[:debug] = true ; $DEBUG = true }
     opts.on( '-h', '--help', 'Display this screen' )          {  usage }
   #  opts.on( '-n', '--dryrun', "Don't really execute code" ) { $opts[:dryrun] = true }
@@ -57,11 +63,59 @@ def init()    # see lib_autoinit in lib/util.rb
   $optparse.parse!  
 end
 
+# PrettyPrint part
+
+def write_header
+  puts "| #{ @columns.map { |_,g| g[:label].ljust(g[:width]) }.join(' | ') } |"
+end
+
+def write_divider
+  puts "+-#{ @columns.map { |_,g| "-"*g[:width] }.join("-+-") }-+"
+end
+
+def write_line(h)
+  str = h.keys.map { |k| h[k].ljust(@columns[k][:width]) }.join(" | ")
+  puts "| #{str} |"
+end
+
+# dremel style :)
+def tabular_pretty_print(arr)
+  col_labels = { host: "Hostname", ip: "IP Address", response_code: "Rsp", icmp: "Ping"}
+  @columns = col_labels.each_with_object({}) { |(col,label),h|
+    h[col] = { label: label,
+               width: [arr.map { |g| g[col].size }.max, label.size].max } }
+
+  sorted_arr = arr.sort_by { |el| el[:host] }
+  write_divider
+  write_header
+  write_divider
+  sorted_arr.each { |h| write_line(h) }
+  write_divider
+end
+
+
+# Network part
+def colorize(str)
+  #return red("err") if str == :err
+  return green("ok") if str == :up
+  return red("DOWN") if str == :down
+  str.to_s
+end
+
+
 # tells if up or down
 def up?(host)
   check = Net::Ping::External.new(host)
   check.ping? 
   #Net::Ping::External.new(host).ping?
+end
+
+def get_ip(host)
+  begin
+    return IPSocket.getaddress(host)
+  rescue SocketError
+    return :err # :dunno # Can return anything you want here
+  end
 end
 
 def http_ping(host,port=80)
@@ -73,34 +127,48 @@ def http_ping(host,port=80)
 
   return [ response.code, response["content-type"] ] # response.body ]
 end
+
 def threaded_ping_host(host)
-  up_response =  up?(host) ? 'ok  ' : 'DOWN'
-  http_ret = http_ping(host, 80) rescue [:ERR, $! ]
-  ret = "[Thread] ICMP:#{ up_response } HTTP:#{http_ret[0]} #{host}\t# #{http_ret[1].to_s[0..80]}.."
-  $ThreadedArray << ret
-  #puts ret
-  ret 
+  up_response =  up?(host) ? :up : :down
+  http_ret = http_ping(host, 80) rescue [:err, $! ]
+  ip = get_ip(host) rescue :error
+  #ret = "[Thread] ICMP:#{ up_response } HTTP:#{http_ret[0]} #{ip}\t #{host}\t# #{http_ret[1].to_s[0..80]}.."
+  #$ThreadedArray << ret
+  my_hash =  {
+    :host => (host), 
+    :ip => colorize(ip), 
+    :response_code => colorize(http_ret[0]),
+    :icmp => colorize(up_response), 
+  }
+  $ThreadedArray << my_hash
+  my_hash # per ora non lo uso ma ansamai.. 
 end
 
 def ping_hosts(hosts)
+  t_start = Time.now
   threads = []
   hosts.each { |host| 
     threads <<  Thread.new { threaded_ping_host(host)  }
   }
   threads.each(&:join)
   #sleep 1
+  t_end = Time.now
   puts "Here's your result hoping it comes from a thead safe array (if something is missing just enable puts):"
-  puts($ThreadedArray.sort.join("\n"))
+  #puts($ThreadedArray.sort.join("\n"))
+  #puts($ThreadedArray.map{|x| x.to_s }.sort.join("\n"))
+  tabular_pretty_print($ThreadedArray)
+  puts "It took me #{Integer((t_end-t_start)*1000)}ms - RESTECP!"
 end
 
 def real_program
   debug_on 'Just created script, presuming u need some debug. TODO REMOVE ME when everything works!' if $DEBUG
     # Maybe you may want to check on ARGV
-  # unless ARGV.size == 2
-  #   usage "Give me 2 arguments!" 
-  # end
+  unless ARGV.size >= 1
+    usage "Give me 1 or more hosts to ping and aruspex!"
+    exit 1 
+  end
   puts("Ricc, consider --watch to optimize the loading of expensive libraries..")
-  puts "+ Options are:  #{gray $opts}"
+  #puts "+ Options are:  #{gray $opts}"
   puts "+ Pinging: #{ARGV}"
   
   if $opts[:watch]
