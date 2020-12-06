@@ -1,0 +1,127 @@
+#!/usr/bin/env ruby
+
+=begin
+
+############################################################
+@author:    Riccardo Carlesso
+@email:     riccardo.carlesso@gmail.com
+@maturity:  development
+@language:  Ruby
+@synopsis:  pings N hosts che esistono o forse no
+@tags:      development, network
+@description: See description below (Im super DRY!)
+############################################################
+
+=end
+
+require 'optparse'       # http://ruby.about.com/od/advancedruby/a/optionparser.htm
+require 'ric'       # http://ruby.about.com/od/advancedruby/a/optionparser.htm
+require('net/ping') rescue fatal( "requires: gem install net-ping")
+require "net/http"
+require "uri"
+
+# Program constants, automagically picked up by RicLib
+# More configuration could be written in:
+#    $GIC/etc/ricsvn/<FILENAME>.yml
+# That would go into the variable '$prog_conf_d'
+$myconf = {
+  :app_name       => "pinger",
+  :description    => "pings many hosts. we start with ICMP, then HTTP ping and ret status, and finally check HTTPS and title",
+  :sample_hosts   => "www.google.com www.facebook.com doesnt.exist.com"
+}
+
+$PROG_VER = '1.0.0'
+$DEBUG    = false
+$ThreadedArray = [] # will contains responses. PS SEems to be thread-safe! More here: https://www.jstorimer.com/blogs/workingwithcode/8085491-nobody-understands-the-gil
+
+def usage(comment=nil)
+  puts $optparse.banner
+  puts $optparse.summarize
+  pred comment if comment
+  #puts "Description: #{ $myconf[:description] }"
+  exit 13
+end
+
+# include it in main if you want a custome one
+def init()    # see lib_autoinit in lib/util.rb
+  $opts = {}
+  $optparse = OptionParser.new do |opts|
+    opts.banner = "#{$0} v.#{$PROG_VER}\n Usage: #{File.basename $0} [options] host1 host2 host3 ...\n\nExample: pinger #{$myconf[:sample_hosts]}"
+    opts.on( '-d', '--debug', 'enables debug (DFLT=false)' )  {  $opts[:debug] = true ; $DEBUG = true }
+    opts.on( '-h', '--help', 'Display this screen' )          {  usage }
+  #  opts.on( '-n', '--dryrun', "Don't really execute code" ) { $opts[:dryrun] = true }
+  #  opts.on( '-l', '--logfile FILE', 'Write log to FILE' )    {|file| $opts[:logfile] = file }
+  #  opts.on( '-v', '--verbose', 'Output more information' )   { $opts[:verbose] = true}
+    opts.on( '-w', '--watch', 'Repeats every 2 seconds AWESOME' )   { $opts[:watch] = true}
+  end
+  $optparse.parse!  
+end
+
+# tells if up or down
+def up?(host)
+  check = Net::Ping::External.new(host)
+  check.ping? 
+  #Net::Ping::External.new(host).ping?
+end
+
+def http_ping(host,port=80)
+  uri = URI.parse("http://#{host}:#{port}/")
+  #uri = URI.parse("http://www.google.com/")
+  http = Net::HTTP.new(uri.host, uri.port)
+  request = Net::HTTP::Get.new(uri.request_uri)
+  response = http.request(request)
+
+  return [ response.code, response["content-type"] ] # response.body ]
+end
+def threaded_ping_host(host)
+  up_response =  up?(host) ? 'ok  ' : 'DOWN'
+  http_ret = http_ping(host, 80) rescue [:ERR, $! ]
+  ret = "[Thread] ICMP:#{ up_response } HTTP:#{http_ret[0]} #{host}\t# #{http_ret[1].to_s[0..80]}.."
+  $ThreadedArray << ret
+  #puts ret
+  ret 
+end
+
+def ping_hosts(hosts)
+  threads = []
+  hosts.each { |host| 
+    threads <<  Thread.new { threaded_ping_host(host)  }
+  }
+  threads.each(&:join)
+  #sleep 1
+  puts "Here's your result hoping it comes from a thead safe array (if something is missing just enable puts):"
+  puts($ThreadedArray.sort.join("\n"))
+end
+
+def real_program
+  debug_on 'Just created script, presuming u need some debug. TODO REMOVE ME when everything works!' if $DEBUG
+    # Maybe you may want to check on ARGV
+  # unless ARGV.size == 2
+  #   usage "Give me 2 arguments!" 
+  # end
+  puts("Ricc, consider --watch to optimize the loading of expensive libraries..")
+  puts "+ Options are:  #{gray $opts}"
+  puts "+ Pinging: #{ARGV}"
+  
+  if $opts[:watch]
+    puts "Watch activated. Looping every 2 seconds :)"
+    while true 
+      ping_hosts(ARGV)
+      sleep 2
+      $ThreadedArray=[]
+      system "clear" # || system "cls" # https://stackoverflow.com/questions/3170553/how-can-i-clear-the-terminal-in-ruby
+    end
+
+  else # normal mode
+    ping_hosts(ARGV)
+  end
+
+end
+
+def main()
+  init        # Enable this to have command line parsing capabilities!
+  #lib_autoinit # if u dont like the autoinit, uncomment init :)
+  real_program 
+end
+
+main() # __FILE__)

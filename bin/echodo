@@ -2,6 +2,7 @@
 
   # Sakura-simplified version of this amazing script
 
-(echo -en 'SachoDo: ' ; echo "$@" )>&2
+(echo "[sak-echoDo] $@" | lolcat )>&2
+#(echo -en '[sak-echoDo] ' ; echo "$@" | lolcat )>&2
 
 "$@"
