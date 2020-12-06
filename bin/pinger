@@ -80,7 +80,14 @@ end
 
 # dremel style :)
 def tabular_pretty_print(arr)
-  col_labels = { host: "Hostname", ip: "IP Address", response_code: "Rsp", icmp: "Ping"}
+  col_labels = { 
+    host: "Hostname", 
+    ip: "IP Address", 
+    response_code: "R80", 
+    response_code_443: "443", 
+    #response_code_8080: "8080", 
+    icmp: "Ping"
+  }
   @columns = col_labels.each_with_object({}) { |(col,label),h|
     h[col] = { label: label,
                width: [arr.map { |g| g[col].size }.max, label.size].max } }
@@ -97,6 +104,7 @@ end
 # Network part
 def colorize(str)
   #return red("err") if str == :err
+  return ("-") if str == :err
   return green("ok") if str == :up
   return red("DOWN") if str == :down
   str.to_s
@@ -118,10 +126,12 @@ def get_ip(host)
   end
 end
 
-def http_ping(host,port=80)
+def http_ping(host,port)
   uri = URI.parse("http://#{host}:#{port}/")
-  #uri = URI.parse("http://www.google.com/")
   http = Net::HTTP.new(uri.host, uri.port)
+  http.read_timeout = 1
+  http.open_timeout = 1
+  http.use_ssl = true if port == 443
   request = Net::HTTP::Get.new(uri.request_uri)
   response = http.request(request)
 
@@ -131,6 +141,8 @@ end
 def threaded_ping_host(host)
   up_response =  up?(host) ? :up : :down
   http_ret = http_ping(host, 80) rescue [:err, $! ]
+  http_ret_443 = http_ping(host, 443) rescue [:err, $! ]
+  #http_ret_8080 = http_ping(host, 8080) rescue [:err, $! ]
   ip = get_ip(host) rescue :error
   #ret = "[Thread] ICMP:#{ up_response } HTTP:#{http_ret[0]} #{ip}\t #{host}\t# #{http_ret[1].to_s[0..80]}.."
   #$ThreadedArray << ret
@@ -138,6 +150,8 @@ def threaded_ping_host(host)
     :host => (host), 
     :ip => colorize(ip), 
     :response_code => colorize(http_ret[0]),
+    :response_code_443 => colorize(http_ret_443[0]),
+    #:response_code_8080 => colorize(http_ret_8080[0]),
     :icmp => colorize(up_response), 
   }
   $ThreadedArray << my_hash
@@ -154,8 +168,6 @@ def ping_hosts(hosts)
   #sleep 1
   t_end = Time.now
   puts "Here's your result hoping it comes from a thead safe array (if something is missing just enable puts):"
-  #puts($ThreadedArray.sort.join("\n"))
-  #puts($ThreadedArray.map{|x| x.to_s }.sort.join("\n"))
   tabular_pretty_print($ThreadedArray)
   puts "It took me #{Integer((t_end-t_start)*1000)}ms - RESTECP!"
 end
@@ -168,14 +180,13 @@ def real_program
     exit 1 
   end
   puts("Ricc, consider --watch to optimize the loading of expensive libraries..")
-  #puts "+ Options are:  #{gray $opts}"
-  puts "+ Pinging: #{ARGV}"
+  puts "I'm Pinging: #{ARGV}"
   
   if $opts[:watch]
-    puts "Watch activated. Looping every 2 seconds :)"
+    puts "Watch activated. Looping every 3 seconds :)"
     while true 
       ping_hosts(ARGV)
-      sleep 2
+      sleep 3
       $ThreadedArray=[]
       system "clear" # || system "cls" # https://stackoverflow.com/questions/3170553/how-can-i-clear-the-terminal-in-ruby
     end
