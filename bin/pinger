@@ -16,7 +16,7 @@
 
 require 'optparse'       # http://ruby.about.com/od/advancedruby/a/optionparser.htm
 require 'ric'       # http://ruby.about.com/od/advancedruby/a/optionparser.htm
-require('net/ping') rescue fatal( "requires: gem install net-ping")
+require 'net/ping' # rescue fatal( "requires: gem install net-ping")
 require "net/http"
 require "uri"
 require "socket"
