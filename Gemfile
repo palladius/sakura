@@ -1,6 +1,8 @@
 # Scopiazzed from Gruff gem
 # Messo ruby 2.5.3. Speriamo!
 
+# pre install Mac: brew install imagemagick
+# pre install Linux: simile
 source 'https://rubygems.org'
 
 gem 'echoe'
