@@ -10,13 +10,14 @@
 @synopsis:  pings N hosts che esistono o forse no
 @tags:      development, network
 @description: See description below (Im super DRY!)
+@dependencies: Just type "gem install ric net-ping net-http uri"
 ############################################################
 
 =end
 
 require 'optparse'       # http://ruby.about.com/od/advancedruby/a/optionparser.htm
-require 'ric'       # http://ruby.about.com/od/advancedruby/a/optionparser.htm
-require('net/ping') rescue fatal( "requires: gem install net-ping")
+require 'ric'       # for the colors
+require 'net/ping' # rescue fatal( "requires: gem install net-ping")
 require "net/http"
 require "uri"
 require "socket"
@@ -28,7 +29,7 @@ require "socket"
 $myconf = {
   :app_name       => "pinger",
   :description    => "pings many hosts. we start with ICMP, then HTTP ping and ret status, and finally check HTTPS and title",
-  :sample_hosts   => "www.google.com www.facebook.com doesnt.exist.com"
+  :sample_hosts   => "www.google.com www.facebook.com doesnt.exist.com localhost septober.palladius.it"
 }
 
 $PROG_VER = '1.0.1'
@@ -51,7 +52,7 @@ def init()    # see lib_autoinit in lib/util.rb
   $opts[:debug] = false
   
   $optparse = OptionParser.new do |opts|
-    opts.banner = "#{$0} v.#{$PROG_VER}\n Usage: #{File.basename $0} [options] host1 host2 host3 ...\n\nExample: pinger #{$myconf[:sample_hosts]}"
+    opts.banner = "#{$0} v.#{$PROG_VER}\n Usage: #{File.basename $0} [options] host1 host2 host3 ...\n\nExample: pinger --watch #{$myconf[:sample_hosts]}"
     opts.on( '-c', '--color', 'Enables colors (dflt: TRUE)' )   { $opts[:color] = true}
     opts.on( '-d', '--debug', 'enables debug (DFLT=false)' )  {  $opts[:debug] = true ; $DEBUG = true }
     opts.on( '-h', '--help', 'Display this screen' )          {  usage }
@@ -86,7 +87,7 @@ def tabular_pretty_print(arr)
     response_code: "R80", 
     response_code_443: "443", 
     #response_code_8080: "8080", 
-    icmp: "Ping"
+    icmp: white("Ping")
   }
   @columns = col_labels.each_with_object({}) { |(col,label),h|
     h[col] = { label: label,
