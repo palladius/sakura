@@ -1,0 +1,13 @@
+#!/bin/sh
+
+if uname | grep -q Linux ; then
+  echo "DEB: Ok we are on Linux, executing this: $*" >&2
+  "$@"
+  exit $?
+else
+  echo "DEB: Not on a Linux, wont execute this but still exit 0 because of semantic versioning: $*" >&2
+  # note its bollock. I just like to sound smart when taking arbitrary decisions :)
+  # I still genuinely feel that if_linux? should nicely return 0 anyway.  
+  exit 0
+fi
+

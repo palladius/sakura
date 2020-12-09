@@ -15,9 +15,9 @@
 
 =end
 
-require 'optparse'       # http://ruby.about.com/od/advancedruby/a/optionparser.htm
-require 'ric'       # for the colors
-require 'net/ping' # rescue fatal( "requires: gem install net-ping")
+require 'optparse'     # http://ruby.about.com/od/advancedruby/a/optionparser.htm
+require 'ric'          # for the colors
+require 'net/ping'     # rescue fatal( "requires: gem install net-ping")
 require "net/http"
 require "uri"
 require "socket"
