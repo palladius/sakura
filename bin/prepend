@@ -1,5 +1,5 @@
 #!/bin/bash
 
 while read L ; do
-  echo "$*" "$L"
+  echo "$*$L"
 done
