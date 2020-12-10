@@ -56,7 +56,6 @@ def init()    # see lib_autoinit in lib/util.rb
     opts.on( '-c', '--color', 'Enables colors (dflt: TRUE)' )   { $opts[:color] = true}
     opts.on( '-d', '--debug', 'enables debug (DFLT=false)' )  {  $opts[:debug] = true ; $DEBUG = true }
     opts.on( '-h', '--help', 'Display this screen' )          {  usage }
-  #  opts.on( '-n', '--dryrun', "Don't really execute code" ) { $opts[:dryrun] = true }
   #  opts.on( '-l', '--logfile FILE', 'Write log to FILE' )    {|file| $opts[:logfile] = file }
   #  opts.on( '-v', '--verbose', 'Output more information' )   { $opts[:verbose] = true}
     opts.on( '-w', '--watch', 'Repeats every 2 seconds AWESOME' )   { $opts[:watch] = true}

@@ -1,0 +1,6 @@
+#!/bin/bash
+
+while read L ; do
+	# no space after for my use case (hostanem -> FQD appending .DOMAIN)
+	echo "$L$*"
+done
