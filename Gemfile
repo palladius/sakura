@@ -12,11 +12,12 @@ gem 'google-cloud-logging'
 gem 'lolcat'
 
 
-# Just for pinger...
-gem 'net-ping'
-gem 'net-http'
-gem 'uri'
-
+group :pinger do
+  # Just for pinger...
+  gem 'net-ping'
+  gem 'net-http'
+  gem 'uri'
+end
 
 #gem 'psych'
 

@@ -1,9 +1,9 @@
 #!/bin/bash
 
 if [ -d  /Applications/Safari.app/ ] ; then
-	echo [ricc] I presume youre on a mac..
+	echo [ricc] I presume youre on a mac.. >&2
 	jq-mac "$@"
 else
-	echo [ricc] I presume youre NOT on a mac hence youre on Linux.
+	echo [ricc] I presume youre NOT on a mac hence youre on Linux. >&2
 	jq-linux "$@"
 fi
