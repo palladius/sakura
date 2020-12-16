@@ -2,13 +2,17 @@
 
 # Useful if you want to makje sure you onlt execute once some expensive computationally work.
 # Similar to makefile dependencies but uses touch based on commmand.
+# To Clean: rm	.onlyonce.*.touch
+
 
 command="$*"
-if [ -f "$*".touch ]; then
-    verde "Skipping as I have already executed it: $*"
+TOUCHFILE=".onlyonce.$*".touch
+
+if [ -f "$TOUCHFILE" ]; then
+    yellow "Skipping as I have already executed it: $*"
 else
     verde "First and last time I execute this: $*"
-    touch  "$*".touch
+    touch "$TOUCHFILE"
     "$@"
 fi
 
