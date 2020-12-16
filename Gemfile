@@ -10,6 +10,7 @@ gem 'facter'
 gem 'ric'
 gem 'google-cloud-logging'
 gem 'lolcat'
+gem 'filecache'
 
 
 group :pinger do

@@ -1,0 +1,14 @@
+#!/bin/bash
+
+# Useful if you want to makje sure you onlt execute once some expensive computationally work.
+# Similar to makefile dependencies but uses touch based on commmand.
+
+command="$*"
+if [ -f "$*".touch ]; then
+    verde "Skipping as I have already executed it: $*"
+else
+    verde "First and last time I execute this: $*"
+    touch  "$*".touch
+    "$@"
+fi
+
