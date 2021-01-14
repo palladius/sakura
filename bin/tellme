@@ -1,13 +1,18 @@
 #!/bin/bash
 
 DIMMIPATH="$SAKURADIR/sounds/"
-SUONA=/usr/local/bin/ogg123
+SUONA=ogg123
 # oppure /usr/local/bin/ogg123
 
+path_to_executable=$(which $SUONA )
 
-if [ ! -f $SUONA ] ; then
-	echo "Ogg123 not installed, try: sudo apt-get install vorbis-tools"
+# https://stackoverflow.com/questions/6569478/detect-if-executable-file-is-on-users-path
+#if [ ! -f $SUONA ] ; then
+if [ ! -x "$path_to_executable" ] ; then
+	echo "Ogg123 seemingly not installed, try: sudo apt-get install vorbis-tools (or brew or whatevs)"
 	exit 2
+else
+	echo "[DEB] suona executable alive and kicking (X): $path_to_executable"
 fi
 
 function gestisci() {
@@ -16,12 +21,13 @@ function gestisci() {
 		return
 	fi
 	FNAME="$DIMMIPATH/$PAROLA.ogg"
+	# If I dont find the wod... i say BOH
 	RISERVA="$DIMMIPATH/boh.ogg"
 	if [ -f "$FNAME" ] ; then
 		$SUONA  "$FNAME" >/dev/null 2>/dev/null
 	else
 		$SUONA  "$RISERVA" >/dev/null 2>/dev/null
-		echo "'$FNAME' not found" >&2
+		echo "File/sound '$FNAME' not found" >&2
 	fi
 }
 
