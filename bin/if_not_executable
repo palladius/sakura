@@ -1,0 +1,17 @@
+#!/bin/bash
+
+SCRIPT_TO_TEST=${1:-_GIVE_ME_A_SCRIPT_TO_CHECK_}
+
+path_to_executable=$(which "$SCRIPT_TO_TEST" )
+
+# https://stackoverflow.com/questions/6569478/detect-if-executable-file-is-on-users-path
+
+if [ -x "$path_to_executable" ] ; then
+	echo "[$(basename $0)] '$SCRIPT_TO_TEST' seems executable and located here: $path_to_executable"
+	exit 0
+else
+    shift
+    # removed $1 which is the command. Note I dont see that variable anymore nut thankfully I have it in SCRIPT_TO_TEST
+	echo "[$(basename $0)] '$SCRIPT_TO_TEST' doesnt exist. Executing now: '$@'"
+    "$@"
+fi
