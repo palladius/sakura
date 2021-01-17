@@ -1,0 +1,30 @@
+#!/bin/bash
+
+# expects a file .env with the following data in local dir:
+# MYSQL_HOST
+# MYSQL_USER
+# MYSQL_PASSWORD
+# Everything else goes in "$@"
+
+#ENVFILE="${1:-.env}"
+# Silly me - either you have "$@" or .env in ARGV but you cant have both :P 
+# Maybe i can do two flavours:
+# - mysql-test-from-env-anyenv
+# - mysql-test-from-env-anycommand :)
+ENVFILE=".env"
+
+set -e 
+
+if [ ! -f "$ENVFILE" ]; then 
+    echo Sorry, this directory doesnt have a .env. Provide one in ARGV
+    exit 50
+fi
+
+source "$ENVFILE" || 
+    fatal 43 "Cant find $ENVFILE"
+
+
+# The cool part is that i wont disclose the password and its all GOOD :)
+# https://stackoverflow.com/questions/20751352/suppress-warning-messages-using-mysql-from-within-terminal-but-password-written
+export MYSQL_PWD="$MYSQL_PASSWORD"
+echodo mysql -u $MYSQL_USER  -h "$MYSQL_HOST" "$@"
