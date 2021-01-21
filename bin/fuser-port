@@ -1,0 +1,9 @@
+
+# i always forget how to fuser for a TCP port
+
+PORT=${1:-8080}
+echo INspecting port $PORT..
+echodo fuser -n tcp $PORT
+
+netstat -ant | grep LISTEN | grep ":$PORT"
+
