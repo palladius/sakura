@@ -1,0 +1,3 @@
+
+echodo kubectl config view | grep 'name: gke' |sed -e 's/- / /g'  |sort | uniq  | cut -f 2 -d: |uniq
+
