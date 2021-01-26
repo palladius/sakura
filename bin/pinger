@@ -160,18 +160,25 @@ end
 
 def ping_hosts(hosts)
   t_start = Time.now
-  threads = []
+  threads = [] # strating threads
+  deb "#DEB strating threads..."
   hosts.each { |host| 
     threads <<  Thread.new { threaded_ping_host(host)  }
   }
   threads.each(&:join)
+  t_end = Time.now # last thread finished
+  clear_screen # in teoria adesso dovrebbe avere il join di tutti i thread
+  deb "#DEB slowest thread has finished..."
   #sleep 1
-  t_end = Time.now
   puts "Here's your result hoping it comes from a thead safe array (if something is missing just enable puts):"
   tabular_pretty_print($ThreadedArray)
   puts "It took me #{Integer((t_end-t_start)*1000)}ms - RESTECP!"
 end
 
+def clear_screen
+  system "clear" # https://stackoverflow.com/questions/12719021/linux-command-reset1-is-slow
+  # Alternative: || system "cls" # https://stackoverflow.com/questions/3170553/how-can-i-clear-the-terminal-in-ruby
+end
 def real_program
   debug_on 'Just created script, presuming u need some debug. TODO REMOVE ME when everything works!' if $DEBUG
     # Maybe you may want to check on ARGV
@@ -188,8 +195,8 @@ def real_program
       ping_hosts(ARGV)
       sleep 3
       $ThreadedArray=[]
-      system "clear" # || system "cls" # https://stackoverflow.com/questions/3170553/how-can-i-clear-the-terminal-in-ruby
-    end
+      #clear_screen # lo sposto ad appena prima della puts.
+      end
 
   else # normal mode
     ping_hosts(ARGV)

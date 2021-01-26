@@ -3,7 +3,7 @@
 # Filter that fixes code oin INPUT which is 
 # Number of readings to fix this.
 
-# INPUT: "opportunitÃ    di persona. Se Ã¨ perchÃ¨ ho occasione o perchÃ¨. HTML: guarderÃ  storto, vi considererÃ  gay e forse cercherÃ  la rissa (HTML)" 
+# INPUT: "opportunitÃ    di persona. Se Ã¨ perchÃ¨ ho occasione o perchÃ¨ con semplicitÃ . HTML: guarderÃ  storto, vi considererÃ happy e forse cercherÃ  la rissa (HTML)" 
 # OUTPUT: 
 
 # TODO ricc: also see www.goliardia.it-github/bin/fix-encoding.sh
@@ -15,16 +15,17 @@
 
 def get_input
     #TODO stdin
-    "opportunitÃ di incontrarti di persona. Non so se Ã¨ perchÃ¨ non ho cercato abbastanza l' occasione o perchÃ¨. PerÃ² piÃ¹ guarderÃ." 
+    "opportunitÃ di incontrarti di persona. Non so se Ã¨ perchÃ¨ non so perchÃ¨. PerÃ² piÃ¹ guarderÃ. ConsidererÃ e cercherÃ  la" 
 end    
 
 def process_input(s)
     # inefficient but who cares
     ret = s.
         #########################
-        #\ A  Átha, Ã, semplicitÃ . Città  B         città 
+        # A  Átha, Ã, semplicitÃ . Città  B         città 
         # guarderÃ  storto, vi considererÃ  gay e forse cercherÃ  la rissa
-        gsub(/Ã /, "à").
+        gsub(/Ã  /, "à ").
+        gsub(/Ã /, "à").
         #########################
         # è - e grave / Ã¨
         gsub(/Ã¨/,"è").
@@ -45,12 +46,12 @@ def process_input(s)
 
         #########################
         # end
+        gsub(/Ã/, "à"). # Note all have "Ã<SOMETHING>" except the A so i need to jeep it kast.
+        # most times it has a double space, so good.
         # TODO removeme - just to keep the final dots going
         gsub(/DoesntExist3487fgerfugey/,"Just so I can have a DOT at the end of every part :)")
     return ret 
 end
-
-
 
 def main()
     puts "#DEB Welcome to $0"
