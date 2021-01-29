@@ -1,8 +1,6 @@
 # TODO require puppet-lint
 language: ruby
 rvm: 
-# - 1.8.7
-# - 1.9.3
  - 2.5.3
  - 2.6.3
  - 2.7.2
@@ -13,9 +11,8 @@ notifications:
   email:
     - palladiusbonton+github@gmail.com
 before_install:
-  - make install 
-    #- gem install bundler --pre
-  - gem install bundler 
+  #- make install 
+  #- gem install bundler 
   - bundle install
 env:
   - RICCARDO_MESSAGE="Modestamente sono un figo e ascolto volentieri i Travis in formato YAML"
