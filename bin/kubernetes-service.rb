@@ -6,9 +6,10 @@ if RUBY_VERSION.split('.')[0] == 1
 end
 
 
-$PROG_VER = '2.0' 
+$PROG_VER = '2.1'
 $DEBUG    = false
 
+# 2.1 Moved to sakura for having the world seeing this amazing crown jewel. Unfortunately a small dependency is NOT in sakura yet. Bear with me.
 # 2.0 had to obsolete this hottibler GCP_COLONED_ENDPOINT1 as I was giving it BOTH IPs and static endpoints for GCP
 #     so i moved to both names and halt the program if I find the old one. Hopegully it'll nbe clearer thanks to patching also the help.
 # 1.1 amazing
@@ -41,7 +42,7 @@ $myconf = {
         - GCP_ENDPOINT_DNS_MAPPING: somerthing like 'my-static-ip-endpoint:myhost.example.com' (usually for Nodeport Deployments)
     ".strip.gsub(/^\s+/, "").gsub(/\s+$/, ""),
     :default_env => ".env",
-    :default_kubedir => "kubernetes/",
+    :default_kubedir => ".", # "kubernetes/",
     :mandatory_keys => %w{ PROJECT_ID GCLOUD_CONFIG_NAME NAMESPACE GKE_CREDENTIALS_COMMAND },
     # inutile e nmon usato..
     #:additional_keys => %w{ GCP_COLONED_ENDPOINT__SINGLEDIGIT GCP_STATIC_IP_NAME1 CLOUD_DNS_NAME1 GCP_STATIC_IP_NAME2 CLOUD_DNS_NAME2  GCP_COLONED_ENDPOINT1 GCP_COLONED_ENDPOINT2 },
@@ -66,26 +67,23 @@ def init()    # see lib_autoinit in lib/util.rb
   $opts[:verbose] = false # dflt
   $optparse = OptionParser.new do |opts|
     opts.banner = "#{$0} v.#{$PROG_VER}\n Usage: #{File.basename $0} [--envfile <FILE>] [check | up/start | stop/down | restart | status | init | drain/killpod | destroy/cleanup] "
-    opts.on( '-d', '--debug', 'enables debug (DFLT=false)' )  {  $opts[:debug] = true ; $DEBUG = true }
-    opts.on( '-h', '--help', 'Display this screen' )          {  usage }
-    opts.on( '-k', '--dir KUBE_DIR', 'Kubernetes Dir (dflt: kubernetes/)')   {|kubedir| $opts[:kubedir] = kubedir }
+    opts.on( '-d', '--debug', 'enables debug (DFLT=false)' ) {  $opts[:debug] = true ; $DEBUG = true }
+    opts.on( '-h', '--help', 'Display this screen') {  usage }
+    opts.on( '-k', '--dir KUBE_DIR', "Kubernetes Dir (dflt: '#{$opts[:default_kubedir]}')") {|kubedir| $opts[:kubedir] = kubedir }
     #opts.on( '-n', '--dryrun', "Don't really execute code (TODOIMPL)" ) { $opts[:dryrun] = true }
-    opts.on( '-e', '--envfile FILE', 'Write log to FILE' )    {|file| $opts[:envfile] = file }
-    opts.on( '-v', '--verbose', 'Output more information' )   { $opts[:verbose] = true}
+    opts.on( '-e', '--envfile FILE', 'Write log to FILE') {|file| $opts[:envfile] = file }
+    opts.on( '-v', '--verbose', 'Output more information') { $opts[:verbose] = true}
   end
   $optparse.parse!  
 end
 
 def kubectl_command(payload, opts={})
-  #$opts[:envfile]
-  deb "kubectl_command(payload='#{payload}', opts=#{opts})"
   ret = "kubectl --namespace #{ENV["NAMESPACE"]} #{payload}"
-  deb "kubectl_command ==> #{ret}"
+  deb "kubectl_command(payload='#{payload}', opts=#{opts}) ==> #{ret}"
   ret 
 end
 
-# funge ma inutile - lo fa gia dotenv!
-
+# funge ma inutile - lo fa gia la gemma mitica `dotenv` e il resto del mono non ruby sta a guardare!
 def ensure_env_exist_or_die(arr_of_keys)
   deb "CHecking ENV for: #{arr_of_keys}"
   arr_of_keys.each do |k|

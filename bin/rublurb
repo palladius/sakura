@@ -1,5 +1,8 @@
 #!/bin/bash
 
+export PATH=./bin:$PATH
+
+echo "== Ruby stuff =="
 echo -en "+ Ruby   version: " ; ruby -v 
 echo -en "+ Gem    version: " ; gem -v
 echo -en "+ Bundle version: " ; bundle -v
@@ -8,5 +11,7 @@ echo -en "+ OS version: " ; uname -a
 echo "== Additional Linux blurb =="
 echo -en "+ Ubuntu stuff: " ; lsb_release -a | prepend "  -"
 echo -en "+ Debian stuff: " ; cat /etc/debian_version
+echo "== Riccardo stuff =="
+printenv | grep SAKURA
 echo "== Gem list =="
 gem list | prepend " -"
