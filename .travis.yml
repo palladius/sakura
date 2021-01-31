@@ -27,6 +27,8 @@ env:
 #  - "cp config/database.example.yml config/database.yml"
 #script: "RAILS_ENV=test bundle exec rake test:ci --trace"
 script: 
+  # Non ho idea se le ENV cars siano sticky - ma val la pena provare..
+- source bashrc
 - bin/rublurb
 - bundle exec rake --trace
 - make test
