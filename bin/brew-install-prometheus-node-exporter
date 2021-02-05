@@ -1,0 +1,7 @@
+
+echodo brew install node_exporter
+
+
+echodo brew services start node_exporter
+
+
