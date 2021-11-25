@@ -9,9 +9,9 @@ command="$*"
 TOUCHFILE=".onlyonce.$*".touch
 
 if [ -f "$TOUCHFILE" ]; then
-    yellow "Skipping as I have already executed it: $*"
+    yellow "Skipping as I have already executed it in this DIR: $*"
 else
-    verde "First and last time I execute this: $*"
+    verde "First and last time I execute this in this DIR: $*"
     touch "$TOUCHFILE"
     "$@"
 fi
