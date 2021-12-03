@@ -1,0 +1,4 @@
+
+# https://newbedev.com/how-to-get-the-path-of-a-file-relative-to-the-git-repository-root
+git ls-files --full-name "$@"
+
