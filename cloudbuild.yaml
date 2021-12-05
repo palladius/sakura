@@ -1,0 +1,11 @@
+
+steps:
+  - id: '1. Make Test start with'
+    # list of nice builders: https://github.com/GoogleCloudPlatform/cloud-builders
+    name: 'gcr.io/cloud-builders/docker' # vediamo se questo ha il MAKE
+    entrypoint: 'sh'
+    args:
+    - '-c'
+    - |
+        set -e
+        make test
