@@ -5,6 +5,11 @@ if RUBY_VERSION.split('.')[0] == 1
   exit 2020
 end
 
+minimal_version = "2.7"
+unless Gem::Version.new(RUBY_VERSION) >= Gem::Version.new(minimal_version)
+	puts "Refusing to launch as script needs filter_array which requires v2.7.\nUmglaublughly your version is #{RUBY_VERSION}"
+	exit 27
+end
 
 $PROG_VER = '2.1'
 $DEBUG    = false
