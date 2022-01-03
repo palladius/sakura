@@ -6,7 +6,7 @@ if RUBY_VERSION.split('.')[0] == 1
 end
 
 
-$PROG_VER = '2.1'
+$PROG_VER = '2.2'
 $DEBUG    = false
 
 # 2.1 Moved to sakura for having the world seeing this amazing crown jewel. Unfortunately a small dependency is NOT in sakura yet. Bear with me.
@@ -105,14 +105,16 @@ end
 
 def set_dns_based_on_env(ip_dns_mapping)
   pred "[set_dns_based_on_env] set_dns_based_on_env => #{ip_dns_mapping.split(':')}" 
-  static_ip_name, dns =  ip_dns_mapping.split(':')
-  pgreen :TODO_IMPLEMENT_CREATE_DNS_ENTRY
+  static_ip, dns =  ip_dns_mapping.split(':')
+  #pgreen :TODO_IMPLEMENT_CREATE_DNS_ENTRY
+  command = "cloud-dns-manage create #{dns} --ip #{static_ip}" 
+  esegui(command)
 end
 
 def release_dns_based_on_env(ip_dns_mapping)
   pred "[release_dns_based_on_env] release_dns_based_on_env => #{ip_dns_mapping.split(':')}" 
   static_ip_name, dns =  ip_dns_mapping.split(':')
-  pgreen :TODO_IMPLEMENT_DESTROY_DNS_ENTRY
+  pgreen :TODO_IMPLEMENT_DESTROY_DNS_ENTRY_MA_COPIA_DA_SOPRA_SE_SOPRA_FUNGE
 end
 
 # static_ip_name, dns
@@ -355,6 +357,7 @@ def real_program
   else
     fatal 89, "STRANILLIMO: You gave me #{x} -- I have no idea what to do with that."
   end
+  pgreen "Sono uscito senza errori!"
 end
 
 def main(filename)

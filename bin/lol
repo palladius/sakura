@@ -1,3 +1,5 @@
 
-yellow ":) It also makes ME laugh!"
+[[ $(type -P "lolcat" ) ]] && 
+	echo "I feel lollissimo as a cat" | lolcat ||
+		yellow ":) It also makes ME laugh!"
 
