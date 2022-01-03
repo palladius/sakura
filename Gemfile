@@ -5,6 +5,7 @@
 
 source 'https://rubygems.org'
 
+gem 'dotenv' # to use kubernetes-service
 gem 'echoe'
 gem 'facter'
 gem 'ric'
