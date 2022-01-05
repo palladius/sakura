@@ -2,39 +2,39 @@
 
 export PATH=./bin:$PATH
 
-echo "== Ruby stuff =="
-echo "+ Versions:"
-echo -en "+ Ruby   version: " ; ruby -v 
-echo -en "+ Gem    version: " ; gem -v
-echo -en "+ Bundle version: " ; bundle -v
-echo -en "+ Rails  version: " ; rails -v
-echo -en "+ Facter version: " ; facter -v
-echo -en "+ IRB    version: " ; irb -v
-echo -en "+ rbenv  version: " ; rbenv -v
-rbenv version
+echo "== Ruby stuff 💎 =="
+echo "Versions: 🧐"
+echo -en "🔴 Ruby   version: " ; ruby -v 
+echo -en "🔴 Gem    version: " ; gem -v
+echo -en "🔴 Bundle version: " ; bundle -v
+echo -en "🔴 Rails  version: $( rails -v 2>/dev/null) \n"
+echo -en "🔴 Facter version: $( facter -v 2>/dev/null) \n"
+echo -en "🔴 IRB    version: " ; irb -v
+echo -en "🔴 rbenv version1: " ; rbenv -v
+echo -en "🔴 rbenv version2: " ; rbenv version
 echo
-echo "+ Paths:"
-echo -en "+ Ruby   path: " ; which ruby || echo "-"
-echo -en "+ Gem    path: " ; which gem || echo "-"
-echo -en "+ Bundle path: " ; which bundle || echo "-"
-echo -en "+ Rails  path: " ; which rails || echo "-"
-echo -en "+ facter path: " ; which facter || echo "-"
-echo -en "+ IRB    path: " ; which irb || echo "-"
-echo -en "+ RbEnv  path: " ; which rbenv || echo "-"
-echo -en "+ rvm    path: " ; which rvm || echo "-"
+echo "Paths: 😎 "
+echo -en "⛩️  Ruby   path: " ; which ruby || echo "-"
+echo -en "⛩️  Gem    path: " ; which gem || echo "-"
+echo -en "⛩️  Bundle path: " ; which bundle || echo "-"
+echo -en "⛩️  Rails  path: " ; which rails || echo "-"
+echo -en "⛩️  facter path: " ; which facter || echo "-"
+echo -en "⛩️  IRB    path: " ; which irb || echo "-"
+echo -en "⛩️  RbEnv  path: " ; which rbenv || echo "-"
+echo -en "⛩️  rvm    path: " ; which rvm || echo "-"
 echo
 echo "== Additional Linux/Darwin blurb =="
-echo -en "+ OS version:   " ; uname -a
-echo -en "+ Ubuntu stuff: " ; lsb_release -a | prepend "  -"
-echo -en "+ Debian stuff: " ; cat /etc/debian_version
-echo -en "+ RbEnv Ruby version:     " ; rbenv version || echo "-"
-echo -en "+ Darwin Brew ruby stuff: " ; brew list | egrep "ruby|irb|facter|bundle|rbenv|rvm|gem|rails"
+echo -en "🍉 OS version:   " ; uname -a
+echo -en "🍉 Ubuntu stuff: " ; lsb_release -a | prepend "  -"
+echo -en "🍉 Debian stuff: " ; cat /etc/debian_version
+echo -en "🍉 RbEnv Ruby version:     " ; rbenv version || echo "-"
+echo -en "🍉 Darwin Brew ruby stuff: " ; brew list | egrep "ruby|irb|facter|bundle|rbenv|rvm|gem|rails"
 
 #echo -en "+ Facter OS: " ; facter os.name 2>/dev/null
 echo -en "+ PATH:         " ; echo $PATH
 
 echo
-echo " -- Created with rublurb from http://github.com/palladius/sakura/"
+echo " -- Created with 😎rublurb😎 from http://github.com/palladius/sakura/"
 #echo "== Riccardo stuff =="
 #printenv | grep SAKURA
 # echo "== Gem list =="
