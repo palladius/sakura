@@ -1,4 +1,5 @@
 
 git branch -vv
+git remote -v | lolcat
 echodo git status
 
