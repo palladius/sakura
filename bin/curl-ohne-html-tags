@@ -1,0 +1,12 @@
+#!/bin/bash
+
+# Usage: watch curl-ohne-html-tags http://localhost:3000/
+
+# removes HTML
+# then removes initial empty spaces
+# then filter out empty lioes
+# in the future i might remove trailing lines but in my example it wasnt the case
+curl "$@"  | sed -E 's/<[^>]*>//g' | 
+    sed -e 's/^[ ]*//g' | 
+    #sed -e 's/ /A/g' | 
+    egrep -v "^$"
