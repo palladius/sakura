@@ -6,12 +6,13 @@
 source 'https://rubygems.org'
 
 gem 'dotenv' # to use kubernetes-service
-gem 'echoe'
+#gem 'echoe'
 gem 'facter'
 gem 'ric'
 gem 'google-cloud-logging'
 gem 'lolcat'
 gem 'filecache'
+#gem 'sakuric'
 
 
 group :pinger do
