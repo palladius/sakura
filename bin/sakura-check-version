@@ -34,7 +34,7 @@
   def main
     debug_on 'Just created script, presuming u need some debug. TODO REMOVE ME when everything works!' if $DEBUG
     current_version = File.open(ENV['SAKURADIR'] + "VERSION").read.to_s.chomp
-    online_version = URI.open($myconf[:sakura_version_online]).read.chomp rescue "InternetUnavailableItSeems$ #{$!}" # "1.2.3 err(#{$!})"
+    online_version = URI.open($myconf[:sakura_version_online]).read.chomp rescue "InternetUnavailable: #{$!}" # "1.2.3 err(#{$!})"
     if (online_version =~ /^InternetUnavailableItSeems/ )
       #$stderr.puts "Internet seems unavailable: #{online_version.split('$')[1]}"  # ugly seprator... TODO make it better
       $stderr.puts "[ERR] Remote Sakura version unavailable, I'm happy with current version: #{current_version}"
