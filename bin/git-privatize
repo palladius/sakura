@@ -1,0 +1,381 @@
+#!/usr/bin/env ruby
+
+if RUBY_VERSION.split('.')[0] == 1
+  puts "Refusing to launch a script form Ruby 1. Sorry Ric, its 2020 damn it!"
+  exit 2020
+end
+
+# Please don't tell my manager! :)
+class String
+  # "first second".remove_from_beginning("first") => " second"
+  def remove_from_beginning(s)
+    self.split(s)[1]
+  end
+
+  def remove_double_slashes
+    self.gsub('//','/')
+  end
+  def remove_trailing_slashes
+    self.gsub('/$','')
+  end
+
+  # '/a/b//c/d/' => '/a/b/c/d'
+  def cleanup_folder
+    self.remove_double_slashes.remove_trailing_slashes
+  end
+end
+
+=begin
+
+  ############################################################
+  @author:    Riccardo Carlesso
+  @email:     riccardo.carlesso@gmail.com
+  @maturity:  development
+  @language:  Ruby
+  @synopsis:  Privatize stuff
+  @tags:      development, rcarlesso, git, git-ignore, symlink
+  @description: See description below (DRY)
+ ############################################################
+
+=end
+
+$PROG_VER = '0.2'
+$DEBUG    = false
+
+require 'optparse'       # http://ruby.about.com/od/advancedruby/a/optionparser.htm
+
+def deb(s);   puts "#DEB #{s}" if $DEBUG; end
+def gray(s)    "\033[1;30m#{s}\033[0m" ; end
+def green(s)   "\033[1;32m#{s}\033[0m" ; end
+def red(s)     "\033[1;31m#{s}\033[0m" ; end
+def yellow(s)  "\033[1;33m#{s}\033[0m" ; end
+def blue(s)  "\033[1;34m#{s}\033[0m" ; end
+def purple(s)  "\033[1;35m#{s}\033[0m" ; end
+def azure(s)   "\033[1;36m#{s}\033[0m" ; end
+def white(s)   "\033[1;37m#{s}\033[0m" ; end
+
+def orange(s)   "\033[38;5;208m#{s}\033[0m" ; end
+
+# Program constants, automagically picked up by RicLib
+# More configuration could be written in:
+#    $GIC/etc/ricsvn/<FILENAME>.yml
+# That would go into the variable '$prog_conf_d'
+$myconf = {
+    :app_name            => "AppName should be sth like #{$0}",
+    :privatize_prefix    => "/private/projects/git-privatize/",
+    :description         => "
+        This is the basic idea behind privatize. According to
+        https://stackoverflow.com/questions/25177014/make-some-files-private-in-a-repository
+        there are only 3 ways to solve this problem. I can think of a 4th and better one:
+        a utility which allows you to privatize files. You need a single private
+        repo and i need to know where it is via an ENV variable:
+
+        PRIVATIZE_REPO_DIR=~/git/gic/
+
+        Now let's say you are in some random public repo like:
+
+        ~/git/public-repo/
+
+        and you add a private .env with loads of private info. You start creating it
+        and adding priovate stuff. You'd like to .gitignore it but you cant since you do NOT
+        own the repo and cant commit to it (mayeb). Well, this script will MOVE
+        your file under here:
+
+        $PRIVATIZE_REPO_DIR/privatize/github.com_user_public-repo/.env
+
+        and symlink your file back there. To get started you JUST need the env file to
+        be created :)
+
+
+    ".strip.gsub(/^\s+/, "").gsub(/\s+$/, ""),
+  #  :repo_path => nil,
+}
+
+$TEMPLATE_VER = '2.0.1' # This template from scripta.rb, useful with -V in libautoinit
+
+# look for repo path in 3 different places
+def get_repo_path()
+  ret = $myconf.fetch(
+    :repo_path,
+    ENV['PRIVATIZE_REPO_DIR']
+  )
+  deb "get_repo_path(): '#{ret}'"
+  return File.expand_path(ret) rescue ''
+end
+
+def usage(comment=nil)
+  puts $optparse.banner
+  puts $optparse.summarize
+  #puts "Actions: #{$actions.join("\n- ")}"
+  puts(red comment) if comment
+  exit 13
+end
+
+=begin
+  Possible regexes:
+  * FUNGE git@github.com:palladius/orgie.git
+  * FUNGE ssh://git@bitbucket.org/palladius/gprojects.git
+  * NONVA https://github.com/willisc7/next21-demo-golden-path
+=end
+def determine_folder_by_repo_url(url)
+  $GIT_REGEXES_123 = [
+    /git@(\w+\.\w+):(.*)\/(.*).git/,   # works
+    /git@(\w+\.\w+)\/(.*)\/(.*).git/,  # works
+    /https:\/\/(\w+\.\w+)\/(.*)\/(.*)/,  # works
+   # /http[s]:\/\/github.com\/willisc7\/next21-demo-golden-path\//,
+  ]
+  $GIT_REGEXES_123.each do |regex_i|
+    m = url.match(regex_i)
+    if m
+      deb green("Matcha! #{m}. Dominio: #{ m[1] }. User: #{m[2]}. Repo: #{m[3]}")
+      buridone = [m[1],m[2],m[3]].join('__')
+      return "#{ $myconf[:privatize_prefix] }/#{buridone}/"
+    else
+      deb("Non matcha: '#{url}' con re #{regex_i}")
+    end
+  end
+  raise "Unknown REPO regex - pls ask Riccardo to fix this!"
+  :TODO
+end
+
+
+
+# include it in main if you want a custome one
+def init()    # see lib_autoinit in lib/util.rb
+  $opts = {}
+  dollaro0 = File.basename $0
+  $opts[:force] = false
+
+  $optparse = OptionParser.new do |opts|
+    opts.banner = "#{$0} v.#{$PROG_VER}\n Usage: #{dollaro0} [options] [ACTION] file1 file2 ... \n        (If called with no ARGV it prints status)"
+    opts.banner += " #{dollaro0} status"
+    opts.banner += " #{dollaro0} privatize files1 file2 file3 .."
+    opts.banner += " #{dollaro0} unprivatize files1 file2 file3 .."
+    opts.on( '-d', '--debug', 'enables debug (DFLT=false)' )  {  $opts[:debug] = true ; $DEBUG = true }
+    opts.on( '-f', '--force', 'enables forcing on untest features (DFLT=false)' )  { $opts[:force] = true}
+    opts.on( '-h', '--help', 'Display this screen' )          {  usage }
+    opts.on( '-j', '--jabba', 'Activates my Jabber powerful CLI' ) {  $opts[:jabba] = true  }
+    opts.on( '-n', '--dryrun', "Don't really execute code" ) { $opts[:dryrun] = true }
+    opts.on( '-r', '--repo PATH', 'sets PRIVATIZE_REPO_DIR to given path' ) {|path|
+      $opts[:repo] = path
+      $myconf[:repo_path] = path
+    }
+    opts.on( '-v', '--verbose', 'Output more information' )   { $opts[:verbose] = true}
+  end
+  $optparse.parse!
+
+  deb " $opts vale:  #{ $opts}"
+
+  # finds local git repo
+  deb "init(): Setting initialization stuff.."
+  $conf = {
+    :local_repo_root_dir => `git rev-parse --show-toplevel`.chomp ,
+    :pwd => Dir.pwd,
+    :env_repopath => get_repo_path(),
+  }
+  # fins relative path within current git repo, eg "subdir1/subdir2/"
+  #$conf[:local_repo_relative_dir] = ($conf[:pwd].split($conf[:local_repo_root_dir])[1] or '')  + "/" #rescue :Err
+  $conf[:local_repo_relative_dir] = ($conf[:pwd].remove_from_beginning($conf[:local_repo_root_dir]) or '') + "/" #rescue :Err
+  #  $current_git_repo_path = `git remote show origin`
+  $conf[:local_repo_url] =`git remote get-url origin`.chomp # .cleanup_folder
+  $conf[:remote_repo_relative_path] = determine_folder_by_repo_url($conf[:local_repo_url]).cleanup_folder
+  $conf[:remote_repo_absolute_path] = ($conf[:env_repopath] + "/" + $conf[:remote_repo_relative_path]).cleanup_folder
+  $conf[:local_untracked_files] = `git ls-files . --exclude-standard --others`.chomp.split("\n")
+  $conf[:remote_privatized_files_abs] = `find  #{$conf[:remote_repo_absolute_path]} -type f`.chomp.split("\n")
+  $conf[:remote_privatized_files_rel] = $conf[:remote_privatized_files_abs].map{|longfile|
+    # deb "shortning: #{longfile}"
+    longfile.remove_from_beginning( $conf[:remote_repo_absolute_path])
+  }
+  $conf[:local_untracked_files_ohne_symlinks] = $conf[:local_untracked_files].select{|file|
+    ! File.symlink?(file)
+  }
+
+  if $conf[:pwd].include?(get_repo_path())
+    usage "Please invoke OUTSIDE of your private repo (#{$conf[:env_repopath]}) :) or I fear PEBKAC infinite recursion due to bad coder"
+  else
+    deb green("You're IN luck: you're OUT of GIC")
+  end
+
+  unless File.exist?( $conf[:remote_repo_absolute_path] )
+    execute_unless_dryrun("mkdir -p #{ $conf[:remote_repo_absolute_path]}")
+  end
+end
+
+def print_status
+  puts "====== print_status(BEGIN) ======"
+  puts "+ CONF:"
+  $conf.sort.each do |k,v|
+    puts "  - #{white k}: '#{azure v}'"
+  end
+
+  puts "+ TIPS:"
+  unless $conf[:local_untracked_files].empty?
+    puts white("(1) #{yellow $conf[:local_untracked_files].count} untracked LOCAL files found. Try this command to privatize [some of] those:")
+    puts azure(" git-privatize pr '#{ $conf[:local_untracked_files].join("' '")}'")
+  end
+  unless $conf[:remote_privatized_files_abs].empty?
+    puts white("(2) Some possibly unsynced REMOTE files found (#{yellow  $conf[:remote_privatized_files_abs].count}). Try this command to privatize [some of] those:")
+    puts azure(" git-privatize pull '#{ $conf[:remote_privatized_files_rel].join("' '") }'")
+    puts ".. or simply .. "
+    puts azure(" git-privatize restore")
+  end
+
+  puts "+ REMOTE vs LOCAL"
+  puts " # Mamote(TM):"
+  $conf[:remote_privatized_files_rel].each{|f|
+    puts("- [REM] #{green f}")
+    #puts("- [REM1] #{green f} => #{azure File.realpath(f)}")
+  }
+  # $conf[:remote_privatized_files_abs].each{|f|
+  #   puts("- [REM2] #{green f} => #{azure File.realpath(f)}")
+  # }
+
+  puts "- Lokaal(TM):"
+  $conf[:local_untracked_files_ohne_symlinks].each{|f|
+    puts("- [#{red 'LOK-real'}] #{red f}")
+  }
+  $conf[:local_untracked_files].select{|f| File.symlink?(f)}.each{|f|
+    puts("- [#{ 'LOK-syml'}] #{f} -> #{azure File.readlink(f)}")
+  }
+  puts "====== print_status(END) ======"
+ # puts " ~-~ {End of Status} ~-~"
+  puts ''
+end
+
+def execute_unless_dryrun(command)
+  if $opts[:dryrun]
+    puts "[DRYRUN] Wont execute: #{command}"
+    return
+  end
+  if $opts[:force]
+    newcommand = command.gsub('echo ', '')
+    puts "[FORCE] Changing: #{gray command} to #{orange newcommand}"
+    command = newcommand
+  end
+  puts "[CMD] #{azure command}"
+  output = `#{command}`
+  puts "[RET=#{($?.to_s)}] #{azure command}"
+  output
+end
+
+def privatize_files(files)
+  puts white "WARNING: for now the script ONLY works from LOCAL root dir. i cant be bothered to implement a sync ../dir/blah"
+  files.each do |filename|
+    deb "privatizing LOCAL file: #{white filename}"
+    if ! File.exists?(filename)
+      puts red("File doesnt existsm skipping: #{filename}")
+      next
+    end
+    if File.symlink?(filename)
+      puts red("File is a symlink - I wont move symlinks Im not crazy: #{filename}")
+      next
+    end
+    if File.directory?(filename)
+      puts red("File is a DIRECTORY - are you out of your mind?!? Skipping: #{filename}")
+      next
+    end
+    puts "OK now Im convinced to privatize this! Berlusconi would be proud of this commie :P"
+    puts "Please execute this command MANUALLY until i'm sure to do it myself (just remove echo when it works a few times):"
+    local_subdir = File.dirname(filename) # finche non ho cose piu complicate..
+    remote_repo_dir = $conf[:remote_repo_absolute_path]
+    command = "echo mv #{filename} #{remote_repo_dir}/#{local_subdir}/"
+    puts "[CMD] #{white command}"
+   # `#{command}` unless $opts[:dryrun]
+    execute_unless_dryrun(command)
+  end
+  puts green "NOTE: Once moved everything a simple sync (action = '$0 restore') should synlink them back :)"
+end
+
+def restore_privatized_files(files=[])
+  if $conf[:remote_privatized_files_abs].empty?
+    puts red("No files to restore, PIRLA!")
+    exit(42)
+  end
+  puts yellow("IMPORTANT: Now symlinking from REMOTE repo to local repo - remember NOT to touch .gitignore :)")
+  commands_to_issue = [] #  "cd #{$conf[:local_repo_root_dir]}" ]
+  comments = []
+  $conf[:remote_privatized_files_abs].each do |remote_file|
+    local_file_wouldbe = remote_file.gsub(
+        $conf[:remote_repo_absolute_path],
+        $conf[:local_repo_root_dir]+"/")
+    relative_remote_file =  remote_file.remove_from_beginning( $conf[:remote_repo_absolute_path])
+    deb "remote_file: '#{remote_file}' -> '#{relative_remote_file}'"
+    local_dir_wouldbe = File.dirname(relative_remote_file)
+    # if file exists..
+    remotedir = "#{$conf[:local_repo_root_dir]}/#{local_dir_wouldbe}/"
+    deb "Remote: #{green remote_file}"
+    deb "RemoteDir:  #{green remotedir}"
+    deb "Local:  #{orange local_file_wouldbe}"
+    deb "LocalDir:  #{yellow local_dir_wouldbe}"
+    #      puts green("ALSO DO git add #{remote_file}")
+    #execute_unless_dryrun("git add #{remote_file}")
+    if File.exists?(local_file_wouldbe)
+      #commands_to_issue << "echo File '#{local_file_wouldbe}' exists already: skipping."
+      if File.symlink?(local_file_wouldbe)
+        comments << green("File #{local_file_wouldbe} exists and is a symlink. I could be paranoid and check correct link but this is for another day..")
+      else
+        comments << red("File #{local_file_wouldbe} exists but is NOT a symlink. please MANUALLY resolve this by either removing local or remote file!")
+      end
+    else
+      # file doesnt exist locally I need to create it via symlink
+      comments << white("File #{local_file_wouldbe} does NOT exist: creating it now")
+      command = "ln -s #{remote_file} #{$conf[:local_repo_root_dir]}/#{local_dir_wouldbe}/"
+      commands_to_issue << command
+      execute_unless_dryrun(command)
+    end
+  end
+  puts yellow(commands_to_issue.join("\n - "))
+  puts "Comments: #{comments.join("\n - ")}"
+end
+
+def real_program
+  deb("Hello world from a templated '#{yellow $0 }'")
+  deb "+ Options are:  #{gray $opts}"
+  deb "+ Depured args: #{azure ARGV}"
+  deb "+ ENV[:PRIVATIZE_REPO_DIR]: #{azure ENV['PRIVATIZE_REPO_DIR']}"
+  deb "+ Script-specifig super-cool conf: #{green $prog_conf_d}"
+  deb "+ Your configuration: #{purple $myconf.inspect}"
+
+  ## populates config strings which i'll need else wehre
+
+  $repo_path = get_repo_path()
+  # PRIVATIZE_REPO_DIR
+#  puts ":repo_path: '#{repo_path}'"
+  $actions = [
+    %W(st status),
+    %W{pr privatize push},
+    %W{re restore   pull sy symlink sync},
+    %s{un unprivatize },
+  ]
+  if ARGV.size == 0
+    print_status()
+    usage "No arguments! Please provide an action among: ST[ATUS] PR[IVATIZE] UN[PRIVATIZE] RE[STORE] - #{$actions}"
+  end
+  action = ARGV[0]
+  case(action)
+    when "status", "list", "st"
+      print_status()
+    when "privatize", "pr", "push"
+      print_status if  $opts[:verbose]
+      privatize_files(ARGV.drop(1))
+    when "restore", "re", "pull", "symlink", "sy", 'sync'
+      print_status if  $opts[:verbose]
+      #usage red( "UNIMPLEMENTED YET. Creates symlinks from GIC to local folder")
+      restore_privatized_files(ARGV.drop(1))
+    when "unprivatize", "un"
+      usage red( "UNIMPLEMENTED YET")
+      print_status if  $opts[:verbose]
+      unprivatize_files(ARGV.drop(1))
+    else
+      usage red( "Unknown action: #{action}")
+  end
+end
+
+def main(filename)
+  deb "I'm called by #{filename}"
+  init        # Enable this to have command line parsing capabilities!
+  #warn "template 2.0.1: proviamo il warn che magari depreca il DEB"
+  real_program
+end
+
+main(__FILE__)
