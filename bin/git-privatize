@@ -39,8 +39,11 @@ end
 
 =end
 
-$PROG_VER = '0.2'
+$PROG_VER = '0.2.1'
 $DEBUG    = false
+
+# 0.2.1 26apr22  Backfilled a GIC feature to sakura (last night i forgot to commit a local symlink to whole project DIR)
+# 0.2.0 26apr22  Ported from GIC to Sakura  
 
 require 'optparse'       # http://ruby.about.com/od/advancedruby/a/optionparser.htm
 
@@ -199,6 +202,12 @@ def init()    # see lib_autoinit in lib/util.rb
   unless File.exist?( $conf[:remote_repo_absolute_path] )
     execute_unless_dryrun("mkdir -p #{ $conf[:remote_repo_absolute_path]}")
   end
+  unless File.exist?( $conf[:local_repo_root_dir] + "/.git-privatize")
+    puts "symlinking remote repo locally for convenience.."
+    command = "ln -s #{ $conf[:remote_repo_absolute_path]} #{$conf[:local_repo_root_dir] + "/.git-privatize"}"
+    #execute_unless_dryrun()
+  end
+
 end
 
 def print_status
@@ -288,7 +297,7 @@ end
 
 def restore_privatized_files(files=[])
   if $conf[:remote_privatized_files_abs].empty?
-    puts red("No files to restore, PIRLA!")
+    puts red("No files to restore, you silly sausage!")
     exit(42)
   end
   puts yellow("IMPORTANT: Now symlinking from REMOTE repo to local repo - remember NOT to touch .gitignore :)")
