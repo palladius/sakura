@@ -125,6 +125,8 @@ def determine_folder_by_repo_url(url)
     /git@(\w+\.\w+):(.*)\/(.*).git/,   # works
     /git@(\w+\.\w+)\/(.*)\/(.*).git/,  # works
     /https:\/\/(\w+\.\w+)\/(.*)\/(.*)/,  # works
+    #  ssh://ricc@google.com@source.developers.google.com:2022/p/ekupershlak-test/r/ricc-getting-started
+    /ssh:\/\/.*@(source.developers.google.com).*\/p\/(.*)\/r\/(.*)/,
    # /http[s]:\/\/github.com\/willisc7\/next21-demo-golden-path\//,
   ]
   $GIT_REGEXES_123.each do |regex_i|
@@ -137,7 +139,7 @@ def determine_folder_by_repo_url(url)
       deb("Non matcha: '#{url}' con re #{regex_i}")
     end
   end
-  raise "Unknown REPO regex - pls ask Riccardo to fix this!"
+  raise "Unknown REPO regex - pls ask Riccardo to fix this: #{url}"
   :TODO
 end
 
@@ -284,10 +286,10 @@ def privatize_files(files)
       next
     end
     puts "OK now Im convinced to privatize this! Berlusconi would be proud of this commie :P"
-    puts "Please execute this command MANUALLY until i'm sure to do it myself (just remove echo when it works a few times):"
+    #puts "Please execute this command MANUALLY until i'm sure to do it myself (just remove echo when it works a few times):"
     local_subdir = File.dirname(filename) # finche non ho cose piu complicate..
     remote_repo_dir = $conf[:remote_repo_absolute_path]
-    command = "echo mv #{filename} #{remote_repo_dir}/#{local_subdir}/"
+    command = "mv #{filename} #{remote_repo_dir}/#{local_subdir}/"
     puts "[CMD] #{white command}"
    # `#{command}` unless $opts[:dryrun]
     execute_unless_dryrun(command)
@@ -352,7 +354,7 @@ def real_program
 #  puts ":repo_path: '#{repo_path}'"
   $actions = [
     %W(st status),
-    %W{pr privatize push},
+    %W{pr privatize push add },
     %W{re restore   pull sy symlink sync},
     %s{un unprivatize },
   ]
@@ -364,7 +366,7 @@ def real_program
   case(action)
     when "status", "list", "st"
       print_status()
-    when "privatize", "pr", "push"
+    when "privatize", "pr", "push", "add"
       print_status if  $opts[:verbose]
       privatize_files(ARGV.drop(1))
     when "restore", "re", "pull", "symlink", "sy", 'sync'
