@@ -4,9 +4,9 @@ ERROR_MSG="$1"
 shift
 COMMAND="$@"
 
-echo "[$0] Running command '$*' and returning 0 if and only if the command returns 0 OR it returns error but error msg GREPs '$ERROR_MSG'"
+yellow "[$0] Running command '$*' and returning 0 if and only if the command returns 0 OR it returns error but error msg GREPs '$ERROR_MSG'"
 # exec command
-OUTPUT=$($@ 2>&1)
+OUTPUT="$("$@" 2>&1)"
 RET=$?
 
 if [ "0" = "$RET" ] ; then 
