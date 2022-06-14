@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 
 if RUBY_VERSION.split('.')[0] == 1
-  puts "Refusing to launch a script form Ruby 1. Sorry Ric, its 2020 damn it!"
+  puts "Refusing to launch a script form Ruby 1. Sorry Ric, its 2022 damn it!"
   exit 2020
 end
 
@@ -39,9 +39,10 @@ end
 
 =end
 
-$PROG_VER = '0.2.1'
+$PROG_VER = '0.2.2'
 $DEBUG    = false
 
+# 0.2.2 14jun22  less verbose by default. But give me -d or -v and I will unleash hell!
 # 0.2.1 26apr22  Backfilled a GIC feature to sakura (last night i forgot to commit a local symlink to whole project DIR)
 # 0.2.0 26apr22  Ported from GIC to Sakura  
 
@@ -152,10 +153,11 @@ def init()    # see lib_autoinit in lib/util.rb
   $opts[:force] = false
 
   $optparse = OptionParser.new do |opts|
-    opts.banner = "#{$0} v.#{$PROG_VER}\n Usage: #{dollaro0} [options] [ACTION] file1 file2 ... \n        (If called with no ARGV it prints status)"
-    opts.banner += " #{dollaro0} status"
-    opts.banner += " #{dollaro0} privatize files1 file2 file3 .."
-    opts.banner += " #{dollaro0} unprivatize files1 file2 file3 .."
+    opts.banner = "#{$0} v.#{$PROG_VER}\n Usage: #{dollaro0} [options] [ACTION] file1 file2 ... \n"
+    opts.banner += "   #{dollaro0} status\n"
+    opts.banner += "   #{dollaro0} privatize|add files1 file2 file3 ..\n"
+    opts.banner += "   #{dollaro0} unprivatize files1 file2 file3 ..\n"
+    opts.banner += "   #{dollaro0} sync\n"
     opts.on( '-d', '--debug', 'enables debug (DFLT=false)' )  {  $opts[:debug] = true ; $DEBUG = true }
     opts.on( '-f', '--force', 'enables forcing on untest features (DFLT=false)' )  { $opts[:force] = true}
     opts.on( '-h', '--help', 'Display this screen' )          {  usage }
@@ -205,9 +207,9 @@ def init()    # see lib_autoinit in lib/util.rb
     execute_unless_dryrun("mkdir -p #{ $conf[:remote_repo_absolute_path]}")
   end
   unless File.exist?( $conf[:local_repo_root_dir] + "/.git-privatize")
-    puts "symlinking remote repo locally for convenience.."
+    puts ".git-privatize not found: symlinking remote repo locally for convenience.."
     command = "ln -s #{ $conf[:remote_repo_absolute_path]} #{$conf[:local_repo_root_dir] + "/.git-privatize"}"
-    #execute_unless_dryrun()
+    execute_unless_dryrun(command)
   end
 
 end
@@ -339,6 +341,10 @@ def restore_privatized_files(files=[])
   puts "Comments: #{comments.join("\n - ")}"
 end
 
+def verbose?
+  $opts[:verbose] rescue false 
+end
+
 def real_program
   deb("Hello world from a templated '#{yellow $0 }'")
   deb "+ Options are:  #{gray $opts}"
@@ -359,7 +365,7 @@ def real_program
     %s{un unprivatize },
   ]
   if ARGV.size == 0
-    print_status()
+    print_status() if verbose?
     usage "No arguments! Please provide an action among: ST[ATUS] PR[IVATIZE] UN[PRIVATIZE] RE[STORE] - #{$actions}"
   end
   action = ARGV[0]
