@@ -1,0 +1,64 @@
+#!/bin/bash
+
+	############################################################
+	# @author     Riccardo Carlesso
+	# @email      riccardo.carlesso@gmail.com
+	# @tags       old
+	# @language   bash
+	# @date       2022-06-22
+	############################################################
+	# @description:
+	#  Generic script in BASH...
+	############################################################
+
+VER="0.01"
+#. $GIC/lib/_common_bash_functions_include
+
+function usage() {
+	echo "Usage: `basename $0` [-dhv] <ARG1>"
+	echo " generic template of bash"
+	echo " -d:     activates debug"
+	echo " -h:     this help"
+	echo " -v:     prints version and exits"
+}
+
+
+while getopts "dhv" OPTION 
+ do
+  case $OPTION in
+	d) DEBUG=true ; debug "Debug activated"  ;;
+    h) usage ; exit 0 ;;
+    v) echo "$0, v. $VER"; exit 0 ;;
+  esac
+done
+
+################################################################################
+##### MAIN vero e proprio
+################################################################################
+
+function calculate_md5() {
+	# on Mac 
+	uname -a | grep -q Darwin &&
+		md5 "$1" | cut -d= -f 2 | sed -e 's/ //g'
+}
+
+function  process_single_file() {
+    eval $(stat -s "$1")
+	#stat -s "$1"
+	#st_dev=16777231 st_ino=996183 st_mode=0100755 st_nlink=1 st_uid=164825 st_gid=89939 st_rdev=0 st_size=129 st_atime=1646513274 
+	#st_mtime=1646513269 st_ctime=1646513269 st_birthtime=1646513269 st_blksize=4096 st_blocks=8 st_flags=0
+	MD5=$(calculate_md5 "$1")
+    #echo "[SwM1] size:$st_size st_mode:$st_mode st_atime:$st_atime st_ctime:$st_ctime  st_mtime:$st_mtime md5:${MD5} filename:$1" 
+	echo "[SwM2] $MD5 $(stat "$1")"
+}
+
+function main() {
+	echo "[deb] Hello world. Args: '$*'"
+	# if no arg, exit
+	while (($#)) ; do
+	 	process_single_file "$1"
+	 	shift
+	done
+}
+
+main $*
