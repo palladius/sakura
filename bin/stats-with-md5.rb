@@ -2,7 +2,7 @@
 
 require 'digest/md5'
 require 'digest'
-
+require 'socket'
 
 if RUBY_VERSION.split('.')[0] == 1
   puts "Refusing to launch a script form Ruby 1. Sorry Ric, its 2020 damn it!"
@@ -16,15 +16,13 @@ end
   @email:     riccardo.carlesso@gmail.com
   @maturity:  development
   @language:  Ruby
-  @synopsis:  Brief Description here
   @tags:      development, rcarlesso, test
-  @description: See description
  ############################################################
 
 =end
 
 $PROG_VER = '0.2'
-$DEBUG    = true
+$DEBUG    = false
 
 require 'optparse'       # http://ruby.about.com/od/advancedruby/a/optionparser.htm
 
@@ -65,7 +63,6 @@ def usage(comment=nil)
   puts($optparse.summarize)
   puts("Description: " + gray($myconf[:description]))
   puts red(comment) if comment
-  #puts "Description: #{ $myconf[:description] }"
   exit 13
 end
 
@@ -76,12 +73,13 @@ def init()    # see lib_autoinit in lib/util.rb
   $opts[:verbose] = false
   $opts[:dryrun] = false
   $opts[:debug] = false
+  $opts[:color] = true
 
   $optparse = OptionParser.new do |opts|
     opts.banner = "#{$0} v.#{$PROG_VER}\n Usage: #{File.basename $0} [options] file1 file2 ..."
+    opts.on( '-c', '--no-color', 'disables color (DFLT=false)' )  {  $opts[:color] = false  }
     opts.on( '-d', '--debug', 'enables debug (DFLT=false)' )  {  $opts[:debug] = true ; $DEBUG = true }
     opts.on( '-h', '--help', 'Display this screen' )          {  usage }
-    #opts.on( '-j', '--jabba', 'Activates my Jabber powerful CLI' ) {  $opts[:jabba] = true  }
     opts.on( '-n', '--dryrun', "Don't really execute code" ) { $opts[:dryrun] = true }
     opts.on( '-l', '--logfile FILE', 'Write log to FILE' )    {|file| $opts[:logfile] = file }
     opts.on( '-v', '--verbose', 'Output more information' )   { $opts[:verbose] = true}
@@ -137,11 +135,26 @@ def compute_stats_and_md5(file)
 	ret 
 end
 
+$print_stats_and_md5_version = "1.0"
+$print_stats_and_md5_counter = 0
+
+def stats_and_md5_number_of_files_processed()
+	return $print_stats_and_md5_counter 
+end
+
 def print_stats_and_md5(file, opts={})
 	opts_color = opts.fetch :color, true
 	opts_verbose = opts.fetch :verbose, false 
+	opts_ping_frequency = opts.fetch :ping_frequency, 50
+	$print_stats_and_md5_counter += 1 # global counter! I should increment at the END of fucntion.. but you never know if i exit wrongly so i do at beginning. so within this function the real #files is N-1 (i.e., if N is 6, we're processing file %5)
 
-	deb "print_stats_and_md5: #{file}" if opts_verbose
+	# in main i had to put 2 branched to invoke a single thing but if logic changes that sentence might be printed twice. Instead here, the BEGIN line could be nice to do here instead.
+	#$stderr.puts("print_stats_and_md5() Fikst invocation! Consider moving the 2 things in main here :)") if ($print_stats_and_md5_counter == 1)
+	puts("[print_stats_and_md5] version=#{$print_stats_and_md5_version}  host=#{Socket.gethostname}(#{`uname`.chomp}) created_on=#{Time.now}") if ($print_stats_and_md5_counter == 1)
+
+	$stderr.puts "-- print_stats_and_md5(): #{$print_stats_and_md5_counter - 1} counted --" if (($print_stats_and_md5_counter) % opts_ping_frequency == 1 )
+
+	#puts "print_stats_and_md5: #{file}" if opts_verbose
 	stats = compute_stats_and_md5 file 
 	maybecolored_md5 = opts_color ? red(stats[:md5]) : stats[:md5]
 	maybecolored_filename = opts_color ? azure(stats[:name]) : stats[:name]
@@ -160,33 +173,35 @@ def real_program
   deb "+ Options are:  #{gray $opts}"
   deb "+ Depured args: #{azure ARGV}"
   # Your code goes here...
-  puts "Description: '''#{white $myconf[:description] }'''"
+  #puts "Description: '''#{white $myconf[:description] }'''"
+  #puts("[print_stats_and_md5] version=#{$print_stats_and_md5_version}  host=#{Socket.gethostname}(#{`uname`.chomp}) created_on=#{Time.now}") if ARGV.size > 0
+
   if ARGV.size == 1
     directory_to_explore_recursively = ARGV[0]
-	puts "1. I expect a single arg with DIR to explore: #{blue directory_to_explore_recursively }"
+	deb "1. I expect a single arg with DIR to explore: #{blue directory_to_explore_recursively }"
 	Dir.glob("#{(directory_to_explore_recursively)}/**/*") do |globbed_filename|
 		# Do work on files & directories ending in .rb
 		#puts "[deb] #{globbed_filename}" 
-		print_stats_and_md5(globbed_filename, :color => true)
+		print_stats_and_md5(globbed_filename, :color => $opts[:color], :verbose => $opts[:verbose])
 	  end
   elsif ARGV.size > 1
-	puts green "2. I expect a lot of single files:"
+	deb "2. I expect a lot of single files:"
     for arg in ARGV
-   		print_stats_and_md5(arg, :color => true)
+   		print_stats_and_md5(arg, :color => $opts[:color], :verbose => $opts[:verbose])
     end
   else
 	puts "No args given. Exiting"
 	exit 41
   end
   tf = Time.now
-  puts "# Time taken: #{tf-t0}"
+  puts "# Time taken for processing #{stats_and_md5_number_of_files_processed} files: #{tf-t0}"
 end
 
 def main(filename)
   deb "I'm called by #{white filename}"
   deb "To remove this shit, just set $DEBUG=false :)"
   init        # Enable this to have command line parsing capabilities!
-  warn "[warn] template v#{$TEMPLATE_VER }: proviamo il warn che magari depreca il DEB"
+  #warn "[warn] template v#{$TEMPLATE_VER }: proviamo il warn che magari depreca il DEB"
   real_program
 end
 
