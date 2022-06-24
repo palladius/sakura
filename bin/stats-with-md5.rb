@@ -160,7 +160,7 @@ def print_stats_and_md5(file, opts={})
 	maybecolored_filename = opts_color ? azure(stats[:name]) : stats[:name]
 	maybecolored_size = opts_color ? white(stats[:size]) : stats[:size]
 	mode  = sprintf("%06o", stats[:mode] ) rescue :ERROR # .to_s.right(4)        #=> "100644"
-	file_type = stats[:stat_ftype][0]
+	file_type = stats[:stat_ftype][0] rescue '?'
 
 	#colored_string = "[COL] #{red stats[:md5]} #{stats[:size]} #{stats[:stat_birthtime]} #{white stats[:name]}"
 	#boring_string =  "[B/W] #{    stats[:md5]} #{stats[:size]} #{stats[:stat_birthtime]} #{      stats[:name]}"
