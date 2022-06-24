@@ -92,43 +92,67 @@ end
 def compute_stats_and_md5(file)
 	ret={}
 	ret[:name] = file
-	file_content = File.read(file)
-	#ret[:md5_fake] = Digest::MD5.hexdigest 'abc'      #=> "90015098..."
-	#ret[:md5_digest] = Digest::MD5.digest(file_content) #=> string with binary hash
-	ret[:md5] = Digest::MD5.hexdigest(file_content) #=> string with hexadecimal digits
-	#<File::Stat                     
-	# dev=0x100000f,                  
-	# ino=1247768,                    
-	# mode=0100644 (file rw-r--r--),  
-	# nlink=1,
-	# uid=164825 (ricc),
-	# gid=89939 (primarygroup),
-	# rdev=0x0 (0, 0),
-	# size=564,
-	# blksize=4096,
-	# blocks=8,
-	# atime=2022-03-05 22:36:48.373362127 +0100 (1646516208),
-	# mtime=2022-03-05 22:36:48.176789949 +0100 (1646516208),
-	# ctime=2022-03-05 22:36:48.176789949 +0100 (1646516208)>
-	stats = File.stat(file)
-	ret[:stats_object] = stats # TODO deprecate
-	ret[:size] = stats.size
-	ret[:mode] = stats.mode
-	# datetimes
-	ret[:stat_birthtime] = stats.birthtime # eg,  2022-03-05 21:47:51 +0100 
-	ret[:stat_mtime] = stats.mtime # eg,  2022-03-05 21:47:51 +0100 Returns the modification time of stat.
-	ret[:stat_ctime] = stats.ctime # eg,  2022-03-05 21:47:51 +0100 Returns the change time for stat (that is, the time directory information about the file was changed, not the file itself). Note that on Windows (NTFS), returns creation time (birth time).
-	ret[:stat_atime] = stats.atime # eg,  2022-03-05 21:47:51 +0100 Last Access
-	ret[:stat_gid] = stats.gid     # Group Id
+
+	begin
+		stats = File.stat(file)
+		ret[:stats_object] = stats # TODO deprecate
+
+		#<File::Stat                     
+		# dev=0x100000f,                  
+		# ino=1247768,                    
+		# mode=0100644 (file rw-r--r--),  
+		# nlink=1,
+		# uid=164825 (ricc),
+		# gid=89939 (primarygroup),
+		# rdev=0x0 (0, 0),
+		# size=564,
+		# blksize=4096,
+		# blocks=8,
+		# atime=2022-03-05 22:36:48.373362127 +0100 (1646516208),
+		# mtime=2022-03-05 22:36:48.176789949 +0100 (1646516208),
+		# ctime=2022-03-05 22:36:48.176789949 +0100 (1646516208)>
+		ret[:size] = stats.size
+		ret[:mode] = stats.mode
+		# datetimes
+		ret[:stat_birthtime] = stats.birthtime # eg,  2022-03-05 21:47:51 +0100 
+		ret[:stat_mtime] = stats.mtime # eg,  2022-03-05 21:47:51 +0100 Returns the modification time of stat.
+		ret[:stat_ctime] = stats.ctime # eg,  2022-03-05 21:47:51 +0100 Returns the change time for stat (that is, the time directory information about the file was changed, not the file itself). Note that on Windows (NTFS), returns creation time (birth time).
+		ret[:stat_atime] = stats.atime # eg,  2022-03-05 21:47:51 +0100 Last Access
+		ret[:stat_gid] = stats.gid     # Group Id
+		ret[:stat_uid] = stats.uid     # UUID
+		ret[:stat_ftype] = stats.ftype     # 
+		
+
+		ret[:md5] = '______________NONE______________'
+		if stats.ftype != "directory"
+			file_content = File.read(file)
+			ret[:md5] = Digest::MD5.hexdigest(file_content) # rescue 'none                             ' #=> string with hexadecimal digits
+		end
+	rescue Errno::EISDIR => e 
+		#puts "It's a dir, nothing I can do here except skipping the stuff"
+		ret[:md5] = "_________I'm a dir sorry________" 	
+	rescue Exception => e 
+		ret[:error] = e
+	end
 	ret 
 end
 
 def print_stats_and_md5(file, opts={})
 	opts_color = opts.fetch :color, true
+	opts_verbose = opts.fetch :verbose, false 
+
+	deb "print_stats_and_md5: #{file}" if opts_verbose
 	stats = compute_stats_and_md5 file 
-	colored_string = "[COL] #{red stats[:md5]} #{stats[:size]} #{stats[:stat_birthtime]} #{white stats[:name]}"
-	boring_string =  "[B/W] #{    stats[:md5]} #{stats[:size]} #{stats[:stat_birthtime]} #{      stats[:name]}"
-	puts(opts_color ? colored_string : boring_string) 
+	maybecolored_md5 = opts_color ? red(stats[:md5]) : stats[:md5]
+	maybecolored_filename = opts_color ? azure(stats[:name]) : stats[:name]
+	maybecolored_size = opts_color ? white(stats[:size]) : stats[:size]
+	mode  = sprintf("%06o", stats[:mode] ) # .to_s.right(4)        #=> "100644"
+	file_type = stats[:stat_ftype][0]
+
+	#colored_string = "[COL] #{red stats[:md5]} #{stats[:size]} #{stats[:stat_birthtime]} #{white stats[:name]}"
+	#boring_string =  "[B/W] #{    stats[:md5]} #{stats[:size]} #{stats[:stat_birthtime]} #{      stats[:name]}"
+	#puts(opts_color ? colored_string : boring_string)
+	puts "#{maybecolored_md5} #{mode} #{file_type} #{maybecolored_size} #{stats[:stat_birthtime]} #{maybecolored_filename}"
 end
 
 def real_program
@@ -137,8 +161,22 @@ def real_program
   deb "+ Depured args: #{azure ARGV}"
   # Your code goes here...
   puts "Description: '''#{white $myconf[:description] }'''"
-  for arg in ARGV
-	print_stats_and_md5(arg, :color => true)
+  if ARGV.size == 1
+    directory_to_explore_recursively = ARGV[0]
+	puts "1. I expect a single arg with DIR to explore: #{blue directory_to_explore_recursively }"
+	Dir.glob("#{(directory_to_explore_recursively)}/**/*") do |globbed_filename|
+		# Do work on files & directories ending in .rb
+		#puts "[deb] #{globbed_filename}" 
+		print_stats_and_md5(globbed_filename, :color => true)
+	  end
+  elsif ARGV.size > 1
+	puts green "2. I expect a lot of single files:"
+    for arg in ARGV
+   		print_stats_and_md5(arg, :color => true)
+    end
+  else
+	puts "No args given. Exiting"
+	exit 41
   end
   tf = Time.now
   puts "# Time taken: #{tf-t0}"

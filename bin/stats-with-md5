@@ -56,3 +56,5 @@ while (($#)) ; do
 	process_single_file "$1"
 	shift
 done
+
+yellow "Note. Im obsoleting this in favor of stats-with-md5.rb. Why? Mac and Linux produce 2 different outputs with this one due to different 'stats' output :/"
