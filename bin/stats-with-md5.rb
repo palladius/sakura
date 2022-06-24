@@ -135,7 +135,7 @@ def compute_stats_and_md5(file)
 	ret 
 end
 
-$print_stats_and_md5_version = "1.0"
+$print_stats_and_md5_version = "1.1a_220624"
 $print_stats_and_md5_counter = 0
 
 def stats_and_md5_number_of_files_processed()
@@ -152,14 +152,14 @@ def print_stats_and_md5(file, opts={})
 	#$stderr.puts("print_stats_and_md5() Fikst invocation! Consider moving the 2 things in main here :)") if ($print_stats_and_md5_counter == 1)
 	puts("[print_stats_and_md5] version=#{$print_stats_and_md5_version}  host=#{Socket.gethostname}(#{`uname`.chomp}) created_on=#{Time.now}") if ($print_stats_and_md5_counter == 1)
 
-	$stderr.puts "-- print_stats_and_md5(): #{$print_stats_and_md5_counter - 1} counted --" if (($print_stats_and_md5_counter) % opts_ping_frequency == 1 )
+	$stderr.puts "-- print_stats_and_md5(v#{$print_stats_and_md5_version}): #{$print_stats_and_md5_counter - 1} files processed --" if (($print_stats_and_md5_counter) % opts_ping_frequency == 1 )
 
 	#puts "print_stats_and_md5: #{file}" if opts_verbose
 	stats = compute_stats_and_md5 file 
 	maybecolored_md5 = opts_color ? red(stats[:md5]) : stats[:md5]
 	maybecolored_filename = opts_color ? azure(stats[:name]) : stats[:name]
 	maybecolored_size = opts_color ? white(stats[:size]) : stats[:size]
-	mode  = sprintf("%06o", stats[:mode] ) # .to_s.right(4)        #=> "100644"
+	mode  = sprintf("%06o", stats[:mode] ) rescue :ERROR # .to_s.right(4)        #=> "100644"
 	file_type = stats[:stat_ftype][0]
 
 	#colored_string = "[COL] #{red stats[:md5]} #{stats[:size]} #{stats[:stat_birthtime]} #{white stats[:name]}"
