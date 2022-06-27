@@ -3,11 +3,15 @@
 require 'digest/md5'
 require 'digest'
 require 'socket'
+require 'optparse'       # http://ruby.about.com/od/advancedruby/a/optionparser.htm
 
 if RUBY_VERSION.split('.')[0] == 1
   puts "Refusing to launch a script form Ruby 1. Sorry Ric, its 2020 damn it!"
   exit 2020
 end
+
+$PROG_VER = '0.3'
+$DEBUG    = false
 
 =begin
 
@@ -17,14 +21,11 @@ end
   @maturity:  development
   @language:  Ruby
   @tags:      development, rcarlesso, test
+  @works_on:  Linux (little tested since v0.3), Mac (100% developed here)
  ############################################################
 
 =end
 
-$PROG_VER = '0.2'
-$DEBUG    = false
-
-require 'optparse'       # http://ruby.about.com/od/advancedruby/a/optionparser.htm
 
 
 def deb(s);   puts "#DEB #{s}" if $DEBUG; end
@@ -87,6 +88,10 @@ def init()    # see lib_autoinit in lib/util.rb
   $optparse.parse!
 end
 
+def getSafeCreationTime(file)
+	File.ctime(file)
+end
+
 def compute_stats_and_md5(file)
 	ret={}
 	ret[:name] = file
@@ -94,7 +99,13 @@ def compute_stats_and_md5(file)
 	begin
 		stats = File.stat(file)
 		ret[:stats_object] = stats # TODO deprecate
+		deb("Stats methods: #{stats.methods.sort.join(', ')}")
+		#deb(stats.ftype)
+		#puts(stats.methods)
+		deb(stats.ctime)
+		#puts(stats.birthtime rescue (stats.ctime))
 
+		# On Mac:
 		#<File::Stat                     
 		# dev=0x100000f,                  
 		# ino=1247768,                    
@@ -109,10 +120,29 @@ def compute_stats_and_md5(file)
 		# atime=2022-03-05 22:36:48.373362127 +0100 (1646516208),
 		# mtime=2022-03-05 22:36:48.176789949 +0100 (1646516208),
 		# ctime=2022-03-05 22:36:48.176789949 +0100 (1646516208)>
+
+		# On LInux:
+		#<File::Stat                                
+		#  dev=0xfe01,                                
+		#  ino=6293055,                               
+		#  mode=0100644 (file rw-r--r--),             
+		#  nlink=1,                                   
+		#  uid=164825 (ricc),                         
+		#  gid=89939 (primarygroup),                  
+		#  rdev=0x0 (0, 0),                           
+		#  size=7,                                    
+		#  blksize=4096,                              
+		#  blocks=8,                                  
+		#  atime=2022-06-27 08:49:38.586706861 +0200 (1656312578),
+		#  mtime=2022-03-23 14:28:45 +0100 (1648042125),
+		#  ctime=2022-05-30 10:12:10.381629305 +0200 (1653898330)>
 		ret[:size] = stats.size
 		ret[:mode] = stats.mode
 		# datetimes
-		ret[:stat_birthtime] = stats.birthtime # eg,  2022-03-05 21:47:51 +0100 
+		ret[:stat_safebirthtime] = getSafeCreationTime(file) # in Mac uses birthtime,but on Linux wont work
+#			defined?(stats.birthtime) ? # rescue stats.mtime # eg,  2022-03-05 21:47:51 +0100 on Mac (not implemented on my Linuix)#
+#			stats.birthtime : # works on Mac 
+#			stats.ctime
 		ret[:stat_mtime] = stats.mtime # eg,  2022-03-05 21:47:51 +0100 Returns the modification time of stat.
 		ret[:stat_ctime] = stats.ctime # eg,  2022-03-05 21:47:51 +0100 Returns the change time for stat (that is, the time directory information about the file was changed, not the file itself). Note that on Windows (NTFS), returns creation time (birth time).
 		ret[:stat_atime] = stats.atime # eg,  2022-03-05 21:47:51 +0100 Last Access
@@ -120,7 +150,6 @@ def compute_stats_and_md5(file)
 		ret[:stat_uid] = stats.uid     # UUID
 		ret[:stat_ftype] = stats.ftype     # 
 		
-
 		ret[:md5] = '______________NONE______________'
 		if stats.ftype != "directory"
 			file_content = File.read(file)
@@ -162,10 +191,10 @@ def print_stats_and_md5(file, opts={})
 	mode  = sprintf("%06o", stats[:mode] ) rescue :ERROR # .to_s.right(4)        #=> "100644"
 	file_type = stats[:stat_ftype][0] rescue '?'
 
-	#colored_string = "[COL] #{red stats[:md5]} #{stats[:size]} #{stats[:stat_birthtime]} #{white stats[:name]}"
-	#boring_string =  "[B/W] #{    stats[:md5]} #{stats[:size]} #{stats[:stat_birthtime]} #{      stats[:name]}"
+	#colored_string = "[COL] #{red stats[:md5]} #{stats[:size]} #{stats[:stat_safebirthtime]} #{white stats[:name]}"
+	#boring_string =  "[B/W] #{    stats[:md5]} #{stats[:size]} #{stats[:stat_safebirthtime]} #{      stats[:name]}"
 	#puts(opts_color ? colored_string : boring_string)
-	puts "#{maybecolored_md5} #{mode} #{file_type} #{maybecolored_size} #{stats[:stat_birthtime]} #{maybecolored_filename}"
+	puts "#{maybecolored_md5} #{mode} #{file_type} #{maybecolored_size} #{stats[:stat_safebirthtime]} #{maybecolored_filename}"
 end
 
 def real_program
