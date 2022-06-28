@@ -10,7 +10,7 @@ if RUBY_VERSION.split('.')[0] == 1
   exit 2020
 end
 
-$PROG_VER = '0.3'
+$PROG_VER = '0.4'
 $DEBUG    = false
 
 =begin
@@ -164,38 +164,145 @@ def compute_stats_and_md5(file)
 	ret 
 end
 
-$print_stats_and_md5_version = "1.1a_220624"
+$print_stats_and_md5_version = "1.1a_220624_F" # files
 $print_stats_and_md5_counter = 0
+$print_stats_and_md5_for_gcs_version = "1.1alpha_220628_G" #GCS bucket
 
 def stats_and_md5_number_of_files_processed()
 	return $print_stats_and_md5_counter 
 end
 
-def print_stats_and_md5(file, opts={})
+def smells_like_gcs?(file)
+	file =~ /gs:\/\//
+end
+
+# You give me gs://bucket123/path/to/dir
+def print_stats_and_md5_for_gcs(mybucket_with_subdir, opts={})
+#	opts_color = opts.fetch :color, true#
+#	opts_verbose = opts.fetch :verbose, false 
+#	opts_ping_frequency = opts.fetch :ping_frequency, 50
+	opts_max_files = opts.fetch :max_files, 50
+
+	raise "Wrong GCS Path: #{mybucket_with_subdir}" unless smells_like_gcs?(mybucket_with_subdir)
+	puts "0. mybucket_with_subdir: #{mybucket_with_subdir}" # gs://mybucket123/path/to/dir
+	path_split = mybucket_with_subdir.split('/')
+	mybucket = path_split[0,3].join('/')      # gs://mybucket123/
+	gcs_subpath = path_split[3,42].join('/')  # path/to/dir
+	cleanedup_bucket = path_split[2]          # mybucket123
+	puts "1. mybucket: #{mybucket}"
+	puts "2. gcs_subpath: #{gcs_subpath}"
+	puts "3. cleanedup_bucket: #{cleanedup_bucket}"
+	
+	puts("[print_stats_and_md5_for_gcs] version=#{$print_stats_and_md5_for_gcs_version} host=#{Socket.gethostname}(#{`uname`.chomp}) created_on='#{Time.now}' bucket=#{mybucket} subpath=#{gcs_subpath}")
+	begin 
+		require "google/cloud/storage"
+		project_id = `gcloud config get project 2>/dev/null`
+		deb "project_id: #{project_id}"
+		storage = Google::Cloud::Storage.new(project_id: project_id)
+		bucket = storage.bucket(cleanedup_bucket)
+		files = bucket.files.first(opts_max_files)
+		#puts(files)
+		deb("All Sorted Methods: #{files.first.methods.sort}")
+		files.each do |gcs_file|
+			md5 = Base64.decode64(gcs_file.md5).unpack('H*')[0]  # md5 in base64 -> then de-binarizied: Base64.urlsafe_decode64(md5).unpack('H*')[0]
+			size = gcs_file.size # crc rescue :boh
+			time_created = gcs_file.created_at
+			mode = 'XXXXXX' # for compatbility with files
+			file_type = gcs_file.name.to_s =~ /\/$/ ? 'd' : 'f' # if ends with a slash its a DIR :P
+			#puts("[OLD_GCS_v11] #{md5} #{size}\t#{time_created} [#{gcs_file.content_type}]\t#{gcs_file.name}")
+			print_colored_polymoprhic('gcs_v1.2', md5, mode, file_type, size, gcs_file.content_type, time_created,gcs_file.name, opts)
+
+			deb gcs_file.to_yaml
+		end
+		#puts("Hash Methods: #{files.first.methods.select{|x| x.match /hash/}}")
+	rescue LoadError # require Exception 
+		puts 'Error with library #{$!}, maybe type: gem install google-cloud-storage'
+	rescue Exception # generic Exception 
+		puts "Generic Error: #{$!}"
+		exit 1
+	end
+	#puts :TODO_GCS
+end 
+
+# Generic polymorpghic coloring, can be GCS. Would have been nice to pass a Dict so easier to extend, but Ruby doesnt support doesblt Dict with magic args. Plus might be a GOOD
+# thing its hard to change since it breaks Storazzo.
+# TODO(ricc): make sure the dates are the same. Currently:
+# GCS Date:  2021-12-20T12:26:13+00:00  DateTime
+# File Date: 2022-05-30 11:55:42 +0200  Time
+def print_colored_polymoprhic(entity_type, md5, mode, file_type, size, content_type, creation_time, filename, opts={})
 	opts_color = opts.fetch :color, true
 	opts_verbose = opts.fetch :verbose, false 
 	opts_ping_frequency = opts.fetch :ping_frequency, 50
-	$print_stats_and_md5_counter += 1 # global counter! I should increment at the END of fucntion.. but you never know if i exit wrongly so i do at beginning. so within this function the real #files is N-1 (i.e., if N is 6, we're processing file %5)
 
+	# Increment counter across all!
+	$print_stats_and_md5_counter += 1 # global counter! I should increment at the END of fucntion.. but you never know if i exit wrongly so i do at beginning. so within this function the real #files is N-1 (i.e., if N is 6, we're processing file %5)
 	# in main i had to put 2 branched to invoke a single thing but if logic changes that sentence might be printed twice. Instead here, the BEGIN line could be nice to do here instead.
 	#$stderr.puts("print_stats_and_md5() Fikst invocation! Consider moving the 2 things in main here :)") if ($print_stats_and_md5_counter == 1)
-	puts("[print_stats_and_md5] version=#{$print_stats_and_md5_version}  host=#{Socket.gethostname}(#{`uname`.chomp}) created_on=#{Time.now}") if ($print_stats_and_md5_counter == 1)
-
+	#puts("[print_stats_and_md5] version=#{$print_stats_and_md5_version} host=#{Socket.gethostname}(#{`uname`.chomp}) created_on=#{Time.now}") if ($print_stats_and_md5_counter == 1)
 	$stderr.puts "-- print_stats_and_md5(v#{$print_stats_and_md5_version}): #{$print_stats_and_md5_counter - 1} files processed --" if (($print_stats_and_md5_counter) % opts_ping_frequency == 1 )
+
+	maybecolored_md5 = opts_color ? red(md5) : md5
+	maybecolored_filename = opts_color ? azure(filename) : filename
+	enlarged_size = sprintf("%7o", size.to_s ) # or SIZE 
+	maybecolored_size = opts_color ? yellow(enlarged_size) : enlarged_size
+	maybecolored_file_type = file_type
+	colored_content_type = opts_color ? white(content_type) : content_type
+	if opts_color 
+		maybecolored_file_type = case file_type
+		when 'f' then green(file_type)
+		when 'd' then blue(file_type)
+		when 's' then azure(file_type)
+		else red(file_type)
+		end
+	end	
+	standardized_creation_time = creation_time.is_a?(DateTime) ? 
+		creation_time : 
+		DateTime.parse(creation_time.to_s) # if you prefer to use Time since its already supported by Storazzo (but its ugly since it has SPACES! so hard to parse) use tt = Time.parse(d.to_s)
+		# as per https://stackoverflow.com/questions/279769/convert-to-from-datetime-and-time-in-ruby
+	#puts "#{maybecolored_md5} #{mode} #{maybecolored_file_type} #{maybecolored_size}\t#{creation_time}(DEB #{creation_time.class})(DEB2 #{DateTime.parse(creation_time.to_s)}) [#{colored_content_type}] #{maybecolored_filename}"
+	puts "[TYPE_TODO][#{entity_type}] #{maybecolored_md5} #{mode} #{maybecolored_file_type} #{standardized_creation_time} #{maybecolored_size} [#{colored_content_type}] #{maybecolored_filename}"
+end
+
+def print_stats_and_md5(file, opts={})
+	return print_stats_and_md5_for_gcs(file, opts) if smells_like_gcs?(file)
+
+	opts_color = opts.fetch :color, true
+	opts_verbose = opts.fetch :verbose, false 
+	opts_ping_frequency = opts.fetch :ping_frequency, 50
+
+	
+	# $print_stats_and_md5_counter += 1 # global counter! I should increment at the END of fucntion.. but you never know if i exit wrongly so i do at beginning. so within this function the real #files is N-1 (i.e., if N is 6, we're processing file %5)
+
+	# # in main i had to put 2 branched to invoke a single thing but if logic changes that sentence might be printed twice. Instead here, the BEGIN line could be nice to do here instead.
+	# #$stderr.puts("print_stats_and_md5() Fikst invocation! Consider moving the 2 things in main here :)") if ($print_stats_and_md5_counter == 1)
+	# puts("[print_stats_and_md5] version=#{$print_stats_and_md5_version} host=#{Socket.gethostname}(#{`uname`.chomp}) created_on=#{Time.now}") if ($print_stats_and_md5_counter == 1)
+	# $stderr.puts "-- print_stats_and_md5(v#{$print_stats_and_md5_version}): #{$print_stats_and_md5_counter - 1} files processed --" if (($print_stats_and_md5_counter) % opts_ping_frequency == 1 )
 
 	#puts "print_stats_and_md5: #{file}" if opts_verbose
 	stats = compute_stats_and_md5 file 
-	maybecolored_md5 = opts_color ? red(stats[:md5]) : stats[:md5]
-	maybecolored_filename = opts_color ? azure(stats[:name]) : stats[:name]
-	maybecolored_size = opts_color ? white(stats[:size]) : stats[:size]
+	#maybecolored_md5 = opts_color ? red(stats[:md5]) : stats[:md5]
+	#maybecolored_filename = opts_color ? azure(stats[:name]) : stats[:name]
+	#maybecolored_size = opts_color ? white(stats[:size]) : stats[:size]
 	mode  = sprintf("%06o", stats[:mode] ) rescue :ERROR # .to_s.right(4)        #=> "100644"
 	file_type = stats[:stat_ftype][0] rescue '?'
+	file_type = 's' if File.symlink?(file)
+	content_type = `file --mime-type -b '#{file}' 2>/dev/null`.chomp # .split(': ',2)[1]
 
 	#colored_string = "[COL] #{red stats[:md5]} #{stats[:size]} #{stats[:stat_safebirthtime]} #{white stats[:name]}"
 	#boring_string =  "[B/W] #{    stats[:md5]} #{stats[:size]} #{stats[:stat_safebirthtime]} #{      stats[:name]}"
 	#puts(opts_color ? colored_string : boring_string)
-	puts "#{maybecolored_md5} #{mode} #{file_type} #{maybecolored_size} #{stats[:stat_safebirthtime]} #{maybecolored_filename}"
+	#puts "[OLDv1.1deprecated] #{maybecolored_md5} #{mode} #{file_type} #{maybecolored_size} #{stats[:stat_safebirthtime]} #{maybecolored_filename}"
+	print_colored_polymoprhic('file_v1.2', stats[:md5], mode, file_type,  stats[:size], content_type, stats[:stat_safebirthtime], stats[:name], opts)
 end
+
+def print_stats_and_md5_for_directory(directory_to_explore_recursively)
+	puts "# [print_stats_and_md5_for_directory] DIR to explore (make sure you glob also): #{directory_to_explore_recursively }"
+	Dir.glob("#{(directory_to_explore_recursively)}/**/*") do |globbed_filename|
+		# Do work on files & directories ending in .rb
+		#puts "[deb] #{globbed_filename}" 
+		print_stats_and_md5(globbed_filename, :color => $opts[:color], :verbose => $opts[:verbose])
+	end
+end 
 
 def real_program
   t0 = Time.now
@@ -206,31 +313,33 @@ def real_program
   #puts("[print_stats_and_md5] version=#{$print_stats_and_md5_version}  host=#{Socket.gethostname}(#{`uname`.chomp}) created_on=#{Time.now}") if ARGV.size > 0
 
   if ARGV.size == 1
-    directory_to_explore_recursively = ARGV[0]
-	deb "1. I expect a single arg with DIR to explore: #{blue directory_to_explore_recursively }"
-	Dir.glob("#{(directory_to_explore_recursively)}/**/*") do |globbed_filename|
-		# Do work on files & directories ending in .rb
-		#puts "[deb] #{globbed_filename}" 
-		print_stats_and_md5(globbed_filename, :color => $opts[:color], :verbose => $opts[:verbose])
-	  end
+	directory_to_explore_recursively = ARGV[0]
+    if smells_like_gcs?(directory_to_explore_recursively)
+		print_stats_and_md5_for_gcs(directory_to_explore_recursively)
+	else # normal file..
+		print_stats_and_md5_for_directory(directory_to_explore_recursively)
+	end
   elsif ARGV.size > 1
-	deb "2. I expect a lot of single files:"
+	deb "2. I expect a lot of single files or directories:"
     for arg in ARGV
-   		print_stats_and_md5(arg, :color => $opts[:color], :verbose => $opts[:verbose])
+		if File.directory?(arg)
+			print_stats_and_md5_for_directory(arg)
+		else
+	   		print_stats_and_md5(arg, :color => $opts[:color], :verbose => $opts[:verbose])
+		end
     end
   else
 	puts "No args given. Exiting"
 	exit 41
   end
   tf = Time.now
-  puts "# Time taken for processing #{stats_and_md5_number_of_files_processed} files: #{tf-t0}"
+  puts "# [#{File.basename $0}] Time taken for processing #{stats_and_md5_number_of_files_processed} files: #{tf-t0}"
 end
 
 def main(filename)
   deb "I'm called by #{white filename}"
   deb "To remove this shit, just set $DEBUG=false :)"
   init        # Enable this to have command line parsing capabilities!
-  #warn "[warn] template v#{$TEMPLATE_VER }: proviamo il warn che magari depreca il DEB"
   real_program
 end
 
