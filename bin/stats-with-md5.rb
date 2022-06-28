@@ -4,6 +4,8 @@ require 'digest/md5'
 require 'digest'
 require 'socket'
 require 'optparse'       # http://ruby.about.com/od/advancedruby/a/optionparser.htm
+require 'date' # for DateTime
+require 'tempfile'
 
 if RUBY_VERSION.split('.')[0] == 1
   puts "Refusing to launch a script form Ruby 1. Sorry Ric, its 2020 damn it!"
@@ -12,6 +14,8 @@ end
 
 $PROG_VER = '0.4'
 $DEBUG    = false
+$reset_autowrite_file_reincarnation = 0
+DEFAULT_MAX_FILES = 'Infinite'
 
 =begin
 
@@ -54,10 +58,6 @@ $myconf = {
 		And bakes it in a way that can be easily parsed. 
     ".strip.gsub(/^\s+/, "").gsub(/\s+$/, ""),
 }
-# This template from scripta.rb. from 2.1.0 removed aby ric gem dependency.
-# 2022-04-26 2.1.1  Added more colors
-# 2022-04-26 2.1.0  Historical momemnt: removed gem 'ric' dependency
-$TEMPLATE_VER = '2.1.1'
 
 def usage(comment=nil)
   puts white($optparse.banner)
@@ -67,6 +67,11 @@ def usage(comment=nil)
   exit 13
 end
 
+def reset_autowrite_file()
+	$autowrite_file = "# #{File.basename $0} Autowrite v1.0 #{Time.now} reincarnation=#{$reset_autowrite_file_reincarnation}\n"
+	$reset_autowrite_file_reincarnation += 1 # ($reset_autowrite_file_reincarnation + 1) # rescue 1
+end 
+
 # include it in main if you want a custome one
 def init()    # see lib_autoinit in lib/util.rb
   $opts = {}
@@ -74,13 +79,19 @@ def init()    # see lib_autoinit in lib/util.rb
   $opts[:verbose] = false
   $opts[:dryrun] = false
   $opts[:debug] = false
+  $opts[:autowrite] = false
   $opts[:color] = true
+  $opts[:max_files] = nil # infinite
+
+  reset_autowrite_file()
 
   $optparse = OptionParser.new do |opts|
     opts.banner = "#{$0} v.#{$PROG_VER}\n Usage: #{File.basename $0} [options] file1 file2 ..."
-    opts.on( '-c', '--no-color', 'disables color (DFLT=false)' )  {  $opts[:color] = false  }
+    opts.on( '-a', '--autowrite', 'automatically writes results to Root Folder (DFLT=false)' )  {  $opts[:autowrite] = true  }
+    opts.on( '-c', '--no-color', 'disables color (DFLT=false, that is color enabled)' )  {  $opts[:color] = false  }
     opts.on( '-d', '--debug', 'enables debug (DFLT=false)' )  {  $opts[:debug] = true ; $DEBUG = true }
     opts.on( '-h', '--help', 'Display this screen' )          {  usage }
+    opts.on( '-m', '--max-files NUMBER', "sets max files per Dir to X (DFLT=#{DEFAULT_MAX_FILES})" ) {|nfiles| $opts[:max_files] = nfiles.to_i }
     opts.on( '-n', '--dryrun', "Don't really execute code" ) { $opts[:dryrun] = true }
     opts.on( '-l', '--logfile FILE', 'Write log to FILE' )    {|file| $opts[:logfile] = file }
     opts.on( '-v', '--verbose', 'Output more information' )   { $opts[:verbose] = true}
@@ -181,17 +192,18 @@ def print_stats_and_md5_for_gcs(mybucket_with_subdir, opts={})
 #	opts_color = opts.fetch :color, true#
 #	opts_verbose = opts.fetch :verbose, false 
 #	opts_ping_frequency = opts.fetch :ping_frequency, 50
-	opts_max_files = opts.fetch :max_files, 50
+	opts_max_files = opts.fetch :max_files, nil # BigDecimal('Infinity')
+	opts_autowrite = opts.fetch :autowrite, false
 
 	raise "Wrong GCS Path: #{mybucket_with_subdir}" unless smells_like_gcs?(mybucket_with_subdir)
-	puts "0. mybucket_with_subdir: #{mybucket_with_subdir}" # gs://mybucket123/path/to/dir
+	#puts "0. mybucket_with_subdir: #{mybucket_with_subdir}" # gs://mybucket123/path/to/dir
 	path_split = mybucket_with_subdir.split('/')
 	mybucket = path_split[0,3].join('/')      # gs://mybucket123/
 	gcs_subpath = path_split[3,42].join('/')  # path/to/dir
 	cleanedup_bucket = path_split[2]          # mybucket123
-	puts "1. mybucket: #{mybucket}"
-	puts "2. gcs_subpath: #{gcs_subpath}"
-	puts "3. cleanedup_bucket: #{cleanedup_bucket}"
+	#puts "1. mybucket: #{mybucket}"
+	#puts "2. gcs_subpath: #{gcs_subpath}"
+	#puts "3. cleanedup_bucket: #{cleanedup_bucket}"
 	
 	puts("[print_stats_and_md5_for_gcs] version=#{$print_stats_and_md5_for_gcs_version} host=#{Socket.gethostname}(#{`uname`.chomp}) created_on='#{Time.now}' bucket=#{mybucket} subpath=#{gcs_subpath}")
 	begin 
@@ -200,7 +212,10 @@ def print_stats_and_md5_for_gcs(mybucket_with_subdir, opts={})
 		deb "project_id: #{project_id}"
 		storage = Google::Cloud::Storage.new(project_id: project_id)
 		bucket = storage.bucket(cleanedup_bucket)
-		files = bucket.files.first(opts_max_files)
+		# grabs them ALL if nil, optherwise its an integer.
+		files = opts_max_files.nil? ? 
+			bucket.files :                          # nil -> all of them (I've tried sth more idiomatic like -1 or nil or Infinite. they all failed.)
+			bucket.files.first(opts_max_files)      # not nil -> first(N)
 		#puts(files)
 		deb("All Sorted Methods: #{files.first.methods.sort}")
 		files.each do |gcs_file|
@@ -210,18 +225,18 @@ def print_stats_and_md5_for_gcs(mybucket_with_subdir, opts={})
 			mode = 'XXXXXX' # for compatbility with files
 			file_type = gcs_file.name.to_s =~ /\/$/ ? 'd' : 'f' # if ends with a slash its a DIR :P
 			#puts("[OLD_GCS_v11] #{md5} #{size}\t#{time_created} [#{gcs_file.content_type}]\t#{gcs_file.name}")
-			print_colored_polymoprhic('gcs_v1.2', md5, mode, file_type, size, gcs_file.content_type, time_created,gcs_file.name, opts)
-
+			print_colored_polymoprhic('gcs_v1.2', md5, mode, file_type, size, gcs_file.content_type, time_created, gcs_file.name, opts)
 			deb gcs_file.to_yaml
 		end
 		#puts("Hash Methods: #{files.first.methods.select{|x| x.match /hash/}}")
 	rescue LoadError # require Exception 
 		puts 'Error with library #{$!}, maybe type: gem install google-cloud-storage'
 	rescue Exception # generic Exception 
-		puts "Generic Error: #{$!}"
+		puts "print_stats_and_md5_for_gcs(): Generic Error: #{$!}"
 		exit 1
 	end
-	#puts :TODO_GCS
+
+	autowrite_to_dir_or_gcs(:gcs, mybucket_with_subdir) if opts_autowrite
 end 
 
 # Generic polymorpghic coloring, can be GCS. Would have been nice to pass a Dict so easier to extend, but Ruby doesnt support doesblt Dict with magic args. Plus might be a GOOD
@@ -233,6 +248,7 @@ def print_colored_polymoprhic(entity_type, md5, mode, file_type, size, content_t
 	opts_color = opts.fetch :color, true
 	opts_verbose = opts.fetch :verbose, false 
 	opts_ping_frequency = opts.fetch :ping_frequency, 50
+	opts_autowrite = opts.fetch :autowrite, false
 
 	# Increment counter across all!
 	$print_stats_and_md5_counter += 1 # global counter! I should increment at the END of fucntion.. but you never know if i exit wrongly so i do at beginning. so within this function the real #files is N-1 (i.e., if N is 6, we're processing file %5)
@@ -260,7 +276,17 @@ def print_colored_polymoprhic(entity_type, md5, mode, file_type, size, content_t
 		DateTime.parse(creation_time.to_s) # if you prefer to use Time since its already supported by Storazzo (but its ugly since it has SPACES! so hard to parse) use tt = Time.parse(d.to_s)
 		# as per https://stackoverflow.com/questions/279769/convert-to-from-datetime-and-time-in-ruby
 	#puts "#{maybecolored_md5} #{mode} #{maybecolored_file_type} #{maybecolored_size}\t#{creation_time}(DEB #{creation_time.class})(DEB2 #{DateTime.parse(creation_time.to_s)}) [#{colored_content_type}] #{maybecolored_filename}"
-	puts "[TYPE_TODO][#{entity_type}] #{maybecolored_md5} #{mode} #{maybecolored_file_type} #{standardized_creation_time} #{maybecolored_size} [#{colored_content_type}] #{maybecolored_filename}"
+	# this mightr be colored
+	str = "[#{entity_type}] #{maybecolored_md5} #{mode} #{maybecolored_file_type} #{standardized_creation_time} #{maybecolored_size} [#{colored_content_type}] #{maybecolored_filename}\n"
+	# this will NEVER be colored. WARNING, now you need to maintain TWO of these beasts :/
+	non_colored_str = "[#{entity_type}] #{md5} #{mode} #{file_type} #{standardized_creation_time} #{enlarged_size} [#{content_type}] #{filename}\n"
+	if(opts_autowrite)
+		# need to guarantee this is NOT colored. The easiest way to do it is TWICVE as expensive but... whatevs.
+		# TODO(ricc): fire me for this lazimness!
+		$autowrite_file += (non_colored_str)
+	end
+	print(str)
+	return str
 end
 
 def print_stats_and_md5(file, opts={})
@@ -295,13 +321,62 @@ def print_stats_and_md5(file, opts={})
 	print_colored_polymoprhic('file_v1.2', stats[:md5], mode, file_type,  stats[:size], content_type, stats[:stat_safebirthtime], stats[:name], opts)
 end
 
-def print_stats_and_md5_for_directory(directory_to_explore_recursively)
+def autowrite_to_dir_or_gcs(fs_type, path, opts={})
+    autowrite_version = "1.1_28jun22"
+	file_to_save = "stats-with-md5.log"
+	path_to_save = path + "/" + file_to_save
+	puts(red "TODO(ricc): write results [size=#{$autowrite_file.size}] in this Directory: #{path_to_save}") if fs_type == :dir
+	puts(red "TODO(ricc): write results [size=#{$autowrite_file.size}] in this GCS Bucket or Dir: #{path_to_save}") if fs_type == :gcs
+
+	##########################################################################
+	# do the thing: creates file locally and moves to GCS or Dir.
+	##########################################################################
+	$autowrite_file += "# [autowrite_to_dir_or_gcs v#{autowrite_version}]: about to write it now. #{Time.now}"
+	tmpfile = Tempfile.new(path_to_save)
+	tmpfile.write($autowrite_file)
+	cmd = :no_cmd_yet
+	
+	if fs_type == :gcs
+		cmd = "gsutil mv '#{tmpfile.path}' #{path}/#{file_to_save}"
+	end
+	if fs_type == :dir
+		cmd = "mv '#{tmpfile.path}' #{path}/#{file_to_save}"
+	end
+
+	puts("TMP File is this big: #{azure tmpfile.size}")
+	puts("About to execute this: #{white cmd}")
+	ret = `#{cmd}`
+	if $?.exitstatus != 0
+		puts "Error to execute: #{red cmd}. Exit: #{red $?.exitstatus}"
+		exit 53
+	end
+	puts "Command returned: '#{$?.exitstatus}'" #  - #{$?.class}"
+	# wow: fork { exec("ls") }
+
+	# removes the tmpfile :)
+	tmpfile.close 
+	tmpfile.unlink
+
+	#####################################
+	# finished, lets now clean up the file...
+	#####################################
+	reset_autowrite_file()
+	return :ok
+end
+
+def print_stats_and_md5_for_directory(directory_to_explore_recursively, opts={})
 	puts "# [print_stats_and_md5_for_directory] DIR to explore (make sure you glob also): #{directory_to_explore_recursively }"
+	puts "# DEB Options: #{opts}"
+
+	opts_autowrite = opts.fetch :autowrite, false
+
 	Dir.glob("#{(directory_to_explore_recursively)}/**/*") do |globbed_filename|
 		# Do work on files & directories ending in .rb
 		#puts "[deb] #{globbed_filename}" 
-		print_stats_and_md5(globbed_filename, :color => $opts[:color], :verbose => $opts[:verbose])
+		print_stats_and_md5(globbed_filename, :color => $opts[:color], :verbose => $opts[:verbose], :autowrite => $opts[:autowrite])
 	end
+
+	autowrite_to_dir_or_gcs(:dir, directory_to_explore_recursively) if opts_autowrite
 end 
 
 def real_program
@@ -312,20 +387,27 @@ def real_program
   #puts "Description: '''#{white $myconf[:description] }'''"
   #puts("[print_stats_and_md5] version=#{$print_stats_and_md5_version}  host=#{Socket.gethostname}(#{`uname`.chomp}) created_on=#{Time.now}") if ARGV.size > 0
 
+  common_opts = {
+	:max_files => $opts[:max_files], 
+	:color => $opts[:color], 
+	:verbose => $opts[:verbose],
+	:autowrite => $opts[:autowrite],
+  }
+
   if ARGV.size == 1
 	directory_to_explore_recursively = ARGV[0]
     if smells_like_gcs?(directory_to_explore_recursively)
-		print_stats_and_md5_for_gcs(directory_to_explore_recursively)
+		print_stats_and_md5_for_gcs(directory_to_explore_recursively, common_opts)
 	else # normal file..
-		print_stats_and_md5_for_directory(directory_to_explore_recursively)
+		print_stats_and_md5_for_directory(directory_to_explore_recursively, common_opts)
 	end
   elsif ARGV.size > 1
 	deb "2. I expect a lot of single files or directories:"
     for arg in ARGV
 		if File.directory?(arg)
-			print_stats_and_md5_for_directory(arg)
+			print_stats_and_md5_for_directory(arg, common_opts )
 		else
-	   		print_stats_and_md5(arg, :color => $opts[:color], :verbose => $opts[:verbose])
+	   		print_stats_and_md5(arg, common_opts)
 		end
     end
   else
