@@ -1,6 +1,10 @@
 #!/bin/bash
 
-set -x
+#set -x
 
-curl --write-out '\nHTTP CODE: %{http_code}\n' --silent --output /dev/null "$@"
+# [sakurl] Coloring GREEN 2XX (TODO regex)
+curl --write-out "[sakurl] HTTP_CODE %{http_code}  $*\n" --silent --output /dev/null "$@" |
+    rcg "200" GREEN |
+    rcg "404" RED |
+    rcg "500" RED
 
