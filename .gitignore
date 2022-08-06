@@ -29,3 +29,4 @@ bashrc.d/local.d/*.include
 bin/geo-ip-city.sh
 doc
 *.gemspec
+.echodo_history
