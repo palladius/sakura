@@ -1,0 +1,10 @@
+#! /bin/bash
+
+# https://askubuntu.com/questions/57459/is-there-a-way-extract-and-delete-zip-file-in-a-single-command
+
+# TODO if you trust yourself you can iterate through all ARGS.
+# I use it for my Bank ZIPs. :)
+
+unzip "$1" &&
+    rm "$1"
+
