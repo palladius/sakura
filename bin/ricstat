@@ -1,0 +1,22 @@
+#!/bin/bash
+
+echo -en "+ CurrentDir #files: "
+ls -al | wc -l
+echo -en "+ CurrentDir Size:   "
+du -sh .
+#echo -en "+ Biggest file (non va):   "
+#ls -alrth | tail -1
+white "+ Cheap doppioni (just checking size, not md5):"
+SIZES_APPEARING_MORE_THAN_ONCE=$(ls -alrt | awk '{print $5}' |sort |uniq -c | grep -v ' 1 ' )
+
+if [ 0 == "$?" ] ; then
+    echo -en '' # '[DEB] Bad some occurrences.'
+else
+    echo 'Good, no occurrences.'
+    exit 0
+fi
+# | awk '{print $2}'
+echo "$SIZES_APPEARING_MORE_THAN_ONCE" | while read N_OCCURRENCES SIZE ; do
+echo "[DEB]: N_OCCURRENCES=$N_OCCURRENCES size='$SIZE'"
+    ls -al | grep " $SIZE "
+done
