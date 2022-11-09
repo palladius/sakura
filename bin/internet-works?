@@ -1,0 +1,10 @@
+#!/bin/bash
+
+if ping -c 1 8.8.8.8 -t 1 >/dev/null 2>/dev/null ; then
+	echo YES
+	exit 0
+else 
+	echo 'NO (honest DNS doesnt respond in 1sec)'
+	exit 20  # as NO
+
+fi
