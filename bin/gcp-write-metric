@@ -1,0 +1,106 @@
+#!/usr/bin/env ruby
+
+=begin
+
+  gcp-write-metric
+
+  Tips:
+  * GOOGLE_AUTH_SUPPRESS_CREDENTIALS_WARNINGS=true to avoid errors
+  * export GOOGLE_APPLICATION_CREDENTIALS="~/path/to/your-svcacct.json"
+
+  HISTORY:
+  * 1.6 9nov22 Refactored and cleaned up for GitHub and Medium :)
+
+=end
+
+# TODO(ricc): add TRY
+require 'google/cloud/monitoring'
+require 'socket' # for hostname
+#require 'sys/filesystem'
+require 'openssl'
+require 'colorize' # makes life worth living
+# TODO(ricc): CACTH
+# `gem install google-cloud-monitoring sys-filesystem blah blah`
+
+#DAMN! https://github.com/googleapis/google-api-ruby-client/issues/253
+# Carlessian manhouse fix
+OpenSSL::SSL::VERIFY_PEER = OpenSSL::SSL::VERIFY_NONE
+# better fix TODO
+#cert_path = Gem.loaded_specs['google-api-client'].full_gem_path+'/lib/cacerts.pem'
+#ENV['SSL_CERT_FILE'] = cert_path
+
+$APP_VERSION = "1.5"
+$DEBUG = false
+ENV['GOOGLE_AUTH_SUPPRESS_CREDENTIALS_WARNINGS'] = 'true'
+
+# I want to know server side who called me
+def gethostname
+  Socket.gethostname
+end
+
+def magic_cloud_console_url(project_id)
+  'https://console.cloud.google.com/monitoring/metrics-explorer?project=#{project_id}&pageState=%7B%22xyChart%22:%7B%22dataSets%22:%5B%7B%22timeSeriesFilter%22:%7B%22filter%22:%22metric.type%3D%5C%22custom.googleapis.com%2Friccardo-disc-free-pct%5C%22%20resource.type%3D%5C%22gce_instance%5C%22%22,%22minAlignmentPeriod%22:%2260s%22,%22aggregations%22:%5B%7B%22perSeriesAligner%22:%22ALIGN_MEAN%22,%22crossSeriesReducer%22:%22REDUCE_NONE%22,%22alignmentPeriod%22:%2260s%22,%22groupByFields%22:%5B%5D%7D,%7B%22crossSeriesReducer%22:%22REDUCE_NONE%22,%22alignmentPeriod%22:%2260s%22,%22groupByFields%22:%5B%5D%7D%5D%7D,%22targetAxis%22:%22Y1%22,%22plotType%22:%22LINE%22%7D%5D,%22options%22:%7B%22mode%22:%22COLOR%22%7D,%22constantLines%22:%5B%5D,%22timeshiftDuration%22:%220s%22,%22y1Axis%22:%7B%22label%22:%22y1Axis%22,%22scale%22:%22LINEAR%22%7D%7D,%22isAutoRefresh%22:true,%22timeSelection%22:%7B%22timeRange%22:%221h%22%7D%7D'
+end
+
+def write_generic_metric(project_id, metric_label, metric_value)
+  metric_service_client = Google::Cloud::Monitoring.metric_service
+  project_path = metric_service_client.project_path project: project_id
+
+  full_hostname = gethostname()
+  hostname = full_hostname.split('.')[0]
+  host_domain = full_hostname.split('.')[1,10].join('.')
+
+  series = Google::Cloud::Monitoring::V3::TimeSeries.new
+  series.metric = Google::Api::Metric.new type:   "custom.googleapis.com/#{metric_label}",
+                                          labels: {
+                                            "my_key" => metric_label,
+                                            "hostname" =>  hostname,
+                                            "domain"   =>  host_domain,
+                                            #"app_verison" =>  $APP_VERSION, # found out you dont want to slice and dice metric when you change version... but you might want it.
+                                          }
+
+  resource = Google::Api::MonitoredResource.new type: "gce_instance"
+  resource.labels["project_id"] = project_id
+  resource.labels["instance_id"] = hostname # "1234567890123456789"
+  resource.labels["zone"] = "europe-west6-a" #  Zurich - "us-central1-f"
+  series.resource = resource
+
+  point = Google::Cloud::Monitoring::V3::Point.new
+  point.value = Google::Cloud::Monitoring::V3::TypedValue.new double_value: metric_value # get_disk_space
+
+  now = Time.now
+  end_time = Google::Protobuf::Timestamp.new seconds: now.to_i, nanos: now.nsec
+  point.interval = Google::Cloud::Monitoring::V3::TimeInterval.new end_time: end_time
+  series.points << point
+
+  metric_service_client.create_time_series name: project_path, time_series: [series]
+
+  puts "📉 Successfully wrote time series '#{metric_label.colorize :yellow}'=#{metric_value.to_s.colorize :cyan} on #{project_id.colorize :red} for '#{hostname}'"
+end
+
+def usage(err=nil)
+  filename  = File.basename $0
+  puts("#{filename} v#{$APP_VERSION}. Proper usage:")
+  puts("PROJECT_ID=my-project-id #{filename} <METRIC_NAME> <METRIC_VALUE>".colorize(:white))
+  puts "Example:"
+  puts "  #{filename} temperature 38.0"
+  $stderr.puts "Error: #{err}" if err
+  exit 42
+end
+
+def main
+  # accepts ENV=TRUE and ENV=true and other 14 combinations..
+  env_debug  = ENV.fetch('DEBUG',      'false').to_s.downcase == 'true'
+  project_id = ENV.fetch('PROJECT_ID', 'CHANGEME') # adding a usefule default for me
+
+  usage("few arguments: provide at least 2") if ARGV.size < 2
+  metric = ARGV[0]
+  value = ARGV[1].to_f # float adds value without removing it IMHO
+
+  write_generic_metric(project_id, metric, value)
+
+  puts("Try to see on: #{magic_url(project_id)}") if env_debug
+end
+
+
+main
