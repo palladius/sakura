@@ -38,11 +38,12 @@ The result is x = (“Max Capacity” x 100) / Design Capacity = (6705 x 100) / 
 
 
 CHANGELOG
-  2022-11-10 v0.3 Tried on Linux and trying to fail cleanly.
+  2022-11-10 v0.4 (on MBA) I merge the two so no need for is_m1?() again. But let me first try the new code on the M1 once again.
+  2022-11-10 v0.3 Tried on Linux and trying to fail cleanly. In b I merge the two.
   2022-11-10 v0.2 Re-implemented for M1. Luckily all things made sense, just the string splitting didnt.
   2022-11-10 v0.1 First inmplementation on my MacBook Air at the airport.
 =end
-$PROG_VER = '0.3'
+$PROG_VER = '0.4'
 
 $DEBUG    = false
 
@@ -120,24 +121,28 @@ end
 def is_m1?()
   mac_model().match /Apple M1/
 end
+
 =begin
   Note on my Mac M1 this doesnt work :/
   and I cant test it on both macs at the same time as they're remote.
   So I'm now trying M1 metrics. If they work i'm gonna remove the other ones.
 =end
-def processMacCapacity(buridone)
+def processMacCapacityOldVersion(buridone='')
   ret = {}
-  ret[:debug] = 'Will fill numerator and denominator until I nail it.'
   ret[:capacity_pct] = 142 # clearlly wrong
   # `ioreg -l -w0 | grep AppleRawMaxCapacity`.split
   # => ["|", "|", "\"AppleRawMaxCapacity\"", "=", "4320"]
   ret[:AppleRawMaxCapacity] = `ioreg -l -w0 | grep AppleRawMaxCapacity`.split[4].to_i # Works on my small Mac but not on the M1
   ret[:AppleRawCurrentCapacity] = `ioreg -l -w0 | grep AppleRawCurrentCapacity`.split[4].to_i
-  if is_m1?
-    ret[:AppleRawMaxCapacityM1] = `ioreg -l -w0 | grep AppleRawMaxCapacity`.split("=")[1].strip.to_i
-    ret[:AppleRawCurrentCapacityM1] = `ioreg -l -w0 | grep AppleRawCurrentCapacity`.split("=")[1].strip.to_i
-  end
   #  => ["\"StateOfCharge\"=41"]
+  #if is_m1?
+  # tested on Mac non M1 and this also works
+  ret[:AppleRawMaxCapacityM1] = `ioreg -l -w0 | grep AppleRawMaxCapacity`.split("=")[1].strip.to_i
+  #ret[:AppleRawCurrentCapacityM1] = `ioreg -l -w0 | grep AppleRawCurrentCapacity`.split("=")[1].strip.to_i
+#end
+  #ret[:AppleRawMaxCapacityBoth] = `ioreg -l -w0 | grep AppleRawMaxCapacity`.split("=")[1].strip.to_i
+  #ret[:AppleRawCurrentCapacityBoth] = `ioreg -l -w0 | grep AppleRawCurrentCapacity`.split("=")[1].strip.to_i
+
   ret[:StateOfCharge] = `ioreg -l -w0 | grep BatteryData`.split(',').select{|e| e.match /StateOfCharge/ }[0].split('=')[1].to_i
   ret[:AppleDesignCapacity] = `ioreg -l -w0 | grep BatteryData`.split(',').select{|e| e.match /DesignCapacity/ }[0].split('=')[1].to_i
 
@@ -149,6 +154,39 @@ def processMacCapacity(buridone)
     ret[:BatteryCapacityPercentM1] = ret[:AppleRawCurrentCapacityM1]*100.0 / ret[:AppleRawMaxCapacityM1]
     ret[:battery_healthM1] =  ret[:AppleRawMaxCapacityM1]*100.0/ret[:AppleDesignCapacity]
   end
+  return ret
+end
+
+def processMacCapacity(buridone)
+  ret = {}
+  #ret[:capacity_pct] = 142 # clearlly wrong
+  # `ioreg -l -w0 | grep AppleRawMaxCapacity`.split
+  # => ["|", "|", "\"AppleRawMaxCapacity\"", "=", "4320"]
+  #ret[:AppleRawMaxCapacity] = `ioreg -l -w0 | grep AppleRawMaxCapacity`.split[4].to_i # Works on my small Mac but not on the M1
+  #ret[:AppleRawCurrentCapacity] = `ioreg -l -w0 | grep AppleRawCurrentCapacity`.split[4].to_i
+  #  => ["\"StateOfCharge\"=41"]
+  #if is_m1?
+  # tested on Mac non M1 and this also works
+  #ret[:AppleRawMaxCapacityM1] = `ioreg -l -w0 | grep AppleRawMaxCapacity`.split("=")[1].strip.to_i
+  #ret[:AppleRawCurrentCapacityM1] = `ioreg -l -w0 | grep AppleRawCurrentCapacity`.split("=")[1].strip.to_i
+#end
+  ret[:AppleRawMaxCapacityBoth] = `ioreg -l -w0 | grep AppleRawMaxCapacity`.split("=")[1].strip.to_i
+  ret[:AppleRawCurrentCapacityBoth] = `ioreg -l -w0 | grep AppleRawCurrentCapacity`.split("=")[1].strip.to_i
+  ret[:StateOfCharge] = `ioreg -l -w0 | grep BatteryData`.split(',').select{|e| e.match /StateOfCharge/ }[0].split('=')[1].to_i
+  ret[:AppleDesignCapacityBoth] = `ioreg -l -w0 | grep BatteryData`.split(',').select{|e| e.match /DesignCapacity/ }[0].split('=')[1].to_i
+
+  # derived values..
+  # this should be your battery life i guess?x
+  # ret[:BatteryCapacityPercent] = ret[:AppleRawCurrentCapacity]*100.0 / ret[:AppleRawMaxCapacity]
+  # ret[:battery_health] =  ret[:AppleRawMaxCapacity]*100.0/ret[:AppleDesignCapacity]
+
+  # if is_m1?
+  #   ret[:BatteryCapacityPercentM1] = ret[:AppleRawCurrentCapacityM1]*100.0 / ret[:AppleRawMaxCapacityM1]
+  #   ret[:battery_healthM1] =  ret[:AppleRawMaxCapacityM1]*100.0/ret[:AppleDesignCapacity]
+  # end
+  ret[:BatteryCapacityPercentBoth] = ret[:AppleRawCurrentCapacityBoth] * 100.0 / ret[:AppleRawMaxCapacityBoth]
+  ret[:battery_healthBoth] =  ret[:AppleRawMaxCapacityBoth] * 100.0 / ret[:AppleDesignCapacityBoth]
+  
   return ret
 end
 
@@ -164,20 +202,24 @@ def real_program
   capacity_hash = processMacCapacity(`ioreg -l -w0 | grep Capacity`)
   deb "capacity_hash: '''#{white capacity_hash}'''"
   if $DEBUG
-    capacity_hash.each{|k,v|
+    capacity_hash.sort.each{|k,v|
       puts "[DEB] #{k}:\t#{v}"
   }
   end
 
-  if is_m1?
-    # removing icons as they dont play well with AWK: 🔌🪫🛟
-    puts "1M. 🔋 BatteryLife %: #{capacity_hash[:BatteryCapacityPercentM1].round(2)}" if is_m1? # capacity_hash[:BatteryCapacityPercentM1].nan?
-    puts "2M. 🔋 BatteryHealth %: #{capacity_hash[:battery_healthM1].round(2)}"
-  else
-    # My MacBook air
-    puts "1A. 🔋 BatteryLife %: #{capacity_hash[:BatteryCapacityPercent].round(2)}" # unless capacity_hash[:BatteryCapacityPercent].nan? # == NaN
-    puts "2A. 🔋 BatteryHealth %: #{capacity_hash[:battery_health].round(2)}"
-  end
+    # tried on both Macs, both M1 Macbook Pro (home) and Macbook Air (work)
+    puts "1B. 🔋 BatteryLife %: #{capacity_hash[:BatteryCapacityPercentBoth].round(2)}" # if is_m1? # capacity_hash[:BatteryCapacityPercentM1].nan?
+    puts "2B. 🔋 BatteryHealth %: #{capacity_hash[:battery_healthBoth].round(2)}"
+
+  # if is_m1?
+  #   # removing icons as they dont play well with AWK: 🔌🪫🛟
+  #   puts "1M. 🔋 BatteryLife %: #{capacity_hash[:BatteryCapacityPercentM1].round(2)}" if is_m1? # capacity_hash[:BatteryCapacityPercentM1].nan?
+  #   puts "2M. 🔋 BatteryHealth %: #{capacity_hash[:battery_healthM1].round(2)}"
+  # else
+  #   # My MacBook air
+  #   puts "1A. 🔋 BatteryLife %: #{capacity_hash[:BatteryCapacityPercent].round(2)}" # unless capacity_hash[:BatteryCapacityPercent].nan? # == NaN
+  #   puts "2A. 🔋 BatteryHealth %: #{capacity_hash[:battery_health].round(2)}"
+  # end
 end 
 
 def main(filename)
