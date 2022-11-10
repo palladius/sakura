@@ -1,0 +1,9 @@
+#!/bin/bash
+
+PROJECT_ID=${1:-CHANGEME}
+
+echo "Pushing now metrics to project_id=$PROJECT_ID:"
+
+macbook-battery | while read BL AH METRIC BLEH VALUE ; do
+    PROJECT=$PROJECT_ID gcp-write-metric  "$METRIC" "$VALUE"
+done
