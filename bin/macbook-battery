@@ -36,9 +36,13 @@ The result is x = (“Max Capacity” x 100) / Design Capacity = (6705 x 100) / 
 
  ############################################################
 
-=end
 
-$PROG_VER = '0.1'
+CHANGELOG
+  2022-11-10 v0.2 Re-implemented for M1. Luckily all things made sense, just the string splitting didnt.
+  2022-11-10 v0.1 First inmplementation on my MacBook Air at the airport.
+=end
+$PROG_VER = '0.2'
+
 $DEBUG    = false
 
 require 'optparse'       # http://ruby.about.com/od/advancedruby/a/optionparser.htm
@@ -104,23 +108,43 @@ def init()    # see lib_autoinit in lib/util.rb
   $optparse.parse!
 end
 
+def mac_model()
+  `sysctl -n machdep.cpu.brand_string`
+end
+
+# latest chipset
+def is_m1?()
+  mac_model().match /Apple M1/
+end
+=begin
+  Note on my Mac M1 this doesnt work :/
+  and I cant test it on both macs at the same time as they're remote.
+  So I'm now trying M1 metrics. If they work i'm gonna remove the other ones.
+=end
 def processMacCapacity(buridone)
   ret = {}
   ret[:debug] = 'Will fill numerator and denominator until I nail it.'
   ret[:capacity_pct] = 142 # clearlly wrong
   # `ioreg -l -w0 | grep AppleRawMaxCapacity`.split
   # => ["|", "|", "\"AppleRawMaxCapacity\"", "=", "4320"]
-  ret[:AppleRawMaxCapacity] = `ioreg -l -w0 | grep AppleRawMaxCapacity`.split[4].to_i
+  ret[:AppleRawMaxCapacity] = `ioreg -l -w0 | grep AppleRawMaxCapacity`.split[4].to_i # Works on my small Mac but not on the M1
   ret[:AppleRawCurrentCapacity] = `ioreg -l -w0 | grep AppleRawCurrentCapacity`.split[4].to_i
+  if is_m1?
+    ret[:AppleRawMaxCapacityM1] = `ioreg -l -w0 | grep AppleRawMaxCapacity`.split("=")[1].strip.to_i
+    ret[:AppleRawCurrentCapacityM1] = `ioreg -l -w0 | grep AppleRawCurrentCapacity`.split("=")[1].strip.to_i
+  end
   #  => ["\"StateOfCharge\"=41"]
   ret[:StateOfCharge] = `ioreg -l -w0 | grep BatteryData`.split(',').select{|e| e.match /StateOfCharge/ }[0].split('=')[1].to_i
   ret[:AppleDesignCapacity] = `ioreg -l -w0 | grep BatteryData`.split(',').select{|e| e.match /DesignCapacity/ }[0].split('=')[1].to_i
 
   # derived values..
   # this should be your battery life i guess?x
-  ret[:BatteryCapacityPercent] = ret[:AppleRawCurrentCapacity]*100.0/ret[:AppleRawMaxCapacity]
+  ret[:BatteryCapacityPercent] = ret[:AppleRawCurrentCapacity]*100.0 / ret[:AppleRawMaxCapacity]
   ret[:battery_health] =  ret[:AppleRawMaxCapacity]*100.0/ret[:AppleDesignCapacity]
-
+  if is_m1?
+    ret[:BatteryCapacityPercentM1] = ret[:AppleRawCurrentCapacityM1]*100.0 / ret[:AppleRawMaxCapacityM1]
+    ret[:battery_healthM1] =  ret[:AppleRawMaxCapacityM1]*100.0/ret[:AppleDesignCapacity]
+  end
   return ret
 end
 
@@ -132,17 +156,23 @@ def real_program
 #  deb "+ Depured args: #{azure ARGV}"
   capacity_hash = processMacCapacity(`ioreg -l -w0 | grep Capacity`)
   deb "capacity_hash: '''#{white capacity_hash}'''"
-  if $DEBUG 
+  if $DEBUG
     capacity_hash.each{|k,v|
       puts "[DEB] #{k}:\t#{v}"
   }
   end
-  puts "1. 🔋 BatteryLife % 🔌🪫: #{capacity_hash[:BatteryCapacityPercent].round(2)}"
-  puts "2. 🔋 BatteryHealth % 🛟: #{capacity_hash[:battery_health].round(2)}"
+  if is_m1?
+    puts "1M. 🔋 BatteryLife % 🔌🪫: #{capacity_hash[:BatteryCapacityPercentM1].round(2)}" if is_m1? # capacity_hash[:BatteryCapacityPercentM1].nan?
+    puts "2M. 🔋 BatteryHealth % 🛟: #{capacity_hash[:battery_healthM1].round(2)}"
+  else
+    # My MacBook air
+    puts "1A. 🔋 BatteryLife % 🔌🪫: #{capacity_hash[:BatteryCapacityPercent].round(2)}" # unless capacity_hash[:BatteryCapacityPercent].nan? # == NaN
+    puts "2A. 🔋 BatteryHealth % 🛟: #{capacity_hash[:battery_health].round(2)}"
+  end
 end
 
 def main(filename)
-  deb "I'm called by #{white filename}"
+  deb "I'm main(), called by #{white filename}"
   init        # Enable this to have command line parsing capabilities!
   real_program
 end
