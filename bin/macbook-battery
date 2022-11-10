@@ -137,8 +137,8 @@ def real_program
       puts "[DEB] #{k}:\t#{v}"
   }
   end
-  puts "1. 🔋 BatteryLife % 🔌🪫: #{capacity_hash[:BatteryCapacityPercent].round(2)}"
-  puts "2. 🔋 BatteryHealth % 🛟: #{capacity_hash[:battery_health].round(2)}"
+  puts "1. 🔋 BatteryLife %: #{capacity_hash[:BatteryCapacityPercent].round(2)}"
+  puts "2. 🔋 BatteryHealth %: #{capacity_hash[:battery_health].round(2)}"
 end
 
 def main(filename)
