@@ -5,8 +5,8 @@
 Sakura stands for "Swiss Army Knife Unnecessary Repository yet Awesome" :)
 
  <img src='https://github.com/palladius/sakura/raw/master/images/sakura.jpg' height='200' align='right' />
- 
-It's a very nice way to color your life, I guess. It also provides a lot of tools, aliases, .. that power 
+
+It's a very nice way to color your life, I guess. It also provides a lot of tools, aliases, .. that power
 your shell experience. If you're not a shell guy, you shouldn't be using it. If you are, you can have your
 shell PS1 to be changed to have the Italian flag, or Irish, or Argentinian, for instance. :)
 
@@ -25,7 +25,7 @@ Note. Any help is appreciated to make this changeable!
 
 ## License
 
-Everything in this repo is under the Creative Commons license, except where stated otherwise.
+Everything in this repo is under the [Creative Commons license](https://creativecommons.org/licenses/), except where stated otherwise.
 
 ## Usage
 
