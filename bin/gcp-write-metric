@@ -9,27 +9,28 @@
   * export GOOGLE_APPLICATION_CREDENTIALS="~/path/to/your-svcacct.json"
 
   HISTORY:
-  * 1.6 9nov22 Refactored and cleaned up for GitHub and Medium :)
+  * 1.7 12nov22 Removed SSL workaround, left it documented.
+  * 1.6  9nov22 Refactored and cleaned up for GitHub and Medium :)
 
 =end
 
-# TODO(ricc): add TRY
-require 'google/cloud/monitoring'
-require 'socket' # for hostname
-#require 'sys/filesystem'
-require 'openssl'
-require 'colorize' # makes life worth living
-# TODO(ricc): CACTH
-# `gem install google-cloud-monitoring sys-filesystem blah blah`
+$APP_VERSION = "1.7"
 
+
+begin
+  require 'google/cloud/monitoring'
+  require 'socket' # for hostname
+  #require 'sys/filesystem'
+  require 'openssl'
+  require 'colorize' # makes life worth living
+rescue Exception => e
+  puts "Error: #{$!}.\nProbably some gems are not installed. Consider launching this magical command:\n\n\tgem install google-cloud-monitoring sys-filesystem colorize"
+  exit 41
+end
 #DAMN! https://github.com/googleapis/google-api-ruby-client/issues/253
-# Carlessian manhouse fix
+#If it fails, you can re-enable this, but beware you're 100% disabling SSL! Good luck with that!
 #OpenSSL::SSL::VERIFY_PEER = OpenSSL::SSL::VERIFY_NONE
-# better fix TODO
-#cert_path = Gem.loaded_specs['google-api-client'].full_gem_path+'/lib/cacerts.pem'
-#ENV['SSL_CERT_FILE'] = cert_path
 
-$APP_VERSION = "1.5"
 $DEBUG = false
 ENV['GOOGLE_AUTH_SUPPRESS_CREDENTIALS_WARNINGS'] = 'true'
 
@@ -75,7 +76,7 @@ def write_generic_metric(project_id, metric_label, metric_value)
 
   metric_service_client.create_time_series name: project_path, time_series: [series]
 
-  puts "📉 Successfully wrote time series '#{metric_label.colorize :yellow}'=#{metric_value.to_s.colorize :cyan} on #{project_id.colorize :red} for '#{hostname}'"
+  puts "📉 [#{hostname}] Successfully wrote time series on #{project_id.colorize :red} '#{metric_label.colorize :yellow}'=#{metric_value.to_s.colorize :cyan}"
 end
 
 def usage(err=nil)

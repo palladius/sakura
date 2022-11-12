@@ -3,7 +3,7 @@
 DEFAULT_PROJECT=$( gcloud config get project 2>/dev/null )
 PROJECT_ID=${1:-$DEFAULT_PROJECT}
 
-echo "Pushing now metrics to project_id=$PROJECT_ID:"
+echo "Pushing now metrics to project_id='$PROJECT_ID':"
 
 # I only care about fields 3 and 5 in this output:
 # 1M. 🔋 BatteryLife %🔌🪫: 75.43
