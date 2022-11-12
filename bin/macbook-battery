@@ -162,12 +162,12 @@ def real_program
   }
   end
   if is_m1?
-    puts "1M. 🔋 BatteryLife % 🔌🪫: #{capacity_hash[:BatteryCapacityPercentM1].round(2)}" if is_m1? # capacity_hash[:BatteryCapacityPercentM1].nan?
-    puts "2M. 🔋 BatteryHealth % 🛟: #{capacity_hash[:battery_healthM1].round(2)}"
+    puts "1M. 🔋 BatteryLife %🔌🪫: #{capacity_hash[:BatteryCapacityPercentM1].round(2)}" if is_m1? # capacity_hash[:BatteryCapacityPercentM1].nan?
+    puts "2M. 🔋 BatteryHealth %🛟: #{capacity_hash[:battery_healthM1].round(2)}"
   else
     # My MacBook air
-    puts "1A. 🔋 BatteryLife % 🔌🪫: #{capacity_hash[:BatteryCapacityPercent].round(2)}" # unless capacity_hash[:BatteryCapacityPercent].nan? # == NaN
-    puts "2A. 🔋 BatteryHealth % 🛟: #{capacity_hash[:battery_health].round(2)}"
+    puts "1A. 🔋 BatteryLife %🔌🪫: #{capacity_hash[:BatteryCapacityPercent].round(2)}" # unless capacity_hash[:BatteryCapacityPercent].nan? # == NaN
+    puts "2A. 🔋 BatteryHealth %🛟: #{capacity_hash[:battery_health].round(2)}"
   end
 end
 

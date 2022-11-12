@@ -24,7 +24,7 @@ require 'colorize' # makes life worth living
 
 #DAMN! https://github.com/googleapis/google-api-ruby-client/issues/253
 # Carlessian manhouse fix
-OpenSSL::SSL::VERIFY_PEER = OpenSSL::SSL::VERIFY_NONE
+#OpenSSL::SSL::VERIFY_PEER = OpenSSL::SSL::VERIFY_NONE
 # better fix TODO
 #cert_path = Gem.loaded_specs['google-api-client'].full_gem_path+'/lib/cacerts.pem'
 #ENV['SSL_CERT_FILE'] = cert_path

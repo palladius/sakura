@@ -1,9 +1,15 @@
 #!/bin/bash
 
-PROJECT_ID=${1:-CHANGEME}
+DEFAULT_PROJECT=$( gcloud config get project 2>/dev/null )
+PROJECT_ID=${1:-$DEFAULT_PROJECT}
 
 echo "Pushing now metrics to project_id=$PROJECT_ID:"
 
-macbook-battery | while read BL AH METRIC BLEH VALUE ; do
-    PROJECT=$PROJECT_ID gcp-write-metric  "$METRIC" "$VALUE"
+# I only care about fields 3 and 5 in this output:
+# 1M. 🔋 BatteryLife %🔌🪫: 75.43
+# 2M. 🔋 BatteryHealth %🛟: 93.2
+macbook-battery | while read FOO BAR METRIC BAZ VALUE ; do
+    #export PROJECT_ID="$PROJECT_ID"
+    #echo DEB PROJECT_ID=$PROJECT_ID gcp-write-metric  "$METRIC" "$VALUE"
+    PROJECT_ID=$PROJECT_ID gcp-write-metric  "$METRIC" "$VALUE" # 2>/dev/null
 done
