@@ -1,0 +1,3 @@
+
+# only works on Mac if you do brew install chrome-cli
+chrome-cli list links | awk '{print $2}' | sort | uniq -c | sort -nr | egrep -v '\W1'
