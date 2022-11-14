@@ -346,7 +346,7 @@ def verbose?
 end
 
 def real_program
-  deb("Hello world from a templated '#{yellow $0 }'")
+  deb("Hello 👋🏽 world from a templated '#{yellow $0 }'")
   deb "+ Options are:  #{gray $opts}"
   deb "+ Depured args: #{azure ARGV}"
   deb "+ ENV[:PRIVATIZE_REPO_DIR]: #{azure ENV['PRIVATIZE_REPO_DIR']}"
