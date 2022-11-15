@@ -9,13 +9,13 @@
   * export GOOGLE_APPLICATION_CREDENTIALS="~/path/to/your-svcacct.json"
 
   HISTORY:
+  * 1.8 14nov22 Moved from GCE to GLOBAl as suggested by Yoshi.
   * 1.7 12nov22 Removed SSL workaround, left it documented.
   * 1.6  9nov22 Refactored and cleaned up for GitHub and Medium :)
 
 =end
 
-$APP_VERSION = "1.7"
-
+$APP_VERSION = "1.8"
 
 begin
   require 'google/cloud/monitoring'
@@ -40,7 +40,7 @@ def gethostname
 end
 
 def magic_cloud_console_url(project_id)
-  'https://console.cloud.google.com/monitoring/metrics-explorer?project=#{project_id}&pageState=%7B%22xyChart%22:%7B%22dataSets%22:%5B%7B%22timeSeriesFilter%22:%7B%22filter%22:%22metric.type%3D%5C%22custom.googleapis.com%2Friccardo-disc-free-pct%5C%22%20resource.type%3D%5C%22gce_instance%5C%22%22,%22minAlignmentPeriod%22:%2260s%22,%22aggregations%22:%5B%7B%22perSeriesAligner%22:%22ALIGN_MEAN%22,%22crossSeriesReducer%22:%22REDUCE_NONE%22,%22alignmentPeriod%22:%2260s%22,%22groupByFields%22:%5B%5D%7D,%7B%22crossSeriesReducer%22:%22REDUCE_NONE%22,%22alignmentPeriod%22:%2260s%22,%22groupByFields%22:%5B%5D%7D%5D%7D,%22targetAxis%22:%22Y1%22,%22plotType%22:%22LINE%22%7D%5D,%22options%22:%7B%22mode%22:%22COLOR%22%7D,%22constantLines%22:%5B%5D,%22timeshiftDuration%22:%220s%22,%22y1Axis%22:%7B%22label%22:%22y1Axis%22,%22scale%22:%22LINEAR%22%7D%7D,%22isAutoRefresh%22:true,%22timeSelection%22:%7B%22timeRange%22:%221h%22%7D%7D'
+  'https://console.cloud.google.com/monitoring/metrics-explorer?project=#{project_id}&pageState=%7B%22xyChart%22:%7B%22dataSets%22:%5B%7B%22timeSeriesFilter%22:%7B%22filter%22:%22metric.type%3D%5C%22custom.googleapis.com%2Friccardo-disc-free-pct%5C%22%20resource.type%3D%5C%22global%5C%22%22,%22minAlignmentPeriod%22:%2260s%22,%22aggregations%22:%5B%7B%22perSeriesAligner%22:%22ALIGN_MEAN%22,%22crossSeriesReducer%22:%22REDUCE_NONE%22,%22alignmentPeriod%22:%2260s%22,%22groupByFields%22:%5B%5D%7D,%7B%22crossSeriesReducer%22:%22REDUCE_NONE%22,%22alignmentPeriod%22:%2260s%22,%22groupByFields%22:%5B%5D%7D%5D%7D,%22targetAxis%22:%22Y1%22,%22plotType%22:%22LINE%22%7D%5D,%22options%22:%7B%22mode%22:%22COLOR%22%7D,%22constantLines%22:%5B%5D,%22timeshiftDuration%22:%220s%22,%22y1Axis%22:%7B%22label%22:%22y1Axis%22,%22scale%22:%22LINEAR%22%7D%7D,%22isAutoRefresh%22:true,%22timeSelection%22:%7B%22timeRange%22:%221h%22%7D%7D'
 end
 
 def write_generic_metric(project_id, metric_label, metric_value)
@@ -100,7 +100,7 @@ def main
 
   write_generic_metric(project_id, metric, value)
 
-  puts("Try to see on: #{magic_url(project_id)}") if env_debug
+  puts("Try to see on: #{magic_cloud_console_url(project_id)}") if env_debug
 end
 
 

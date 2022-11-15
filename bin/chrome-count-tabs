@@ -1,0 +1,4 @@
+#!/bin/bash
+
+# only works on Mac if you do brew install chrome-cli
+chrome-cli list links | wc -l
