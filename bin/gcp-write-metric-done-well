@@ -154,7 +154,7 @@ end
 def init()    # see lib_autoinit in lib/util.rb
   $opts = {}
   # setting defaults
-  #$opts[:verbose] = false
+  $opts[:verbose] = false
   $opts[:dryrun] = false
   $opts[:debug] = false
   $opts[:project_id] = $DEFAULT_PROJECT_ID
@@ -168,7 +168,7 @@ def init()    # see lib_autoinit in lib/util.rb
     opts.on( '-n', '--dryrun', "Don't really execute code" ) { $opts[:dryrun] = true }
     opts.on( '-p', '--project PROJECT_ID', "Sets GCP ProjectId (dflt='#{$DEFAULT_PROJECT_ID}'')" )  {|project_id| $opts[:project_id] = project_id }
     #opts.on( '-l', '--logfile FILE', 'Write log to FILE' )    {|file| $opts[:logfile] = file }
-    #opts.on( '-v', '--verbose', 'Output more information' )   { $opts[:verbose] = true}
+    opts.on( '-v', '--verbose', 'Output more information' )   { $opts[:verbose] = true}
   end
   $optparse.parse!
 end
@@ -181,7 +181,7 @@ def extract_labels_from_cli()
     deb "extract_labels_from_cli(): extracted KV=#{kv}"
     mykey = kv.split('=')[0]
     val = kv.split('=')[1]
-    new_key = "gwm-#{mykey}" # custom name 
+    new_key = "gwm_#{mykey}" # custom name 
     ret[new_key] = val
   end
   ret 
@@ -207,7 +207,7 @@ def main(filename)
   labels = extract_labels_from_cli()
   ret = write_generic_metric(project_id, metric_name, value, labels) # 0 => good
 
-  puts("Try to see on: #{magic_cloud_console_url(project_id, metric_name)}") if $opts[:debug]
+  puts("Try to see on: #{magic_cloud_console_url(project_id, metric_name)}") if $opts[:debug] or $opts[:verbose]
 end
 
 main(__FILE__)

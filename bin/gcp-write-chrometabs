@@ -1,0 +1,14 @@
+#!/bin/bash
+
+# https://stackoverflow.com/questions/3214935/can-a-bash-script-tell-if-its-being-run-via-cron
+
+if [ -t 1 ] ; then 
+    echo "interacive mode";
+    gcp-write-metric-done-well --project ric-cccwiki chrome-count-tabs $(chrome-count-tabs) --labels env=prod:source=cli
+else
+    #non interative, probably CRON JOB
+    gcp-write-metric-done-well --project ric-cccwiki chrome-count-tabs $(chrome-count-tabs) --labels env=prod:source=crontab
+fi
+
+
+
