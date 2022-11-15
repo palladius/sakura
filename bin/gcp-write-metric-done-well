@@ -1,0 +1,213 @@
+#!/usr/bin/env ruby
+
+=begin
+
+  gcp-write-metric
+
+  Tips:
+  * GOOGLE_AUTH_SUPPRESS_CREDENTIALS_WARNINGS=true to avoid errors
+  * export GOOGLE_APPLICATION_CREDENTIALS="~/path/to/your-svcacct.json"
+
+  HISTORY:
+  * 1.9 15nov22 Revolutioning the script by using GetOpts
+  * 1.8 14nov22 Moved from GCE to GLOBAl as suggested by Yoshi.
+  * 1.7 12nov22 Removed SSL workaround, left it documented.
+  * 1.6  9nov22 Refactored and cleaned up for GitHub and Medium :)
+
+=end
+
+$APP_VERSION = "2.0"
+$DEFAULT_PROJECT_ID = `gcloud config get core/project 2>/dev/null`
+
+begin
+  require 'google/cloud/monitoring'
+  require 'socket' # for hostname
+  #require 'sys/filesystem'
+  require 'openssl'
+  require 'colorize' # makes life worth living
+rescue Exception => e
+  puts "Error: #{$!}.\nProbably some gems are not installed. Consider launching this magical command:\n\n\tgem install google-cloud-monitoring sys-filesystem colorize"
+  exit 41
+end
+#DAMN! https://github.com/googleapis/google-api-ruby-client/issues/253
+#If it fails, you can re-enable this, but beware you're 100% disabling SSL! Good luck with that!
+#OpenSSL::SSL::VERIFY_PEER = OpenSSL::SSL::VERIFY_NONE
+
+#$DEBUG    = true
+ENV['GOOGLE_AUTH_SUPPRESS_CREDENTIALS_WARNINGS'] = 'true'
+
+require 'optparse'       # http://ruby.about.com/od/advancedruby/a/optionparser.htm
+
+
+def deb(s);   puts "#DEB #{s}" if $DEBUG; end
+# colors 16
+def gray(s)    "\033[1;30m#{s}\033[0m" ; end
+def green(s)   "\033[1;32m#{s}\033[0m" ; end
+def red(s)     "\033[1;31m#{s}\033[0m" ; end
+def yellow(s)  "\033[1;33m#{s}\033[0m" ; end
+def blue(s)  "\033[1;34m#{s}\033[0m" ; end
+def purple(s)  "\033[1;35m#{s}\033[0m" ; end
+def azure(s)   "\033[1;36m#{s}\033[0m" ; end
+def white(s)   "\033[1;37m#{s}\033[0m" ; end
+
+# colors 64k
+def orange(s)   "\033[38;5;208m#{s}\033[0m" ; end
+
+# Program constants, automagically picked up by RicLib
+# More configuration could be written in:
+#    $GIC/etc/ricsvn/<FILENAME>.yml
+# That would go into the variable '$prog_conf_d'
+$myconf = {
+    :app_name            => "GCP Write Metric",
+    :description         => "
+        This program sends a simple Metric (name + numeric float value)
+        as a timeseries with Time.now() timestamp to GCP. It supports
+        multi-labels and needs a project_id in input, or it autoinfers
+        it from gcloud.
+    ".strip.gsub(/^\s+/, "").gsub(/\s+$/, ""),
+}
+# This template from scripta.rb. from 2.1.0 removed aby ric gem dependency.
+# 2022-04-26 2.1.1  Added more colors
+# 2022-04-26 2.1.0  Historical momemnt: removed gem 'ric' dependency
+
+ENV['GOOGLE_AUTH_SUPPRESS_CREDENTIALS_WARNINGS'] = 'true'
+
+# I want to know server side who called me
+def gethostname
+  Socket.gethostname
+end
+
+def magic_cloud_console_url(project_id, metric_name)
+  # TODO() needs the parameter: 22custom.googleapis.com%2Friccardo-disc-free-pct if you want to nail it..
+  "https://console.cloud.google.com/monitoring/metrics-explorer?project=#{project_id}&pageState=%7B%22xyChart%22:%7B%22dataSets%22:%5B%7B%22timeSeriesFilter%22:%7B%22filter%22:%22metric.type%3D%5C%22custom.googleapis.com%2Friccardo-disc-free-pct%5C%22%20resource.type%3D%5C%22global%5C%22%22,%22minAlignmentPeriod%22:%2260s%22,%22aggregations%22:%5B%7B%22perSeriesAligner%22:%22ALIGN_MEAN%22,%22crossSeriesReducer%22:%22REDUCE_NONE%22,%22alignmentPeriod%22:%2260s%22,%22groupByFields%22:%5B%5D%7D,%7B%22crossSeriesReducer%22:%22REDUCE_NONE%22,%22alignmentPeriod%22:%2260s%22,%22groupByFields%22:%5B%5D%7D%5D%7D,%22targetAxis%22:%22Y1%22,%22plotType%22:%22LINE%22%7D%5D,%22options%22:%7B%22mode%22:%22COLOR%22%7D,%22constantLines%22:%5B%5D,%22timeshiftDuration%22:%220s%22,%22y1Axis%22:%7B%22label%22:%22y1Axis%22,%22scale%22:%22LINEAR%22%7D%7D,%22isAutoRefresh%22:true,%22timeSelection%22:%7B%22timeRange%22:%221h%22%7D%7D"
+#  "https://console.cloud.google.com/monitoring/metrics-explorer?project=#{project_id}"
+end
+
+def write_generic_metric(project_id, metric_label, metric_value, labels)
+  dry_run = $opts[:dryrun] 
+
+  full_hostname = gethostname()
+  hostname = full_hostname.split('.')[0]
+  host_domain = full_hostname.split('.')[1,10].join('.')
+  metric_name = "custom.googleapis.com/#{metric_label}"
+  my_labels = {
+    "my_key" => metric_label,
+    "hostname" =>  hostname,
+    "domain"   =>  host_domain,
+    #"app_verison" =>  $APP_VERSION, # found out you dont want to slice and dice metric when you change version... but you might want it.
+  }
+  raise "Need a Hash of labels, empty if you really dont want them! " unless labels.is_a? Hash
+  labels.each do |key,val| 
+    my_labels[key] = val
+  end
+
+  if $opts[:dryrun] 
+    puts azure("[dryrun] Refusing to launch. GCP timeseries '#{metric_name}'=#{metric_value} with Labels=#{my_labels}")
+    return -1
+  end
+
+  metric_service_client = Google::Cloud::Monitoring.metric_service
+  project_path = metric_service_client.project_path project: project_id
+
+  series = Google::Cloud::Monitoring::V3::TimeSeries.new
+  series.metric = Google::Api::Metric.new(
+    type:  metric_name,
+    labels: my_labels)
+
+  # would be semantically better to have this "global", however this would 
+  # cripple the "incance_id" which i love to much to signify the hostname.
+  resource = Google::Api::MonitoredResource.new type: "gce_instance"
+  resource.labels["project_id"] = project_id # not sure this is needed or it makes sense
+  resource.labels["instance_id"] = hostname # "1234567890123456789"
+  resource.labels["zone"] = "europe-west6-a" #  Zurich - why not
+  series.resource = resource
+
+  point = Google::Cloud::Monitoring::V3::Point.new
+  point.value = Google::Cloud::Monitoring::V3::TypedValue.new double_value: metric_value # get_disk_space
+
+  now = Time.now
+  end_time = Google::Protobuf::Timestamp.new seconds: now.to_i, nanos: now.nsec
+  point.interval = Google::Cloud::Monitoring::V3::TimeInterval.new end_time: end_time
+  series.points << point
+
+  ret = metric_service_client.create_time_series name: project_path, time_series: [series]
+
+  puts "📉 [#{hostname}] Successfully wrote time series on #{project_id.colorize :red} '#{metric_label.colorize :yellow}'=#{metric_value.to_s.colorize :cyan}. ret=#{ret}"
+  return 0
+end
+
+def usage(comment=nil)
+  filename  = File.basename $0
+
+  puts white($optparse.banner)
+  puts($optparse.summarize)
+  puts("Description: " + gray($myconf[:description]))
+  puts("#{filename} --project <PROJECT_ID> --labels env=prod:foo=bar <METRIC_NAME> <METRIC_VALUE>".colorize(:white))
+  puts "Example:"
+  puts "  #{filename} --project my-fever-project-123 --labels env=prod temperature 38.0"
+  puts red(comment) if comment
+  #puts "Description: #{ $myconf[:description] }"
+  exit 13
+end
+
+# include it in main if you want a custome one
+def init()    # see lib_autoinit in lib/util.rb
+  $opts = {}
+  # setting defaults
+  #$opts[:verbose] = false
+  $opts[:dryrun] = false
+  $opts[:debug] = false
+  $opts[:project_id] = $DEFAULT_PROJECT_ID
+  $opts[:labels] = ''
+
+  $optparse = OptionParser.new do |opts|
+    opts.banner = "#{$0} v#{$APP_VERSION}\n Usage: #{File.basename $0} [options] file1 file2 ..."
+    opts.on( '-d', '--debug', 'enables debug (DFLT=false)' )  {  $opts[:debug] = true ; $DEBUG = true }
+    opts.on( '-h', '--help', 'Display this screen' )          {  usage }
+    opts.on( '-l', '--labels KEY=VAL:KEY2=VAL2', 'Sets Key/Value pairs (colon-separated)' )  {|label| $opts[:labels] = label }
+    opts.on( '-n', '--dryrun', "Don't really execute code" ) { $opts[:dryrun] = true }
+    opts.on( '-p', '--project PROJECT_ID', "Sets GCP ProjectId (dflt='#{$DEFAULT_PROJECT_ID}'')" )  {|project_id| $opts[:project_id] = project_id }
+    #opts.on( '-l', '--logfile FILE', 'Write log to FILE' )    {|file| $opts[:logfile] = file }
+    #opts.on( '-v', '--verbose', 'Output more information' )   { $opts[:verbose] = true}
+  end
+  $optparse.parse!
+end
+
+# Example: "env=prod:foo=bar"
+def extract_labels_from_cli()
+  ret = {}
+  values = $opts[:labels].split(':')
+  values.each do |kv|
+    deb "extract_labels_from_cli(): extracted KV=#{kv}"
+    mykey = kv.split('=')[0]
+    val = kv.split('=')[1]
+    new_key = "gwm-#{mykey}" # custom name 
+    ret[new_key] = val
+  end
+  ret 
+end
+
+def main(filename)
+  init        # Enable this to have command line parsing capabilities!
+  
+  unless ARGV.size == 2
+    usage "I need 2 arguments (metric name and metric value)!"
+  end
+  #deb "+ Options are:  #{gray $opts}"
+  #deb "+ Depured args: #{azure ARGV}"
+
+  #deb "+ Your configuration: #{purple $myconf.inspect}"
+  metric_name = ARGV[0]
+  value = ARGV[1].to_f # float adds value without removing it IMHO
+  project_id = $opts[:project_id]
+  
+  # Your code goes here...
+  puts "Description: '''#{white $myconf[:description] }'''" if $opts[:debug]
+
+  labels = extract_labels_from_cli()
+  ret = write_generic_metric(project_id, metric_name, value, labels) # 0 => good
+
+  puts("Try to see on: #{magic_cloud_console_url(project_id, metric_name)}") if $opts[:debug]
+end
+
+main(__FILE__)
