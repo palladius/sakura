@@ -16,7 +16,7 @@
 
 =end
 
-$APP_VERSION = "2.0"
+$APP_VERSION = "2.0a"
 $DEFAULT_PROJECT_ID = `gcloud config get core/project 2>/dev/null`
 
 begin
@@ -195,6 +195,7 @@ def main(filename)
   end
   #deb "+ Options are:  #{gray $opts}"
   #deb "+ Depured args: #{azure ARGV}"
+  puts "RubyVersion: #{RUBY_VERSION}" if $opts[:debug]
 
   #deb "+ Your configuration: #{purple $myconf.inspect}"
   metric_name = ARGV[0]
