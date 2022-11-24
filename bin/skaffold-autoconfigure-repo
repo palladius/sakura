@@ -1,0 +1,13 @@
+#!/bin/bash
+
+# TODO getops for project and region :)
+
+PROJECT=$(gcloud config get project)
+echo "This command will help you set up skaffold repo for your unique and very peculiar K🎱🦸 config: $(kubectl config current-context)"
+echo Try one of these:
+gcloud artifacts repositories list 2>/dev/null | grep DOCKER | while read AR_NAME dockerblah standard_blah LOCATION blah ; do
+    REPONAME="$LOCATION-docker.pkg.dev/$PROJECT/$AR_NAME"
+    echo "🌻 skaffold config set default-repo $REPONAME"
+done
+# TODO check with wc -l :)
+echo 'If no flower came out, it means you need to first create an Artifact repository of type Docker (TODO autodetect).'

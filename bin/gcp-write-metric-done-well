@@ -9,10 +9,11 @@
   * export GOOGLE_APPLICATION_CREDENTIALS="~/path/to/your-svcacct.json"
 
   HISTORY:
-  * 1.9 15nov22 Revolutioning the script by using GetOpts
-  * 1.8 14nov22 Moved from GCE to GLOBAl as suggested by Yoshi.
-  * 1.7 12nov22 Removed SSL workaround, left it documented.
-  * 1.6  9nov22 Refactored and cleaned up for GitHub and Medium :)
+  * 1.10 22nov22 Trying again moving from gce_instance to GLOBAL :)
+  * 1.9  15nov22 Revolutioning the script by using GetOpts
+  * 1.8  14nov22 Moved from GCE to GLOBAl as suggested by Yoshi.
+  * 1.7  12nov22 Removed SSL workaround, left it documented.
+  * 1.6   9nov22 Refactored and cleaned up for GitHub and Medium :)
 
 =end
 
@@ -79,12 +80,13 @@ end
 
 def magic_cloud_console_url(project_id, metric_name)
   # TODO() needs the parameter: 22custom.googleapis.com%2Friccardo-disc-free-pct if you want to nail it..
-  "https://console.cloud.google.com/monitoring/metrics-explorer?project=#{project_id}&pageState=%7B%22xyChart%22:%7B%22dataSets%22:%5B%7B%22timeSeriesFilter%22:%7B%22filter%22:%22metric.type%3D%5C%22custom.googleapis.com%2Friccardo-disc-free-pct%5C%22%20resource.type%3D%5C%22global%5C%22%22,%22minAlignmentPeriod%22:%2260s%22,%22aggregations%22:%5B%7B%22perSeriesAligner%22:%22ALIGN_MEAN%22,%22crossSeriesReducer%22:%22REDUCE_NONE%22,%22alignmentPeriod%22:%2260s%22,%22groupByFields%22:%5B%5D%7D,%7B%22crossSeriesReducer%22:%22REDUCE_NONE%22,%22alignmentPeriod%22:%2260s%22,%22groupByFields%22:%5B%5D%7D%5D%7D,%22targetAxis%22:%22Y1%22,%22plotType%22:%22LINE%22%7D%5D,%22options%22:%7B%22mode%22:%22COLOR%22%7D,%22constantLines%22:%5B%5D,%22timeshiftDuration%22:%220s%22,%22y1Axis%22:%7B%22label%22:%22y1Axis%22,%22scale%22:%22LINEAR%22%7D%7D,%22isAutoRefresh%22:true,%22timeSelection%22:%7B%22timeRange%22:%221h%22%7D%7D"
+  "https://console.cloud.google.com/monitoring/metrics-explorer?project=#{project_id}&pageState=%7B%22xyChart%22:%7B%22dataSets%22:%5B%7B%22timeSeriesFilter%22:%7B%22filter%22:%22metric.type%3D%5C%22custom.googleapis.com%2Friccardo-disc-free-pct%5C%22%20resource.type%3D%5C%22global%5C%22%22,%22minAlignmentPeriod%22:%2260s%22,%22aggregations%22:%5B%7B%22perSeriesAligner%22:%22ALIGN_MEAN%22,%22crossSeriesReducer%22:%22REDUCE_NONE%22,%22alignmentPeriod%22:%2260s%22,%22groupByFields%22:%5B%5D%7D,%7B%22crossSeriesReducer%22:%22REDUCE_NONE%22,%22alignmentPeriod%22:%2260s%22,%22groupByFields%22:%5B%5D%7D%5D%7D,%22targetAxis%22:%22Y1%22,%22plotType%22:%22LINE%22%7D%5D,%22options%22:%7B%22mode%22:%22COLOR%22%7D,%22constantLines%22:%5B%5D,%22timeshiftDuration%22:%220s%22,%22y1Axis%22:%7B%22label%22:%22y1Axis%22,%22scale%22:%22LINEAR%22%7D%7D,%22isAutoRefresh%22:true,%22timeSelection%22:%7B%22timeRange%22:%221h%22%7D%7D".gsub(
+    'riccardo-disc-free-pct', metric_name)
 #  "https://console.cloud.google.com/monitoring/metrics-explorer?project=#{project_id}"
 end
 
 def write_generic_metric(project_id, metric_label, metric_value, labels)
-  dry_run = $opts[:dryrun] 
+  dry_run = $opts[:dryrun]
 
   full_hostname = gethostname()
   hostname = full_hostname.split('.')[0]
@@ -97,11 +99,11 @@ def write_generic_metric(project_id, metric_label, metric_value, labels)
     #"app_verison" =>  $APP_VERSION, # found out you dont want to slice and dice metric when you change version... but you might want it.
   }
   raise "Need a Hash of labels, empty if you really dont want them! " unless labels.is_a? Hash
-  labels.each do |key,val| 
+  labels.each do |key,val|
     my_labels[key] = val
   end
 
-  if $opts[:dryrun] 
+  if $opts[:dryrun]
     puts azure("[dryrun] Refusing to launch. GCP timeseries '#{metric_name}'=#{metric_value} with Labels=#{my_labels}")
     return -1
   end
@@ -114,12 +116,12 @@ def write_generic_metric(project_id, metric_label, metric_value, labels)
     type:  metric_name,
     labels: my_labels)
 
-  # would be semantically better to have this "global", however this would 
+  # would be semantically better to have this "global", however this would
   # cripple the "incance_id" which i love to much to signify the hostname.
-  resource = Google::Api::MonitoredResource.new type: "gce_instance"
+  resource = Google::Api::MonitoredResource.new type: "global" # "gce_instance"
   resource.labels["project_id"] = project_id # not sure this is needed or it makes sense
-  resource.labels["instance_id"] = hostname # "1234567890123456789"
-  resource.labels["zone"] = "europe-west6-a" #  Zurich - why not
+  #resource.labels["instance_id"] = hostname # "1234567890123456789"
+  #resource.labels["zone"] = "europe-west6-a" #  Zurich - why not
   series.resource = resource
 
   point = Google::Cloud::Monitoring::V3::Point.new
@@ -144,7 +146,7 @@ def usage(comment=nil)
   puts("Description: " + gray($myconf[:description]))
   puts("#{filename} --project <PROJECT_ID> --labels env=prod:foo=bar <METRIC_NAME> <METRIC_VALUE>".colorize(:white))
   puts "Example:"
-  puts "  #{filename} --project my-fever-project-123 --labels env=prod temperature 38.0"
+  puts "  #{filename} --project my-fever-project-123 --verbose --labels env=prod body_temperature 38.0"
   puts red(comment) if comment
   #puts "Description: #{ $myconf[:description] }"
   exit 13
@@ -181,15 +183,15 @@ def extract_labels_from_cli()
     deb "extract_labels_from_cli(): extracted KV=#{kv}"
     mykey = kv.split('=')[0]
     val = kv.split('=')[1]
-    new_key = "gwm_#{mykey}" # custom name 
+    new_key = "gwm_#{mykey}" # custom name
     ret[new_key] = val
   end
-  ret 
+  ret
 end
 
 def main(filename)
   init        # Enable this to have command line parsing capabilities!
-  
+
   unless ARGV.size == 2
     usage "I need 2 arguments (metric name and metric value)!"
   end
@@ -201,7 +203,7 @@ def main(filename)
   metric_name = ARGV[0]
   value = ARGV[1].to_f # float adds value without removing it IMHO
   project_id = $opts[:project_id]
-  
+
   # Your code goes here...
   puts "Description: '''#{white $myconf[:description] }'''" if $opts[:debug]
 
