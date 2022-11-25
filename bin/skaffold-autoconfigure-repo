@@ -29,6 +29,7 @@ export DEVCONSOLE_URL="https://console.cloud.google.com/artifacts?project=$PROJE
 if skaffold config list | grep default-repo ; then
     echo '👍 Skaffold seems to be already configured. See: `skaffold config list`'
     skaffold config list | possibly_colored_cat
+    echo "Fancy re-configuring with this awesome script? Try: $(_yellow skaffold config unset default-repo)"
 else
 
     #######################################
@@ -41,9 +42,10 @@ else
         echo 'Try one of these:'
         gcloud artifacts repositories list 2>/dev/null | grep DOCKER | while read AR_NAME dockerblah standard_blah LOCATION blah ; do
             REPONAME="$LOCATION-docker.pkg.dev/$PROJECT/$AR_NAME"
-            echo "  🌻 skaffold config set default-repo $REPONAME" # | possibly_colored_cat
+            echo "🌻 REPO $(_yellow $AR_NAME) 🌍 $LOCATION"
+            echo "  🌻 $(_yellow skaffold config set default-repo $REPONAME)" # sets up Skaffold for the win
+            echo "  🌻 $(_yellow gcloud auth configure-docker $LOCATION-docker.pkg.dev) # This can help with Auth"
         done
-        echo "+ Also this might help with authentication: $(_yellow gcloud auth configure-docker $LOCATION-docker.pkg.dev)"
     else
     # TODO check with wc -l :)
         echo '😥 No flower came out, I presume. It means you need to first create an Artifact repository of type Docker. To create one, try this (I chose the location of your GKE cluster so your code is closer to its deployment 😉)'
@@ -51,7 +53,6 @@ else
         echo 'Then try: $(_yellow skaffold build)'
         echo "If you dont like CLI, try to check the AR from the UI: $DEVCONSOLE_URL"
     fi
-    echo "Fancy re-configuring with this awesome script? Try: $(_yellow skaffold config unset default-repo)"
 fi
 
 ## TESTS that project ids conform
