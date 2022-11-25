@@ -12,6 +12,18 @@ function _yellow() {
 
 PROJECT="$(gcloud config get project)"
 # I could delve into repo but i dont know what the user is gonna choose if more than one option is given..
+# Only works with GKE which is why i force the first egrep, in case someone wants to fix the code with another cloud provider :)
+# gke_cicd-platinum-test031_us-central1_cicd-dev
+# ==> 'cicd-platinum-test031'
+K8S_PROJECT=$(kubectl config current-context | egrep ^gke_ | cut -d_ -f 2)
+# Same as above, I get cluster region for Artifact Repository affinity
+K8S_REGION=$(kubectl config current-context | egrep ^gke_ | cut -d_ -f 3)
+#skaffold config:
+#kube-context: gke_cicd-platinum-test031_us-central1_cicd-dev
+#default-repo: us-central1-docker.pkg.dev/cicd-platinum-test031/cicd-plat
+# ==> 'cicd-platinum-test031'
+AR_PROJECT_FROM_SKAFFOLD_CONFIG=$(skaffold config list | grep default-repo | cut -d/ -f 2)
+
 export DEVCONSOLE_URL="https://console.cloud.google.com/artifacts?project=$PROJECT"
 
 if skaffold config list | grep default-repo ; then
@@ -31,33 +43,22 @@ else
             REPONAME="$LOCATION-docker.pkg.dev/$PROJECT/$AR_NAME"
             echo "  🌻 skaffold config set default-repo $REPONAME" # | possibly_colored_cat
         done
-        echo "+ Also this might help with authentication: $(yellow gcloud auth configure-docker $LOCATION-docker.pkg.dev)"
+        echo "+ Also this might help with authentication: $(_yellow gcloud auth configure-docker $LOCATION-docker.pkg.dev)"
     else
     # TODO check with wc -l :)
-        echo '😥 No flower came out, I presume. It means you need to first create an Artifact repository of type Docker. To create one, try this:'
-        yellow "gcloud artifacts repositories create my-skaffold-cornucopia --repository-format DOCKER --location us-central1"
-        echo 'Then try: $(yellow skaffold build)'
+        echo '😥 No flower came out, I presume. It means you need to first create an Artifact repository of type Docker. To create one, try this (I chose the location of your GKE cluster so your code is closer to its deployment 😉)'
+        _yellow "gcloud artifacts repositories create my-skaffold-cornucopia --repository-format DOCKER --location $K8S_REGION"
+        echo 'Then try: $(_yellow skaffold build)'
         echo "If you dont like CLI, try to check the AR from the UI: $DEVCONSOLE_URL"
     fi
-
+    echo "Fancy re-configuring with this awesome script? Try: $(_yellow skaffold config unset default-repo)"
 fi
 
 ## TESTS that project ids conform
 # TODO add docs to this :)
 echo 'NOTE. If these three are NOT the same, this might give you problems. Particularly if 2<>3 you might need to enable proper SvcAccts to access cross-project which doesnt come by default'
 
-CURRENT_GCLOUD_PROJECT="$(gcloud config get project 2>/dev/null)"
-# Only works with GKE which is why i force the first egrep, in case someone wants to fix the code with another cloud provider :)
-# gke_cicd-platinum-test031_us-central1_cicd-dev
-# ==> 'cicd-platinum-test031'
-K8S_PROJECT=$(kubectl config current-context | egrep ^gke_ | cut -d_ -f 2)
-#skaffold config:
-#kube-context: gke_cicd-platinum-test031_us-central1_cicd-dev
-#default-repo: us-central1-docker.pkg.dev/cicd-platinum-test031/cicd-plat
-# ==> 'cicd-platinum-test031'
-AR_PROJECT_FROM_SKAFFOLD_CONFIG=$(skaffold config list | grep default-repo | cut -d/ -f 2)
-
-echo "1. GCLOUD_PROJECT:   $CURRENT_GCLOUD_PROJECT"
-echo "2. K8S_PROJECT:      $K8S_PROJECT"
-echo "3. AR_PROJECT:       $AR_PROJECT_FROM_SKAFFOLD_CONFIG"
+echo "1. GCLOUD_PROJECT:      $PROJECT"
+echo "2. K8S_PROJECT:         $K8S_PROJECT"
+echo "3. AR_PROJECT (if set): $AR_PROJECT_FROM_SKAFFOLD_CONFIG"
 
