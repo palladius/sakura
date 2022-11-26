@@ -13,9 +13,9 @@ VERSION="1.2"
 # the optential pitfalls/errors of your first skaffold
 # usage. Think of it as a "note to self" as a k8s
 # beginner.
+#
+# BUGS: * note GKE cluster can be zonal. auto-inferrance of region becomes a bit less obvious then.
 ######################################################
-
-echo "👋 Welcome to $(basename $0) v$VERSION"
 
 function possibly_colored_cat() {
     # if lolcat is present, good! If not, just cat which in a pipe is basically doing nothing :)
@@ -40,16 +40,18 @@ function gcloud_list_dockeronly_artifacts_repositories_with_name_and_location() 
 # to cluster name. Also weird tools like `kubectx` might merss up with config name but NOT
 # with cluster name. So there you go.
 function _infer_kubectl_cluster_from_config() {
-    CURRENT_CONTEXT="$(kubectl config current-context)"
+    #CURRENT_CONTEXT="$(kubectl config current-context)"
+    CURRENT_CONTEXT="$1"
     kubectl config view -o json | jq '.contexts[] | select(.name=="'$CURRENT_CONTEXT'")' | jq .context.cluster
 }
 
 PROJECT="$(gcloud config get project)"
+CURRENT_CONTEXT="$(kubectl config current-context)"
 # I could delve into repo but i dont know what the user is gonna choose if more than one option is given..
 # Only works with GKE which is why i force the first egrep, in case someone wants to fix the code with another cloud provider :)
 # gke_cicd-platinum-test031_us-central1_cicd-dev
 # ==> 'cicd-platinum-test031'
-K8S_CLUSTER_INFO="$(_infer_kubectl_cluster_from_config)"
+K8S_CLUSTER_INFO="$(_infer_kubectl_cluster_from_config "$CURRENT_CONTEXT")"
 #K8S_PROJECT=$(kubectl config current-context | egrep ^gke_ | cut -d_ -f 2) # OLD
 K8S_PROJECT=$(echo "$K8S_CLUSTER_INFO" | cut -d_ -f 2)
 # Same as above, I get cluster region for Artifact Repository affinity
@@ -65,10 +67,16 @@ AR_PROJECT_FROM_SKAFFOLD_CONFIG=$(skaffold config list | grep default-repo | cut
 
 export DEVCONSOLE_URL="https://console.cloud.google.com/artifacts?project=$PROJECT"
 
-if skaffold config list | grep default-repo ; then
+
+
+### MAIN
+echo "👋 Welcome to $(basename $0) v$VERSION"
+echo "* k8s CURRENT_CONTEXT: $(_yellow $CURRENT_CONTEXT)"
+
+if skaffold config list | grep -q default-repo ; then
     echo '👍 Skaffold seems to be already configured. See: `skaffold config list`'
     skaffold config list | possibly_colored_cat
-    echo "Fancy re-configuring with this awesome script? Try: $(_yellow skaffold config unset default-repo)"
+    echo "🤔 Fancy re-configuring with this awesome script? Try: $(_yellow skaffold config unset default-repo)"
 else
 
     #######################################
