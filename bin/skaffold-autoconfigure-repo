@@ -1,10 +1,11 @@
 #!/bin/bash
 
-VERSION="1.1"
+VERSION="1.2"
 
 ######################################################
 # CHANGELOG
 ######################################################
+# 2022-11-26 v1.2 Fixed the format param changed in my M1 Mac. :/
 # 2022-11-25 v1.1 Fixed in case your config name is not the usual "gke_blah_blah"
 # 2022-11-24 v1.0 First implementation.
 ######################################################
@@ -29,6 +30,7 @@ function gcloud_list_dockeronly_artifacts_repositories_with_name_and_location() 
     # REPOSITORY           REPOSITORY    SIZE (MB) # removed this with table[no-heading]
     # cicd-plat02          europe-west1  1042.586
     # pasta-and-friends32  europe-west3  0
+    # TODO remove gcr.io from possibilities :/
     gcloud artifacts repositories list --format 'table[no-heading](name.basename(),name.segment(3),sizeBytes.size(zero='0',precision=3,units_out=M))' --filter format='DOCKER' 2>/dev/null
 }
 
