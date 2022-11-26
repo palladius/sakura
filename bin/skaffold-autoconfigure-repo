@@ -1,6 +1,110 @@
 #!/bin/bash
 
-# TODO getops for project and region :)
+VERSION="1.1"
+
+######################################################
+# CHANGELOG
+######################################################
+# 2022-11-25 v1.1 Fixed in case your config name is not the usual "gke_blah_blah"
+# 2022-11-24 v1.0 First implementation.
+######################################################
+# This script has the intention of highlighting all
+# the optential pitfalls/errors of your first skaffold
+# usage. Think of it as a "note to self" as a k8s
+# beginner.
+######################################################
+
+echo "👋 Welcome to $(basename $0) v$VERSION"
+
+function possibly_colored_cat() {
+    # if lolcat is present, good! If not, just cat which in a pipe is basically doing nothing :)
+    lolcat 2>/dev/null || cat
+}
+function _yellow() {
+    echo -en "\033[1;33m$*\033[0m"
+}
+function gcloud_list_dockeronly_artifacts_repositories_with_name_and_location() {
+    # https://github.com/palladius/sakura/issues/7
+    # $ gcloud artifacts repositories list --format 'table(name.basename(),name.segment(3),sizeBytes.size(zero='0',precision=3,units_out=M))' --filter format='DOCKER'
+    # REPOSITORY           REPOSITORY    SIZE (MB) # removed this with table[no-heading]
+    # cicd-plat02          europe-west1  1042.586
+    # pasta-and-friends32  europe-west3  0
+    gcloud artifacts repositories list --format 'table[no-heading](name.basename(),name.segment(3),sizeBytes.size(zero='0',precision=3,units_out=M))' --filter format='DOCKER' 2>/dev/null
+}
+
+# This gives you sth like: 'gke_cicd-platinum-test031_us-central1_cicd-dev'
+# which contains: GKE, ProjectId, Region/Zone, ClusterName :)
+# alex taught me this is NOT necessarily the config name, so you need to map the config name
+# to cluster name. Also weird tools like `kubectx` might merss up with config name but NOT
+# with cluster name. So there you go.
+function _infer_kubectl_cluster_from_config() {
+    CURRENT_CONTEXT="$(kubectl config current-context)"
+    kubectl config view -o json | jq '.contexts[] | select(.name=="'$CURRENT_CONTEXT'")' | jq .context.cluster
+}
+
+PROJECT="$(gcloud config get project)"
+# I could delve into repo but i dont know what the user is gonna choose if more than one option is given..
+# Only works with GKE which is why i force the first egrep, in case someone wants to fix the code with another cloud provider :)
+# gke_cicd-platinum-test031_us-central1_cicd-dev
+# ==> 'cicd-platinum-test031'
+K8S_CLUSTER_INFO="$(_infer_kubectl_cluster_from_config)"
+#K8S_PROJECT=$(kubectl config current-context | egrep ^gke_ | cut -d_ -f 2) # OLD
+K8S_PROJECT=$(echo "$K8S_CLUSTER_INFO" | cut -d_ -f 2)
+# Same as above, I get cluster region for Artifact Repository affinity
+# POSSIBLY WRONG K8S_REGION=$(kubectl config current-context | egrep ^gke_ | cut -d_ -f 3)
+#K8S_REGION=$(_infer_kubectl_region_from_config)
+K8S_REGION=$(echo "$K8S_CLUSTER_INFO" | cut -d_ -f 3)
+
+#skaffold config:
+#kube-context: gke_cicd-platinum-test031_us-central1_cicd-dev
+#default-repo: us-central1-docker.pkg.dev/cicd-platinum-test031/cicd-plat
+# ==> 'cicd-platinum-test031'
+AR_PROJECT_FROM_SKAFFOLD_CONFIG=$(skaffold config list | grep default-repo | cut -d/ -f 2)
+
+export DEVCONSOLE_URL="https://console.cloud.google.com/artifacts?project=$PROJECT"
+
+if skaffold config list | grep default-repo ; then
+    echo '👍 Skaffold seems to be already configured. See: `skaffold config list`'
+    skaffold config list | possibly_colored_cat
+    echo "Fancy re-configuring with this awesome script? Try: $(_yellow skaffold config unset default-repo)"
+else
+
+    #######################################
+    # skaffold not configured - lets do it!
+    #######################################
+
+    echo "🤔 This command will help you set up skaffold repo for your k🎱s config: $(_yellow $(kubectl config current-context))"
+
+    if gcloud artifacts repositories list 2>/dev/null | grep -q DOCKER ; then
+        echo 'Try one of these:'
+        # sample output
+        #REPOSITORY           FORMAT  MODE                 DESCRIPTION        LOCATION      LABELS         ENCRYPTION          CREATE_TIME          UPDATE_TIME          SIZE (MB)
+        #cicd-plat02          DOCKER  STANDARD_REPOSITORY                     europe-west1                 Google-managed key  2022-11-03T07:44:04  2022-11-11T17:19:27  1042.586
+        #pasta-and-friends32  DOCKER  STANDARD_REPOSITORY  a cacchio di cane  europe-west3  product=pasta  Google-managed key  2022-11-26T07:35:50  2022-11-26T07:35:50  0
+        #gcloud artifacts repositories list 2>/dev/null | grep DOCKER | while read AR_NAME FORMAT_BLAH MODE_BLAH LOCATION blah ; do
+        gcloud_list_dockeronly_artifacts_repositories_with_name_and_location | while read AR_NAME LOCATION SIZE_DONTCARE; do
+            REPONAME="$LOCATION-docker.pkg.dev/$PROJECT/$AR_NAME"
+            echo "DEB [$AR_NAME]  [$LOCATION] $SIZE_DONTCARE (consider using the --format to just output the nfileds you care about)"
+            echo "🌻 REPO $(_yellow $AR_NAME) 🌍 $LOCATION"
+            echo "  🌻 $(_yellow skaffold config set default-repo $REPONAME)" # sets up Skaffold for the win
+            echo "  🌻 $(_yellow gcloud auth configure-docker $LOCATION-docker.pkg.dev) # This can help with Auth"
+        done
+    else
+    # TODO check with wc -l :)
+        echo '😥 No flower came out, I presume. It means you need to first create an Artifact repository of type Docker. To create one, try this (I chose the location of your GKE cluster so your code is closer to its deployment 😉)'
+        _yellow "gcloud artifacts repositories create my-skaffold-cornucopia --repository-format DOCKER --location $K8S_REGION"
+        echo 'Then try: $(_yellow skaffold build)'
+        echo "If you dont like CLI, try to check the AR from the UI: $DEVCONSOLE_URL"
+    fi
+fi
+
+## TESTS that project ids conform
+# TODO add docs to this :)
+echo 'NOTE. If these three are NOT the same, this might give you problems. Particularly if 2<>3 you might need to enable proper SvcAccts to access cross-project which doesnt come by default'
+
+echo "1. GCLOUD_PROJECT:      $PROJECT"
+echo "2. K8S_PROJECT:         $K8S_PROJECT"
+echo "3. AR_PROJECT (if set): $AR_PROJECT_FROM_SKAFFOLD_CONFIG"
 
 # Possible errors (I got it at home):
 #
@@ -13,12 +117,12 @@
 #
 #    gcloud container clusters get-credentials CLUSTER_NAME
 #
-PROJECT=$(gcloud config get project)
-echo "This command will help you set up skaffold repo for your unique and very peculiar K🎱🦸 config: $(kubectl config current-context)"
-echo Try one of these:
-gcloud artifacts repositories list 2>/dev/null | grep DOCKER | while read AR_NAME dockerblah standard_blah LOCATION blah ; do
-    REPONAME="$LOCATION-docker.pkg.dev/$PROJECT/$AR_NAME"
-    echo "🌻 skaffold config set default-repo $REPONAME"
-done
-# TODO check with wc -l :)
-echo 'If no flower came out, it means you need to first create an Artifact repository of type Docker (TODO autodetect).'
+# PROJECT=$(gcloud config get project)
+# echo "This command will help you set up skaffold repo for your unique and very peculiar K🎱🦸 config: $(kubectl config current-context)"
+# echo Try one of these:
+# gcloud artifacts repositories list 2>/dev/null | grep DOCKER | while read AR_NAME dockerblah standard_blah LOCATION blah ; do
+#     REPONAME="$LOCATION-docker.pkg.dev/$PROJECT/$AR_NAME"
+#     echo "🌻 skaffold config set default-repo $REPONAME"
+# done
+# # TODO check with wc -l :)
+# echo 'If no flower came out, it means you need to first create an Artifact repository of type Docker (TODO autodetect).'
