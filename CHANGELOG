@@ -1,5 +1,8 @@
 # Should be parsed automagically by echoe gem :)
 # This file tries to keep the changelog in a YMLtastic way! :)
+
+v2.4.0. 20230125 Removed ruby-version now that 2.7 is deprecated and everyone uses 3.0 I want to believe 3.0 or 3.1 doesnt really move the needle.
+
 v2.3.0. 20190504 Better travis test
 
 v2.2.2. Accepted my second push request from TWO people! Thanks lucmult@ and davidn@
