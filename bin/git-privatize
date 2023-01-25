@@ -275,7 +275,7 @@ def privatize_files(files)
   puts white "WARNING: for now the script ONLY works from LOCAL root dir. i cant be bothered to implement a sync ../dir/blah"
   files.each do |filename|
     deb "privatizing LOCAL file: #{white filename}"
-    if ! File.exists?(filename)
+    if ! File.exist?(filename)
       puts red("File doesnt existsm skipping: #{filename}")
       next
     end
@@ -322,7 +322,7 @@ def restore_privatized_files(files=[])
     deb "LocalDir:  #{yellow local_dir_wouldbe}"
     #      puts green("ALSO DO git add #{remote_file}")
     #execute_unless_dryrun("git add #{remote_file}")
-    if File.exists?(local_file_wouldbe)
+    if File.exist?(local_file_wouldbe)
       #commands_to_issue << "echo File '#{local_file_wouldbe}' exists already: skipping."
       if File.symlink?(local_file_wouldbe)
         comments << green("File #{local_file_wouldbe} exists and is a symlink. I could be paranoid and check correct link but this is for another day..")
