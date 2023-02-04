@@ -22,7 +22,7 @@ function possibly_colored_cat() {
     lolcat 2>/dev/null || cat
 }
 function _yellow() {
-    echo -en "\033[1;33m$*\033[0m"
+    echo -en "\033[1;33m$*\033[0m\n"
 }
 function gcloud_list_dockeronly_artifacts_repositories_with_name_and_location() {
     # https://github.com/palladius/sakura/issues/7
@@ -33,6 +33,12 @@ function gcloud_list_dockeronly_artifacts_repositories_with_name_and_location() 
     # TODO remove gcr.io from possibilities :/
     gcloud artifacts repositories list --format 'table[no-heading](name.basename(),name.segment(3),sizeBytes.size(zero='0',precision=3,units_out=M))' --filter format='DOCKER'
     # unsafe to remove this output.. 2>/dev/null
+}
+
+function check_local_cluster() {
+    skaffold config list --all | grep local-cluster | grep 'local-cluster: true' &&
+        _yellow "WARNING: LocalCluster is TRUE! This config will never deploy to AR. Try: ${_yellow skaffold config set local-cluster false --global}"
+
 }
 
 # This gives you sth like: 'gke_cicd-platinum-test031_us-central1_cicd-dev'
@@ -117,6 +123,7 @@ echo "1. GCLOUD_PROJECT:      $PROJECT"
 echo "2. K8S_PROJECT:         $K8S_PROJECT"
 echo "3. AR_PROJECT (if set): $AR_PROJECT_FROM_SKAFFOLD_CONFIG"
 
+check_local_cluster
 # Possible errors (I got it at home):
 #
 # - I1124 20:58:14.730645   24170 versioner.go:58] no Auth Provider found for name "gcp"
@@ -137,3 +144,6 @@ echo "3. AR_PROJECT (if set): $AR_PROJECT_FROM_SKAFFOLD_CONFIG"
 # done
 # # TODO check with wc -l :)
 # echo 'If no flower came out, it means you need to first create an Artifact repository of type Docker (TODO autodetect).'
+
+
+# skaffold config list --all | grep local-cluster
