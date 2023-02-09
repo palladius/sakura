@@ -1,0 +1,8 @@
+#!/bin/bash
+
+
+if "$@" ; then
+	echo "🎩 Certainly, sir!"
+else
+	echo "🎩 Blimey! I'm afraid I cant, sir, for $? reasons."
+fi
