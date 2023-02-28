@@ -129,6 +129,8 @@ def determine_folder_by_repo_url(url)
     #  ssh://ricc@google.com@source.developers.google.com:2022/p/ekupershlak-test/r/ricc-getting-started
     /ssh:\/\/.*@(source.developers.google.com).*\/p\/(.*)\/r\/(.*)/,
    # /http[s]:\/\/github.com\/willisc7\/next21-demo-golden-path\//,
+   # sso://TEAM/REPO/ in Gugol
+   /(sso):\/\/(\w+)\/(\w+)/,
   ]
   $GIT_REGEXES_123.each do |regex_i|
     m = url.match(regex_i)
