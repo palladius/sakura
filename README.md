@@ -4,7 +4,7 @@
 
 🌸Sakura🌸 stands for "Swiss Army Knife Unnecessary Repository yet Awesome" (🇨🇭🔪🍍🍕📦😆)
 
- <img src='https://github.com/palladius/sakura/raw/master/images/a_puffin_walking_in_an_ancient_Japanese_town.png' height='200' align='right' />
+ <img src='https://github.com/palladius/sakura/raw/master/images/a_puffin_walking_in_an_ancient_Japanese_town.png' height='300' align='right' />
 
 It's a very nice way to color your life, I guess. It also provides a lot of tools, aliases, .. that power
 your shell experience. If you're not a shell guy, you shouldn't be using it. If you are, you can have your
