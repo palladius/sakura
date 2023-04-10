@@ -29,7 +29,7 @@ Everything in this repo is under the [Creative Commons license](https://creative
 
 ## Usage
 
- <img src='https://github.com/palladius/sakura/raw/master/images/color-sample.png' height='100' align='right' />
+ <img src='https://github.com/palladius/sakura/raw/master/images/color-sample.png' height='200' align='right' />
 See `doc/sakura-samples.txt` for some more samples.
 For instant gratification try the following:
 
