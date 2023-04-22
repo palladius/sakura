@@ -26,11 +26,11 @@ function find_duplicates() {
 	# on linux
   if uname |grep -q Darwin; then
     debugga "We are on a Mac"
-    cat $TMPFILE| cat $TMPFILE | cut -d= -f 2 | sed -e 's/^ //'|
-      uniq -c|egrep -v " 1"|awk '{print $2}'
+    #set -x
+    cat $TMPFILE | cut -d= -f 2 | sed -e 's/^ //' |  sort| uniq -c|egrep -v " 1"|awk '{print $2}'
   else
     debugga "We are on a Linux hopefully"
-    cat $TMPFILE|sort|awk '{print $1}'|
+    cat $TMPFILE|sort|awk '{print $1}' |
       uniq -c|egrep -v " 1"|awk '{print $2}'
   fi
 }
