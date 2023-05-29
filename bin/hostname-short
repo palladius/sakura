@@ -1,0 +1,14 @@
+#!/bin/bash
+
+
+# ensure its short bhostname on both Mac and Linux
+
+# on Mac
+if uname -a | grep -qi darwin ; then
+    # short: hostname -s ; long: hostname
+    hostname -s
+else
+    # on Linux
+    # short: hostname -s?? ; long: hostname --fqdn ???
+    echo TODO verify on Linux: hostname -s maybe
+fi
