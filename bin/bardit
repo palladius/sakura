@@ -19,12 +19,13 @@ which lolcat >/dev/null ||
     #   if your life is colorless you can add a lolcat script which just calls `cat`
     _fatal "Sorry for this script to reach its full potential you need to: gem install lolcat"
 
-# unless NO_DEBUG
+# TODO add NO_DEBUG functionality
+echo '==================================================================================='
 echo 'Lets make sure you have in ENV the right values: (export DEBUG=false to remove this):'
 echo "PROJECT_ID: $PROJECT_ID"
-#echo "MESSAGE:    $MESSAGE"
 STRIPPED_MESSAGE=$(echo -en "$MESSAGE" | tr -d '"')
 echo "STRIPPED_MESSAGE: $STRIPPED_MESSAGE"
+echo '==================================================================================='
 
 export API_ENDPOINT='us-central1-aiplatform.googleapis.com'
 export MODEL_ID='text-bison@001'
@@ -60,6 +61,6 @@ if [ "$OUTPUT" = '""' ]; then # empty answer
     echo "Sorry, some error here. Dig into the JSON file more: .tmp.bard.lastsong" >&2
     cat .tmp.bard.lastsong | jq >&2
 else
-    echo Ok non trivial content..
+    #echo Ok non trivial content..
     cat .tmp.bard.lastsong | jq .predictions[0].content -r | lolcat
 fi
