@@ -1,9 +1,13 @@
 #!/bin/bash
 
 FILE=`mktemp -t okidok.XXXXX`
-LOGFILE=/var/log/riccardo/ok.log
-touch "$LOGFILE"
+#LOGFILE=/var/log/riccardo/ok.log
+LOGFILE=~/.sakura/riccardo/ok.log
 DEBUG=false
+
+# init
+mkdir -p ~/.sakura/riccardo/
+touch "$LOGFILE"
 
 # logs and prints output!
 oklog() {
