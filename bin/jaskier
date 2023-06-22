@@ -1,5 +1,10 @@
 #!/bin/bash
 
+######################################################################################
+# Jaskier uses Palm APIs from GCP to invoke the wealth of knowledge that powers Bard.
+# Make sure to 'Toss a coin to the Palm API' (enable billing first)
+######################################################################################
+
 function _fatal() {
     echo "[FATAL] $*" >&1
     exit 42
@@ -15,6 +20,7 @@ set -euop pipefail
 
 which gcloud >/dev/null ||
     _fatal "Sorry for this hacky auth you need to have a working gcloud config"
+
 which lolcat >/dev/null ||
     #   if your life is colorless you can add a lolcat script which just calls `cat`
     _fatal "Sorry for this script to reach its full potential you need to: gem install lolcat"
