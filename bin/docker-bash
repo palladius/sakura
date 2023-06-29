@@ -4,12 +4,10 @@
 CONTAINTER_ID="${1:nothing}"
 COMMAND="${2:-/bin/bash}"
 
-if [ $# -ne 1 ]; then
-    echo "illegal number of parameters. I need onw for the CONTAINTER_ID. You can find it here"
+if [ $# -lt 1 ]; then
+    echo "illegal number of parameters . I need one or more for the CONTAINTER_ID. You can find it here"
     docker ps
 else
-    echodo docker exec -it "$1" "$COMMAND"
-    # or...
-    #shift
-    #echodo docker exec -it "$1" "$@"
+    shift
+    echodo docker exec -it "$CONTAINTER_ID" "$@"
 fi
