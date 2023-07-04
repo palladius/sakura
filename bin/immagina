@@ -1,0 +1,118 @@
+#!/bin/bash
+
+#!/bin/bash
+
+function _fatal() {
+    echo "[FATAL] $*" >&1
+    exit 42
+}
+
+function _lolcat() {
+    lolcat
+    if which lolcat >/dev/null ; then
+        lolcat
+    else
+        # Dear non rubyists, youre missing out... happyness is one "sudo gem install lolcat" away.
+        cat
+    fi
+}
+
+
+set -euop pipefail
+
+mkdir -p output/
+
+IMAGE_OUTPUT_PATH=output/image-api-response.json
+DEFAULT_IMAGE_PROMPT="Once upon a time, there was a young spy named Agent X. Agent X was the best spy in the world, and she was always on the lookout for new mysteries to solve. One day, Agent X was sent on a mission to investigate a mysterious cave at the bottom of a mountain."
+# IMAGE_PROMPT="you should NEVER see this"
+# if [ -z "$*" ]; then
+#     FOO='default'
+#  #   IMAGE_PROMPT="$DEFAULT_IMAGE_PROMPT"
+# else
+#     FOO="$@"
+# #    IMAGE_PROMPT="$*"
+# fi
+IMAGE_PROMPT="${@:-$DEFAULT_IMAGE_PROMPT}"
+echo "This script will generate images provided you have a PROJECT_ID (in ENV) with billing enabled and also GenAI APIs enabled"
+echo "- IMAGE_PROMPT: $(echo "$IMAGE_PROMPT" | _lolcat )"
+echo "- PROJECT_ID=$PROJECT_ID"
+#echo "- FOO=$FOO"
+BEARER=$(gcloud auth print-access-token)
+########################
+# Add your code here
+########################
+# from: https://cloud.google.com/vertex-ai/docs/generative-ai/image/generate-images
+
+cat > output/image-request.json  <<EOF
+{
+    "instances": [
+        {
+        "prompt": "$IMAGE_PROMPT"
+        }
+    ],
+    "parameters": {
+        "sampleCount": 8,
+        "aspectRatio": "9:16",
+        "negativePrompt": "blurry",
+    }
+}
+EOF
+
+time curl -X POST \
+    -H "Authorization: Bearer $BEARER" \
+    -H "Content-Type: application/json; charset=utf-8" \
+    -d @output/image-request.json \
+    "https://us-central1-aiplatform.googleapis.com/v1/projects/$PROJECT_ID/locations/us-central1/publishers/google/models/imagegeneration:predict" |
+    tee output/image-api-response.json
+
+
+echo 'First part of the script worked correctly. Lets now base64 decode the images...'
+
+
+########################
+# Output looks like this:
+# {
+#   "predictions": [
+#     {
+#       "bytesBase64Encoded": "BASE64_IMG_BYTES",
+#       "mimeType": "image/png"
+#     },
+#     {
+#       "mimeType": "image/png",
+#       "bytesBase64Encoded": "BASE64_IMG_BYTES"
+#     }
+#   ],
+#   "deployedModelId": "DEPLOYED_MODEL_ID",
+#   "model": "projects/PROJECT_ID/locations/us-central1/models/MODEL_ID",
+#   "modelDisplayName": "MODEL_DISPLAYNAME",
+#   "modelVersionId": "1"
+# }
+########################
+echo '+ Output size:'
+wc -l "$IMAGE_OUTPUT_PATH"
+
+#TODO_SIZE="2" # find by grepping...
+
+# Max supported is 8..
+for IMAGE_IX in 0 1 2 3 4 5 6 7 ; do
+    IMAGE_TYPE=$( cat "$IMAGE_OUTPUT_PATH" | jq .predictions[$IMAGE_IX].mimeType )
+    if [ '"image/png"' = "$IMAGE_TYPE" ] ; then
+        echo 'YAY, image IX is a PNG. Lets decode it:'
+        cat "$IMAGE_OUTPUT_PATH" | jq -r .predictions[$IMAGE_IX].bytesBase64Encoded > output/t.base64
+        # https://stackoverflow.com/questions/16918602/how-to-base64-encode-image-in-linux-bash-shell
+        # This works for Linux. For Mac, you need sth slightly different with -i and -o
+        # TODO(ricc): fix for Mac
+        base64 -d output/t.base64 > "output/image-api-response-$IMAGE_IX.JPG"
+    else
+        echo NO: IMAGE_TYPE=$IMAGE_TYPE
+    fi
+done
+
+
+echo '👍 Everything is ok. You should now have some 0..8 images (PNG or JPG) in the output/ folder. 🌍 Try from CLI: open output/*.JPG'
+
+ls -al output/*.JPG
+
+# opening with browser :)
+open output/*.JPG
+
