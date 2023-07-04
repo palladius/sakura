@@ -1,6 +1,9 @@
 #!/bin/bash
 
-#!/bin/bash
+# from: https://cloud.google.com/vertex-ai/docs/generative-ai/image/generate-images
+# Usage: PROJECT_ID=ricc-genai immagina a huge avocado landing on earth with extraterrestrial life forms coming out
+
+SCRIPT_VER='0.2'
 
 function _fatal() {
     echo "[FATAL] $*" >&1
@@ -8,7 +11,6 @@ function _fatal() {
 }
 
 function _lolcat() {
-    lolcat
     if which lolcat >/dev/null ; then
         lolcat
     else
@@ -23,25 +25,19 @@ set -euop pipefail
 mkdir -p output/
 
 IMAGE_OUTPUT_PATH=output/image-api-response.json
+
+IMAGE_MODEL_VERSION='001' # try also 002 ;) better but slower
 DEFAULT_IMAGE_PROMPT="Once upon a time, there was a young spy named Agent X. Agent X was the best spy in the world, and she was always on the lookout for new mysteries to solve. One day, Agent X was sent on a mission to investigate a mysterious cave at the bottom of a mountain."
-# IMAGE_PROMPT="you should NEVER see this"
-# if [ -z "$*" ]; then
-#     FOO='default'
-#  #   IMAGE_PROMPT="$DEFAULT_IMAGE_PROMPT"
-# else
-#     FOO="$@"
-# #    IMAGE_PROMPT="$*"
-# fi
 IMAGE_PROMPT="${@:-$DEFAULT_IMAGE_PROMPT}"
-echo "This script will generate images provided you have a PROJECT_ID (in ENV) with billing enabled and also GenAI APIs enabled"
-echo "- IMAGE_PROMPT: $(echo "$IMAGE_PROMPT" | _lolcat )"
+
+echo "-----------------------------------------------------------------------------------------------"
+echo "This script ( 🇮🇹 immagina 🇮🇹 ) will generate images provided you have a PROJECT_ID (in ENV) with billing enabled and also GenAI APIs enabled"
+echo -en "- IMAGE_PROMPT: " ; echo "$IMAGE_PROMPT" | _lolcat
 echo "- PROJECT_ID=$PROJECT_ID"
-#echo "- FOO=$FOO"
+echo "- IMAGE_MODEL_VERSION=$IMAGE_MODEL_VERSION"
+echo "-----------------------------------------------------------------------------------------------"
+
 BEARER=$(gcloud auth print-access-token)
-########################
-# Add your code here
-########################
-# from: https://cloud.google.com/vertex-ai/docs/generative-ai/image/generate-images
 
 cat > output/image-request.json  <<EOF
 {
@@ -58,11 +54,12 @@ cat > output/image-request.json  <<EOF
 }
 EOF
 
+
 time curl -X POST \
     -H "Authorization: Bearer $BEARER" \
     -H "Content-Type: application/json; charset=utf-8" \
     -d @output/image-request.json \
-    "https://us-central1-aiplatform.googleapis.com/v1/projects/$PROJECT_ID/locations/us-central1/publishers/google/models/imagegeneration:predict" |
+    "https://us-central1-aiplatform.googleapis.com/v1/projects/$PROJECT_ID/locations/us-central1/publishers/google/models/imagegeneration@$IMAGE_MODEL_VERSION:predict" |
     tee output/image-api-response.json
 
 
@@ -110,6 +107,7 @@ done
 
 
 echo '👍 Everything is ok. You should now have some 0..8 images (PNG or JPG) in the output/ folder. 🌍 Try from CLI: open output/*.JPG'
+echo 'Note the script doesnt clean up after itself, you might have images from previous invokations since you have no guarantee each invokation yeilds 8 results. Check timestamps like a pro.'
 
 ls -al output/*.JPG
 
