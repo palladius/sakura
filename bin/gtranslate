@@ -3,6 +3,19 @@
 # This script requires GoogleCloud translate
 # and an API key. I might find that I can achieve the same result with fewer requirements.
 
+DefaultLanguage = 'de'
+DESTINATION_LANGUAGE = ENV.fetch 'LANG', DefaultLanguage
+
+def emoji_by_lang(lang)
+    case lang.to_sym
+    when :it
+        return '🇮🇹'
+    when :de
+        return '🇩🇪'
+    else
+        return '⁇'
+    end
+end
 
 def check_prerequisites()
     begin
@@ -12,7 +25,7 @@ def check_prerequisites()
         exit 1
     end
 
-    $key = GOOGLE_TRANSLATE_KEY.fetch('GOOGLE_TRANSLATE_KEY', nil)
+    $key = ENV.fetch('GOOGLE_TRANSLATE_KEY', nil)
     if $key.nil?
         puts 'Please export your GOOGLE_TRANSLATE_KEY peroperly. To get one, see TODO(docs)'
         exit 2
@@ -29,6 +42,7 @@ def gtranslate(sentence, opts={})
     require 'google/cloud/translate/v2'
 
     destination_lang = opts.fetch :lang, 'en'
+    add_emoji = opts.fetch :add_emoji, true
     begin
         translate_request = Google::Cloud::Translate::V2.new(key: $key)
         translation_response = translate_request.translate(sentence, to: destination_lang)
@@ -37,14 +51,25 @@ def gtranslate(sentence, opts={})
         puts("Google Translate error: #{$!}")
         return 'Some error happened'
     end
-
-    return "TODO(): #{sentence}, but in #{destination_lang}"
+    translated_string = translation_response.text.gsub('&#39;', "'").gsub('&quot;', '"')
+    return add_emoji ?
+        "#{emoji_by_lang(destination_lang)} #{translated_string}"
+        :
+        translated_string
+    #return "TODO(): #{sentence}, but in #{destination_lang}"
 end
 
 def main()
     check_prerequisites
     sentence_to_translate = ARGV.join(' ')
-    puts gtranslate(sentence_to_translate, lang: 'de')
+    if( sentence_to_translate == '-' or sentence_to_translate == '' )
+        # STDIN, line by line, which seems silly. Maybe better all in one?
+        STDIN.read.split("\n").each do |line|
+            puts gtranslate(line, lang: DESTINATION_LANGUAGE)
+        end
+    else
+        puts gtranslate(sentence_to_translate, lang: DESTINATION_LANGUAGE)
+    end
 end
 
 main()
