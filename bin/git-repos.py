@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 
 import glob
 import os
@@ -7,7 +7,7 @@ import subprocess
 from optparse import OptionParser
 
 version = '1.3'
-DEFAULT_DIR = "$HOME/git/"	
+DEFAULT_DIR = "$HOME/git/"
 default_git_basedir = os.path.expandvars(DEFAULT_DIR)
 debug = False
 valid_commands = [ 'list', 'dump', 'pull-all', 'push-all', 'help' ]
@@ -15,28 +15,25 @@ valid_commands = [ 'list', 'dump', 'pull-all', 'push-all', 'help' ]
 
 def deb(*args):
   if (debug):
-    print "#DEB", ' '.join(arg.__str__() for arg in args)
+    print("#DEB", ' '.join(arg.__str__() for arg in args))
 
 def repos_foreach_execute(mybasedir,dump_basedir,cmd):
-    """ForEach REPO, do: 
+    """ForEach REPO, do:
             run(cmd)
-    
+
     For the moment i only support git pull
     """
-    print "repos_foreach_execute(..,..,{})".format(cmd)
-    #print "Repos: ", gitrepos(mybasedir)
+    print(f"repos_foreach_execute(..,..,{cmd})")
     for ix, repo in enumerate(gitrepos(mybasedir)):
-      #cmd2run = "echo git pull {repo}".format(repo=repo)
       # This works: git --git-dir $GIC/.git pull
       cmdArr = ['git', '--git-dir', "{}/.git/".format(repo) , 'pull' ]
       try:
           retLong = subprocess.check_output(cmdArr) # , shell=True
-          ret = "[OK] " + repo 
+          ret = "[OK] " + repo
       except subprocess.CalledProcessError as e:
           ret = "[ERR] {}: {}".format(repo, e)
           retLong = "[ERR] Non zero return for: {}: {}".format(repo, e)
-      print "ret: {}".format(ret)
-      #print retLong
+      print(f"ret: {ret}")
 
 def parse_python_26():
 	'''There's a better parser with python2.7 but that's what I have in 2.6..'''
@@ -69,14 +66,14 @@ Default Dir: {DEFAULT_DIR}
 	if(args[0] not in valid_commands):
 		parser.error("Wrong command: '{}'. Available are: {}".format(
                      args[0],
-                     valid_commands 
+                     valid_commands
                      ))
         #exit(9)
 	return (parser,options,args)
 
 def dumprepos(mybasedir,dump_basedir):
 	'''Prints adump of all your repo in such a way that you can reconstruct them: cool!'''
-	
+
 	from subprocess import Popen,PIPE
 	deb( "Dumping to STDOUT your local Git Repos within {0} (dumpdir='{1}'):".format(mybasedir,dump_basedir))
 	dump = ''
@@ -101,29 +98,27 @@ def print_list_repos(git_dir, is_long):
 	deb( "Listing your local Git Repos:")
 	for repo in gitrepos(git_dir):
 		if is_long:
-			print repo
+			print( repo)
 		else:
 			# strip git_dir from repo
 			shortened_repo = remove_prefix(repo, git_dir).rstrip('/')
 			deb("{} {}\t{}".format(git_dir, repo, shortened_repo))
-			print "{}".format(shortened_repo)
+			print(f"{shortened_repo}")
 
 def main():
 	(parser,opts, args) = parse_python_26()
 	if args[0] == 'list':
 		print_list_repos(opts.gitdir, opts.long)
 	elif args[0] == 'dump':
-		print dumprepos(opts.gitdir,opts.dumpdir)
+		print( dumprepos(opts.gitdir,opts.dumpdir))
 	elif args[0] == 'pull-all':
 		repos_foreach_execute(opts.gitdir,opts.dumpdir,"git pull")
 	elif args[0] == 'push-all':
 		repos_foreach_execute(opts.gitdir,opts.dumpdir,"git push")
 	elif args[0] == 'help':
-		#print dir(parser)
-		print parser.format_help()
-		#parser.print_usage()
+		print( parser.format_help())
 	else:
-		print "Unrecognized command: {}".format(args[0])
+		print( "Unrecognized command: {}".format(args[0]))
 		exit(1)
 	exit(0)
 
@@ -145,4 +140,4 @@ def gitrepos(basedir):
 if __name__ == '__main__':
   main()
 else:
-    print 'Bella Ric! Prova ad usare: gitrepos(), o main()!'
+    print('Bella Ric! Prova ad usare: gitrepos(), o main()!')
