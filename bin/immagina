@@ -47,6 +47,7 @@ cat > output/image-request.json  <<EOF
         }
     ],
     "parameters": {
+        "sampleImageSize": "1024", 
         "sampleCount": 8,
         "aspectRatio": "9:16",
         "negativePrompt": "blurry",

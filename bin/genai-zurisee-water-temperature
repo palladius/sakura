@@ -1,0 +1,30 @@
+#!/bin/bash
+
+export DEBUG='false '
+export PROJECT_ID='ricc-genai'
+
+echo "== Site1 =="
+time jaskier "I need to know the Zurich lake temperature and you can find this in this website: 
+    https://www.badi-info.ch/_temp/zuerichsee-temperatur.htm . 
+    Can you please provide me just with the temperature in degrees centigrads? 
+    Also please quote your exact source."
+
+echo "== Site2 =="
+time jaskier "
+
+    What is the water temperature today of the Zurich see? 
+    If you can browse online, this should have the info you need: 
+    https://www.zh.ch/de/umwelt-tiere/wasser-gewaesser/messdaten/wassertemperaturen.html . 
+    A good point to measure is Zurich Tiefenbrunnen. 
+    
+    If you cannot browse online, please admit it since theres no other way to tell me that information. 
+    
+    Whatever info you give me, please quote your source and the date that that page was parsed.
+"
+
+echo "== Site3 =="
+time jaskier "
+    Can you please tell me what is the Zurich lake (zurisee) water temperature?
+    Please check wthis website for me: https://www.bodenseee.net/wassertemperatur/zuerichsee/
+
+"

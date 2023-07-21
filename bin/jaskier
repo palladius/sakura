@@ -5,10 +5,13 @@
 # Make sure to 'Toss a coin to the Palm API' (enable billing first)
 ######################################################################################
 
+DEBUG="${DEBUG:-true}"
+
 function _fatal() {
     echo "[FATAL] $*" >&1
     exit 42
 }
+
 DEFAULT_MESSAGE="Tell me a joke about an Engineer who executed a bash script forgetting to set ARGV correctly. Make it fun and nerdy but not offensive to this poor Engineer. We care about them."
 
 if [ "$#" -gt 0 ]; then
@@ -16,6 +19,9 @@ if [ "$#" -gt 0 ]; then
 else
      export MESSAGE="$DEFAULT_MESSAGE"
 fi
+
+STRIPPED_MESSAGE=$(echo -en "$MESSAGE" | tr -d '"')
+
 set -euop pipefail
 
 which gcloud >/dev/null ||
@@ -26,12 +32,15 @@ which lolcat >/dev/null ||
     _fatal "Sorry for this script to reach its full potential you need to: gem install lolcat"
 
 # TODO add NO_DEBUG functionality
-echo '==================================================================================='
-echo 'Lets make sure you have in ENV the right values: (export DEBUG=false to remove this):'
-echo "PROJECT_ID: $PROJECT_ID"
-STRIPPED_MESSAGE=$(echo -en "$MESSAGE" | tr -d '"')
-echo "STRIPPED_MESSAGE: $STRIPPED_MESSAGE"
-echo '==================================================================================='
+
+if [ 'true' = "$DEBUG" ]; then
+    echo '==================================================================================='
+    echo 'Lets make sure you have in ENV the right values: (export DEBUG=false to remove this):'
+    echo "GCLOUD USER: $(gcloud config get account)"
+    echo "PROJECT_ID: $PROJECT_ID"
+    echo "STRIPPED_MESSAGE: $STRIPPED_MESSAGE"
+    echo '==================================================================================='
+fi 
 
 export API_ENDPOINT='us-central1-aiplatform.googleapis.com'
 export MODEL_ID='text-bison@001'
