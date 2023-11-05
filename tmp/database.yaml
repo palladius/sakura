@@ -1,0 +1,27 @@
+websites:
+  - Title: Google
+    URL: https://www.google.com/
+    Description: A popular search engine.
+    Image: https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png
+    Score: 100
+  - Title: Wikipedia
+    URL: https://www.wikipedia.org/
+    Description: A free online encyclopedia.
+    Image: https://upload.wikimedia.org/wikipedia/commons/b/bf/Wikipedia_logo_v02_en.svg
+    Score: 95
+  - Title: Riccardo's Fulmine
+    URL: https://github.com/palladius/fulmine
+    Description: An lightning-fast website to seatch for static resources.
+    #Image: https://helios-i.mashable.com/imagery/articles/03bDuXus9Lsnz9sUqURbDiB/hero-image.fill.size_1248x702.v1643714839.jpg
+    Image: https://it.wikipedia.org/wiki/Fulmine#/media/File:Force_Of_Nature_(120800437).jpeg
+    Score: 90
+
+  - Title: Node.JS search site
+    URL: https://github.com/giorgosera/simple-search
+    Description: provides module TODO(rocc) investigate npm install simple-search
+    Score: 10
+
+  - Title: Riccardo 🌸Sakura🌸 repo
+    Description: stands for "Swiss Army Knife Unnecessary Repository yet Awesome" (🇨🇭🔪🍍🍕📦😆)
+    URL: https://github.com/palladius/sakura
+    Image: https://raw.githubusercontent.com/palladius/sakura/master/images/a_puffin_walking_in_an_ancient_Japanese_town.png
