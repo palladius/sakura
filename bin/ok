@@ -34,12 +34,15 @@ RET=$PIPESTATUS
 
 MSG=_NONE_
 
+# OK emojis: 👍 and ✔ (these look great in Cloud run listings)
+# NO emojis: 👎 and X 
+
 if [ 0 = $RET ] ; then
-	verde "👍 OK(`data`): $*"
+	verde "✔ OK(`data`): $*"
 	#tail -20 "$FILE" | ricnotify green "OK '$*'"
 	#echo "`data` End OK"
 else
-	rosso "👎 NO(`data`,ret=$RET): $*"
+	rosso "X NO(`data`,ret=$RET): $*"
 	#echo "`data` End (ERR) '$*'"
 	#echo "There were some errors which returned: $RET" | ricnotify red "Err with '$*'"
 fi
