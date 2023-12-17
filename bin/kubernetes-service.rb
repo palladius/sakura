@@ -1,4 +1,4 @@
-#!/usr/bin/env ruby 
+#!/usr/bin/env ruby
 
 if RUBY_VERSION.split('.')[0] == 1
   puts "Refusing to launch a script form Ruby 1. Sorry Ric, its 2020 damn it!"
@@ -37,7 +37,7 @@ $myconf = {
         Tipo:
         - GKE_CREDENTIALS_COMMAND
         - GCLOUD_CONFIG_NAME (che registra ilk cos di sopra)
-        - addirittura:     gke-setup-loadbalancer-and-dns.sh 
+        - addirittura:     gke-setup-loadbalancer-and-dns.sh
         - GCP_STATIC_IP_NAME1 CLOUD_DNS_NAME1 che va da 1 a 10 forse...
         - anzi piu coeso fare GCP_COLONED_ENDPOINT1 dove so io che hai 'STATIN_NAME:HOST.palladius.it'
 
@@ -79,13 +79,13 @@ def init()    # see lib_autoinit in lib/util.rb
     opts.on( '-e', '--envfile FILE', 'Write log to FILE') {|file| $opts[:envfile] = file }
     opts.on( '-v', '--verbose', 'Output more information') { $opts[:verbose] = true}
   end
-  $optparse.parse!  
+  $optparse.parse!
 end
 
 def kubectl_command(payload, opts={})
   ret = "kubectl --namespace #{ENV["NAMESPACE"]} #{payload}"
   deb "kubectl_command(payload='#{payload}', opts=#{opts}) ==> #{ret}"
-  ret 
+  ret
 end
 
 # funge ma inutile - lo fa gia la gemma mitica `dotenv` e il resto del mono non ruby sta a guardare!
@@ -93,7 +93,7 @@ def ensure_env_exist_or_die(arr_of_keys)
   deb "CHecking ENV for: #{arr_of_keys}"
   arr_of_keys.each do |k|
     #deb "CHecking ENV[#{k}]"
-    if ENV[k] 
+    if ENV[k]
       deb "- OK ENV#{k} ->\t#{ENV[k]}"
     else
       fatal 42, "Missing ENV[#{k}]"
@@ -101,7 +101,7 @@ def ensure_env_exist_or_die(arr_of_keys)
   end
 end
 
-# # ora lo prendo da LIB2021! ModuloFigata2021 esegui 
+# # ora lo prendo da LIB2021! ModuloFigata2021 esegui
 # def esegui_OBSOLETO(cmd, opts={})
 
 def my_email()
@@ -109,23 +109,23 @@ def my_email()
 end
 
 def set_dns_based_on_env(ip_dns_mapping)
-  pred "[set_dns_based_on_env] set_dns_based_on_env => #{ip_dns_mapping.split(':')}" 
+  pred "[set_dns_based_on_env] set_dns_based_on_env => #{ip_dns_mapping.split(':')}"
   static_ip, dns =  ip_dns_mapping.split(':')
   #pgreen :TODO_IMPLEMENT_CREATE_DNS_ENTRY
-  command = "cloud-dns-manage create #{dns} --ip #{static_ip}" 
+  command = "cloud-dns-manage create #{dns} --ip #{static_ip}"
   esegui(command)
 end
 
 def release_dns_based_on_env(ip_dns_mapping)
-  pred "[release_dns_based_on_env] release_dns_based_on_env => #{ip_dns_mapping.split(':')}" 
+  pred "[release_dns_based_on_env] release_dns_based_on_env => #{ip_dns_mapping.split(':')}"
   static_ip_name, dns =  ip_dns_mapping.split(':')
   pgreen :TODO_IMPLEMENT_DESTROY_DNS_ENTRY_MA_COPIA_DA_SOPRA_SE_SOPRA_FUNGE
 end
 
 # static_ip_name, dns
 def destroy_endpoint_based_on_env(gcp_coloned_endpoint)
-  pred "[destroy_endpoint_based_on_env] gcp_coloned_endpoint => #{gcp_coloned_endpoint.split(':')}" 
-  raise "Wrong size for  gcp_coloned_endpoint (must contain a single colon): .." unless 2 == gcp_coloned_endpoint.split(':').size 
+  pred "[destroy_endpoint_based_on_env] gcp_coloned_endpoint => #{gcp_coloned_endpoint.split(':')}"
+  raise "Wrong size for  gcp_coloned_endpoint (must contain a single colon): .." unless 2 == gcp_coloned_endpoint.split(':').size
   static_ip_name, dns =  gcp_coloned_endpoint.split(':')
   #puts esegui("echo OPPOSITE OF gke-setup-loadbalancer-and-dns.sh #{static_ip_name} #{dns}")
   #1 distruggi static IP.
@@ -137,10 +137,10 @@ end
 def setup_endpoint_init_based_on_env(gcp_coloned_endpoint)
   puts "Facoltativo: Now enabling a Carlessian thing: transactionally creating a STATIC IP + setting up DNS for #{green gcp_coloned_endpoint}"
   deb  gcp_coloned_endpoint.split(':')
-  raise "Wrong size for  gcp_coloned_endpoint (must contain a single colon): .." unless 2 == gcp_coloned_endpoint.split(':').size 
+  raise "Wrong size for  gcp_coloned_endpoint (must contain a single colon): .." unless 2 == gcp_coloned_endpoint.split(':').size
   static_ip_name, dns =  gcp_coloned_endpoint.split(':')
   puts esegui("echodo gke-setup-loadbalancer-and-dns.sh #{static_ip_name} #{dns}") # OBSOLETE
-  #1. gcloud compute addresses create "$IPNAME" --global 
+  #1. gcloud compute addresses create "$IPNAME" --global
   #puts esegui("gcloud compute --quiet addresses create '#{static_ip_name}' --global --ip-version IPV4", :exit_on_fail => false ) # vediamo se VA senza chiedere...
   #2. cloud-dns-manage add #{dns} --ip #{static_ip_name}
   #puts esegui("cloud-dns-manage add #{dns}", :exit_on_fail => false)
@@ -159,7 +159,7 @@ def terminate_and_destroy()
   puts esegui("kubectl delete namespace #{ ENV['NAMESPACE'] }", :exit_on_fail => false  )
   puts "Existing Public IP addresses which mmight be of your interest:"
   puts relevant_static_ips
-  
+
   usage "GCP_COLONED_ENDPOINT1 has been deprecated in favor of: TBD. Please update your .env file Ricc" if ENV['GCP_COLONED_ENDPOINT1']
   destroy_endpoint_based_on_env(ENV['GCP_ENDPOINT_DNS_MAPPING1']) if ENV['GCP_ENDPOINT_DNS_MAPPING1']
   destroy_endpoint_based_on_env(ENV['GCP_ENDPOINT_DNS_MAPPING2']) if ENV['GCP_ENDPOINT_DNS_MAPPING2']
@@ -180,11 +180,11 @@ def setup_forzato()
   # qui va bene sia ok che non ok `echo $?`.class
   esegui "gcloud config set project #{ENV['PROJECT_ID']}"
   esegui "gcloud config set account #{my_email}"
-  # echodo 
+  # echodo
   ret = esegui("gcloud config configurations activate #{ENV['GCLOUD_CONFIG_NAME']}")
   # #echodo gcloud container clusters get-credentials goliar dia-prod --zone europe-west6-c --project goliar dia-prod
   # # Cluster goliardifco
-  # echodo $GKE_CREDENTIALS_COMMAND 
+  # echodo $GKE_CREDENTIALS_COMMAND
   ret = esegui( ENV['GKE_CREDENTIALS_COMMAND'] )
   # # gcloud container clusters get-credentials ricc-prod --zone europe-west1-b --project ric-cccwiki
   ret = esegui("kubectl create namespace #{ ENV['NAMESPACE'] }", :exit_on_fail => false  )
@@ -197,7 +197,7 @@ def setup_forzato()
   set_dns_based_on_env(ENV['IP_DNS_MAPPING1']) if ENV['IP_DNS_MAPPING1']
   set_dns_based_on_env(ENV['IP_DNS_MAPPING2']) if ENV['IP_DNS_MAPPING2']
   set_dns_based_on_env(ENV['IP_DNS_MAPPING3']) if ENV['IP_DNS_MAPPING3']
-  # gke-setup-loadbalancer-and-dns.sh palladiusit-global-staging www-staging.palladius.it 
+  # gke-setup-loadbalancer-and-dns.sh palladiusit-global-staging www-staging.palladius.it
   pgreen "Ciuccio bene. TODO fail if it fails :)"
 
 end
@@ -217,11 +217,11 @@ def esegui_kubectl_get_all()
       colora_righe_by_regex(:gray,   /-test-/).
       colora_righe_by_regex(:gray, /-dev-/).
       colora_righe_by_regex(:red, /CrashLoopBackOff|Error|ErrImagePull/i).
-      to_s # ridondante ma mi aiuta a non togliere il punto..      
+      to_s # ridondante ma mi aiuta a non togliere il punto..
 end
 
 def print_interesting_info
-      puts esegui_kubectl_get_all #  , :print_output => true) 
+      puts esegui_kubectl_get_all #  , :print_output => true)
       pyellow relevant_static_ips
       # ora mi interesso a hosts in ENV['GCP_COLONED_ENDPOINT1'])
       interesting_hosts = %w{ GCP_COLONED_ENDPOINT1 GCP_COLONED_ENDPOINT2 GCP_COLONED_ENDPOINT3 GCP_COLONED_ENDPOINT4 }.
@@ -240,7 +240,7 @@ def print_interesting_info
       puts "IP Address Palooza: TODO capture IPs from: 1 Services 2. compute addresses list 3. ENV[IP_DNS_MAPPING] // ENV[GCP_ENDPOINT_DNS_MAPPING ]"
 end
 def kubectlizza(action)
-  dir =  $opts[:kubedir] 
+  dir =  $opts[:kubedir]
   deb "kubectlizza. Action=#{action}, dir"
   case action # no FALLTHROUGH! https://en.wikipedia.org/wiki/Switch_statement#Fallthrough
     when :start
@@ -264,7 +264,7 @@ def kubectlizza(action)
       ensure_or_die_init_launched_vs_not(true, "Cant show you status. Run init first")
       # qui c'e' qualche puts a vuoto...
       print_interesting_info
-    when :drain 
+    when :drain
       pyellow "Soccia questa e dura. Lidea e di fare kill dei pods che triggera la nuova versione.. ma devi prima trovare il pod e poi killarlo. Cominciamo con questa:"
         #get pods -o jsonpath --template='{range .items[*]}{.metadata.name}{"\t"}{"\t"}{.spec.containers[0].image}{"\n"}{end}'
       ret = esegui kubectl_command( %q{ \
@@ -297,11 +297,11 @@ def ensure_or_die_init_launched_vs_not(has_been_initialized_already, msg=nil)
   if has_been_initialized_already
     puts "We are in DESTROY. Only going to destroy stuff if i find trace of someone creating it before :)"
     msg =  "Refusing to run destroy since I find no trace of init before. If you are sure whacchudoin rm that file" if msg.nil?
-    usage(msg) unless File.exists?(".init")
+    usage(msg) unless File.exist?(".init")
   else # init
     puts "We probably are in INIT. Only going fwd if a placeholder file does NOT exist. Makefile style."
     msg = "Refusing to run init (a very dangerous and powerful script" if msg.nil?
-    usage(msg) if File.exists?(".init")
+    usage(msg) if File.exist?(".init")
   end
 
 end
@@ -330,13 +330,13 @@ def real_program
 
   # check ENV and loads it
 
-  usage "File not found: #{$opts[:envfile]}" unless File.exists?($opts[:envfile])
+  usage "File not found: #{$opts[:envfile]}" unless File.exist?($opts[:envfile])
   Dotenv.load($opts[:envfile]) # carica in ENV per tutti
   #manhouse = Dotenv.parse $opts[:envfile]  # lo fa vedere e basta
   #deb "Env a manhouse: #{manhouse}"
   ensure_env_exist_or_die($mandatory_keys) #  %w{ PROJECT_ID GCLOUD_CONFIG_NAME NAMESPACE boh })
   Dotenv.require_keys $mandatory_keys # ("SERVICE_APP_ID", "SERVICE_KEY", "SERVICE_SECRET")
-  
+
   # now lets do sth about it
   case argv_action # first argment - action
     when "up", "start"
@@ -354,7 +354,7 @@ def real_program
     when "init"
       kubectlizza(:init)
     when "destroy", "cleanup", "terminate"
-      kubectlizza(:destroy) # duale di init      
+      kubectlizza(:destroy) # duale di init
     when "exec"
       kubectlizza(:exec, :payload => "todo pensaci amico mio - non so se abbia senso perche sto cazzillo ha solo un argomento non vuoi imbarcarti nel dire: 1 arg a meno che...")
     when String
@@ -367,7 +367,7 @@ end
 
 def main(filename)
   init        # Enable this to have command line parsing capabilities!
-  real_program 
+  real_program
 end
 
 main(__FILE__)
