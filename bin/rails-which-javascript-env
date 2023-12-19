@@ -1,0 +1,100 @@
+#!/usr/bin/env ruby
+
+# Rails supports 4 frameworks:
+# ./bin/rails javascript:install:[bun|esbuild|rollup|webpack]
+# This scripts helps you understand which one you're using.
+# This should be easy but, hey, for me its NOT.
+
+# I asked BArd since i dont have a flu:
+
+=begin
+To determine which JavaScript framework you are currently using in your Rails 7.0 application, you can check for the existence of files associated with each framework. Here's how to identify the framework you're currently using:
+
+Bun:
+
+app/javascript/package.json: If this file exists and contains a dependency on Bun, then you are currently using Bun.
+app/javascript/bun.js: If this file exists, then you are definitely using Bun.
+Esbuild:
+
+app/javascript/esbuild.js: If this file exists, then you are definitely using Esbuild.
+config/importmap.rb: If this file contains the configuration for Esbuild, then you are currently using Esbuild.
+Rollup:
+
+app/javascript/rollup.config.js: If this file exists, then you are definitely using Rollup.
+config/importmap.rb: If this file contains the configuration for Rollup, then you are currently using Rollup.
+Webpack:
+
+app/javascript/build: If this directory exists, then you are likely using Webpack.
+config/webpack.config.js: If this file exists, then you are definitely using Webpack.
+By checking for the existence of these files, you can determine which JavaScript framework is currently in use in your Rails 7.0 application.
+=end
+
+def check_for_framework(framework)
+    #puts("TODO: Check for #{framework} framework")
+    case framework
+        when :bun
+            return check_for_bun()
+        when :esbuild
+            return check_for_esbuild()
+        when :rollup
+            return check_for_rollup()
+        when :webpack
+            return check_for_webpack()
+        else
+            raise "Unsupported framework: #{framework}"
+    end
+end
+
+# Bun:
+# app/javascript/package.json: If this file exists and contains a dependency on Bun, then you are currently using Bun.
+# app/javascript/bun.js: If this file exists, then you are definitely using Bun.
+def check_for_bun()
+    ret = File.exist?('app/javascript/package.json') && File.exist?('app/javascript/bun.js')
+    #puts("You are using Bun? #{ret}")
+end
+
+
+# rollup:
+#app/javascript/rollup.config.js: If this file exists, then you are definitely using Rollup.
+#config/importmap.rb: If this file contains the configuration for Rollup, then you are currently using Rollup.
+def check_for_rollup
+    ret = File.exist?('app/javascript/rollup.config.js') && File.exist?('config/importmap.rb')
+end
+
+# Webpack:
+#app/javascript/build: If this directory exists, then you are likely using Webpack.
+#config/webpack.config.js: If this file exists, then you are definitely using Webpack.
+def check_for_webpack
+    ret = File.exist?('app/javascript/build') && File.exist?('config/webpack.config.js')
+end
+
+#app/javascript/esbuild.js: If this file exists, then you are definitely using Esbuild.
+#config/importmap.rb: If this file contains the configuration for Esbuild, then you are currently using Esbuild.
+def check_for_esbuild
+    ret = File.exist?('app/javascript/esbuild.js') && File.exist?('config/importmap.rb')
+end
+
+def check_for_all_frameworks()
+    [ :bun , :esbuild, :rollup, :webpack ].each do |frmw|
+        ret = check_for_framework(frmw)
+        puts("#{ret ? '✅' : '❌'} You are using #{frmw}? #{ret}")
+    end
+end
+
+def check_for_rails_folder_or_die
+    #puts('TODO: Check for rails folder')
+    ret = File.exist?('app') && File.exist?('Gemfile') && File.exist?('config') && File.exist?('db')
+    raise "Not a Rails app!" unless ret
+end
+
+def main
+    puts '1. Lets see if you are in a rails project'
+    check_for_rails_folder_or_die
+    puts '🟥❤️♥️ 🚅 Yes!'
+    puts '2. Lets see if you are using a framework'
+    check_for_all_frameworks
+    puts 'The end (thanks Bard)'
+end
+
+
+main
