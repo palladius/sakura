@@ -76,7 +76,7 @@ set -euo pipefail
 # echodo git checkout HEAD~${N_COMMITS}
 
 _git_teleport_n_commits "$N_COMMITS"
-_git_log_last
+_git_log_last | tee "$DEST_FOLDER.details"
 
 echo '2. copying dir..'
 echodo cp -r "$FOLDER" "${DEST_FOLDER}"
