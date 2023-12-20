@@ -1,0 +1,57 @@
+#!/bin/bash
+
+DEAFULT_APP='docz/richelp/'
+DEFAULT_COMMITS='30'
+
+# remove trailing slash
+APP_DIRTY=${1:-$DEAFULT_APP}
+N_COMMITS=${2:-$DEFAULT_COMMITS}
+
+function _git_log_last() {
+    git log | head -6 | indenta '💬 '
+}
+
+APP=${APP_DIRTY%/*} # removing slash at the end
+echo I want to TimeMachine a subset of a hgue repo into
+echo "✅ APP:    '$APP'"
+echo "✅ APP_DTY:'$APP_DIRTY'"
+echo "✅ N_COMMITS: ${N_COMMITS}c"
+
+white 'Current git log'
+_git_log_last
+
+echo 1. Observing current packages:
+du -sh ${APP}*
+
+white "== Reverting back N COMMITS=="
+echo 1. N COMMITS ago:
+# https://stackoverflow.com/questions/4052854/how-do-i-check-out-what-was-in-my-git-repository-n-COMMITS-ago
+
+
+git log HEAD~${N_COMMITS} | head | indenta "[${N_COMMITS} AGO] " | lolcat
+
+set -euo pipefail
+
+echo 'Is this ok? [YESSS/anything else]'
+read YES_OR_EXIT_TODO
+echo "Your answer: $YES_OR_EXIT_TODO"
+
+if [ "YESSS" = "$YES_OR_EXIT_TODO" ] ;  then
+    echo ok continue
+else
+    red Exiting..
+    exit 42
+fi
+echodo git co -b ric-timemachine-${N_COMMITS}c
+echodo git checkout HEAD~${N_COMMITS}
+_git_log_last
+
+echo '2. copying dir..'
+echodo cp -r "$APP" "${APP}-${N_COMMITS}c"
+
+echo 3. Revert back:
+red no idea yet
+# https://stackoverflow.com/questions/180052/checkout-subdirectories-in-git
+#echo 'git checkout master */*/wp-content/*/*'
+echo 'git checkout master rails/ror7-scubatracker/*'
+# git-clone-subdir NON VA
