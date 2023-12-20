@@ -1,27 +1,57 @@
 #!/bin/bash
 
-DEAFULT_APP='docz/richelp/'
+# RODO quando funge mettilo dentro git!
+
+DEAFULT_FOLDER='docz/richelp/'
 DEFAULT_COMMITS='30'
+DEFAULT_BRANCH='master'
 
 # remove trailing slash
-APP_DIRTY=${1:-$DEAFULT_APP}
+FOLDER_DIRTY=${1:-$DEAFULT_FOLDER}
 N_COMMITS=${2:-$DEFAULT_COMMITS}
 
+yellow "Usage: $0 [FOLDER] [COMMITS]"
+
 function _git_log_last() {
-    git log | head -6 | indenta '💬 '
+    git log | head -6 | indenta '💬 ' ||
+        echo -en '' # seems to stop!
+}
+function _git_teleport_n_commits() {
+    N_COMMITS="$1"
+    # Turn off this advice by setting config variable advice.detachedHead to false TODO RICC
+    echodo git co HEAD~$N_COMMITS
+    echodo git switch -c ric-timemachine-${N_COMMITS}-commits
 }
 
-APP=${APP_DIRTY%/*} # removing slash at the end
+
+
+# main ..
+
+FOLDER=${FOLDER_DIRTY%/*} # removing slash at the end
+DEST_FOLDER="${FOLDER}-${N_COMMITS}commits-ago"
 echo I want to TimeMachine a subset of a hgue repo into
-echo "✅ APP:    '$APP'"
-echo "✅ APP_DTY:'$APP_DIRTY'"
+echo "✅ FOLDER:    '$FOLDER'"
+echo "✅ FOLDER_DTY:'$FOLDER_DIRTY'"
 echo "✅ N_COMMITS: ${N_COMMITS}c"
+
+if [ -d "$FOLDER" ]; then
+    echo folder eixists
+    else
+    red folder $FOLDER doesnt exist, exiting.
+    exit 56
+fi
+if [ -d "$DEST_FOLDER" ]; then
+    echo folder eixists: $DEST_FOLDER. Probably you shouldnt be running this script as stuff is alreayd there..
+    exit 57
+else
+    green folder $DEST_FOLDER doesnt exist, alles guet.
+fi
 
 white 'Current git log'
 _git_log_last
 
 echo 1. Observing current packages:
-du -sh ${APP}*
+du -sh ${FOLDER}*
 
 white "== Reverting back N COMMITS=="
 echo 1. N COMMITS ago:
@@ -32,25 +62,29 @@ git log HEAD~${N_COMMITS} | head | indenta "[${N_COMMITS} AGO] " | lolcat
 
 set -euo pipefail
 
-echo 'Is this ok? [YESSS/anything else]'
-read YES_OR_EXIT_TODO
-echo "Your answer: $YES_OR_EXIT_TODO"
+# echo 'Is this ok? [YESSS/anything else]'
+# read YES_OR_EXIT_TODO
+# echo "Your answer: $YES_OR_EXIT_TODO"
 
-if [ "YESSS" = "$YES_OR_EXIT_TODO" ] ;  then
-    echo ok continue
-else
-    red Exiting..
-    exit 42
-fi
-echodo git co -b ric-timemachine-${N_COMMITS}c
-echodo git checkout HEAD~${N_COMMITS}
+# if [ "YESSS" = "$YES_OR_EXIT_TODO" ] ;  then
+#     echo ok continue
+# else
+#     red Exiting..
+#     exit 42
+# fi
+# echodo git co -b ric-timemachine-${N_COMMITS}c
+# echodo git checkout HEAD~${N_COMMITS}
+
+_git_teleport_n_commits "$N_COMMITS"
 _git_log_last
 
 echo '2. copying dir..'
-echodo cp -r "$APP" "${APP}-${N_COMMITS}c"
+echodo cp -r "$FOLDER" "${DEST_FOLDER}"
 
 echo 3. Revert back:
 red no idea yet
+git co "$DEFAULT_BRANCH"
+
 # https://stackoverflow.com/questions/180052/checkout-subdirectories-in-git
 #echo 'git checkout master */*/wp-content/*/*'
 echo 'git checkout master rails/ror7-scubatracker/*'
