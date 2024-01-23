@@ -42,24 +42,23 @@ end
 def oauth_tokeinfo_curl(verbose: )
     # 1. Find the Token.
     gapat = `gcloud auth print-access-token 2>.t`.chomp # token
-    stderr = `cat .t`
+    stderr = `cat .t` # I know I know, there's a more sophisticated way with open3()..
     #puts "gapat: '#{gapat}'" if verbose
     #puts "stderr: #{white stderr}" if verbose
     if gapat.empty?
         # probably .t contains sth like this:
-        #         stderr: ERROR: (gcloud.auth.print-access-token) Your current active account [ricc@google.com] does not have any valid credentials
-        # Please run:
-        #   $ gcloud auth login
-        # to obtain new credentials.
-        # For service account, please activate it first:
-        #   $ gcloud auth activate-service-account ACCOUNT
+        # """
+            # ERROR: (gcloud.auth.print-access-token) Your current active account [ricc@google.com] does not have any valid credentials
+            # Please run:
+            #   $ gcloud auth login
+            # to obtain new credentials.
+            # For service account, please activate it first:
+            #   $ gcloud auth activate-service-account ACCOUNT
+        # """
         matchez = stderr.match(/Your current active account \[(.*)\] does not have any valid credentials/)
         if matchez
             m = matchez.to_a
             email = m[1]
-            #puts "m: #{m}"
-            #puts "m[0]: #{m[0]}"
-            #puts "m[1]: #{m[1]}"
             return "🍎 [gapat] Current active account: '#{white email}' has no valid credentials: try #{white 'gcloud auth login'}"
         end
         return "🍎 GapatEmpty (gapat empty) NOT good: '#{gapat}'"
@@ -67,11 +66,6 @@ def oauth_tokeinfo_curl(verbose: )
 
     curl_ret = `curl 'https://www.googleapis.com/oauth2/v3/tokeninfo?access_token=#{gapat}' 2>/dev/null`
     ret = $?
-    #stderr1 = `cat .t.useless` # useful
-    #puts "ret: #{ret} (class: #{ret.class})" if verbose
-    #puts "curl_ret: '#{white curl_ret}'" # if verbose
-    #puts "stderr2: #{stderr2}" if verbose
-    #puts "ret.success?: #{ret.success?}" if verbose"
 
     # could be CURL is succesful but GAPAT is not and returns proper JSON but not-ok auth token. This is GOOD
     if ret.success?
@@ -101,7 +95,6 @@ def oauth_tokeinfo_curl(verbose: )
             puts("⏰ Expires in: #{ricc_time_ago expires_in_seconds} (#{expires_in_seconds}s)")
             puts("🕰️  Expires on: #{Time.at(exp).to_datetime} (#{exp})")
             puts("🕰️  Now:        #{Time.now.to_datetime}")
-            #puts("AGO: #{ricc_time_ago expires_in_seconds}")
         end
         return("🟩 'gcloud' credentials for #{white email} seem valid for another #{white ricc_time_ago(expires_in_seconds)} (until ~#{white Time.at(exp).to_datetime.strftime("%H:%M")})")
     else        puts("")
