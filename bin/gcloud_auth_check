@@ -4,6 +4,10 @@
 # Call me this way:
 # $ VERBOSE=true gcloud_auth_check
 #
+# To test:
+#
+# To revoke:
+# $ gcloud auth revoke
 
 require 'json'
 require 'date'
@@ -23,7 +27,6 @@ require 'date'
 #   "email_verified": "true"
 # }
 
-VERBOSE = ENV.fetch('VERBOSE', "false").downcase == 'true'
 
 def ricc_time_ago(n_seconds)
     #ActionView::Helpers::DateHelper
@@ -36,16 +39,58 @@ def white(s)
 end
 
 
-def main(verbose: )
-    curl_ret = `curl https://www.googleapis.com/oauth2/v3/tokeninfo?access_token=$(gcloud auth print-access-token) 2>/dev/null`
-    ret = $?
-    #puts "ret: #{ret} (class: #{ret.class})"
-    if ret.success?
-        #puts "curl_ret: #{curl_ret}"
-        hash = JSON.load(curl_ret)
-        #puts "hash: #{hash}"
+def oauth_tokeinfo_curl(verbose: )
+    # 1. Find the Token.
+    gapat = `gcloud auth print-access-token 2>.t`.chomp # token
+    stderr = `cat .t`
+    #puts "gapat: '#{gapat}'" if verbose
+    #puts "stderr: #{white stderr}" if verbose
+    if gapat.empty?
+        # probably .t contains sth like this:
+        #         stderr: ERROR: (gcloud.auth.print-access-token) Your current active account [ricc@google.com] does not have any valid credentials
+        # Please run:
+        #   $ gcloud auth login
+        # to obtain new credentials.
+        # For service account, please activate it first:
+        #   $ gcloud auth activate-service-account ACCOUNT
+        matchez = stderr.match(/Your current active account \[(.*)\] does not have any valid credentials/)
+        if matchez
+            m = matchez.to_a
+            email = m[1]
+            #puts "m: #{m}"
+            #puts "m[0]: #{m[0]}"
+            #puts "m[1]: #{m[1]}"
+            return "🍎 [gapat] Current active account: '#{white email}' has no valid credentials: try #{white 'gcloud auth login'}"
+        end
+        return "🍎 GapatEmpty (gapat empty) NOT good: '#{gapat}'"
+    end
 
-        puts("📢📢📢 VERBOSE enabled, thanks! 📢📢📢")
+    curl_ret = `curl 'https://www.googleapis.com/oauth2/v3/tokeninfo?access_token=#{gapat}' 2>/dev/null`
+    ret = $?
+    #stderr1 = `cat .t.useless` # useful
+    #puts "ret: #{ret} (class: #{ret.class})" if verbose
+    #puts "curl_ret: '#{white curl_ret}'" # if verbose
+    #puts "stderr2: #{stderr2}" if verbose
+    #puts "ret.success?: #{ret.success?}" if verbose"
+
+    # could be CURL is succesful but GAPAT is not and returns proper JSON but not-ok auth token. This is GOOD
+    if ret.success?
+        hash = JSON.load(curl_ret) rescue nil
+        if hash.nil?
+            puts "Error NIL: #{hash}"
+            return "🍎 Credentials1 NOT good (not valid JSON): '#{curl_ret}'"
+        end
+        #puts "CURL responded with this hash: #{hash.class}"
+        raise "not a hash" unless hash.is_a?(Hash)
+
+        # TODO(ricc): verify if this ever happens. Not that I moved the GAPAT code above, this probably aint ever gonna happen
+        if hash.has_key?('error_description')
+            error_description = hash['error_description']
+            puts "Error: #{hash}"
+            return "🍎 Credentials2b NOT good but I have 'error_description': #{hash}"
+        end
+
+        puts("📢📢📢 VERBOSE enabled, thanks! 📢📢📢") if verbose
         email = hash['email']
         email_verified = hash['email_verified']
         expires_in_seconds = hash['expires_in'].to_i
@@ -58,12 +103,19 @@ def main(verbose: )
             puts("🕰️  Now:        #{Time.now.to_datetime}")
             #puts("AGO: #{ricc_time_ago expires_in_seconds}")
         end
-        puts("🟩 'gcloud' credentials for #{white email} seem valid for another #{white ricc_time_ago(expires_in_seconds)}")
-    else
-        puts("Something wrong with the CURL, maybe you are not authed correctly")
+        return("🟩 'gcloud' credentials for #{white email} seem valid for another #{white ricc_time_ago(expires_in_seconds)} (until ~#{white Time.at(exp).to_datetime.strftime("%H:%M")})")
+    else        puts("")
+        return "🍎 Something wrong with the CURL, maybe you are not authed correctly. Returned <> 0: #{ret}"
     end
+end
 
+def main()
+    verbose = ENV.fetch('VERBOSE', "false").downcase == 'true'
+    final_message = oauth_tokeinfo_curl(verbose: )
+    puts("|OAuthInfo| #{final_message}")
+    # silently removing this silly file
+    `rm .t`
 end
 
 
-main(verbose: VERBOSE)
+main()
