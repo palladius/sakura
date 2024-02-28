@@ -1,5 +1,11 @@
 #!/usr/bin/env python
 
+# This code allows you to:
+# 1. Define a per-folder .gcloud config (been my dream for pst 10 years - Im done waiting).
+# 2. You can have multiple versions: 'default',. 'foo', 'bar'.
+# 3. If your folder is called 'bar', it will automatically load that folder.
+
+
 # TODO make it super NON verbose and when it is auto load it on every CD in the shell :)
 # .. like direnv works. But first lets make it work :)
 
