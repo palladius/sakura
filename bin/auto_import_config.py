@@ -25,6 +25,12 @@ layout_ricc_gcloud() {
 ```
 Now add to your local .envrc:
 
+```bash
+# this is .envrc (see https://direnv.net/ for more)
+layout ricc_gcloud
+
+export MY_OTHER_VAR='FooBar'
+```
 
 Works like a charm! It's so automagic I need to add a yellow heart emoji to notice!
 
