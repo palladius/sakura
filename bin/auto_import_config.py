@@ -82,7 +82,7 @@ configurations:
       REPO_NAME: 'my-awesome-app'
       # These work! Just make sure you do it in ORDER. (God bless python dicts naivity)
       BUCKET: "gs://my-unique-${PROJECT_ID}-bucket"
-      IMAGE_URI: "${REGION}-docker.pkg.dev/${PROJECT_ID}/${REPO_NAME}/my_vertex_image:latest"
+      IMAGE_URI: "${GCP_REGION}-docker.pkg.dev/${PROJECT_ID}/${REPO_NAME}/my_vertex_image:latest"
 '''
 # python is ugly: https://stackoverflow.com/questions/17215400/format-string-unused-named-arguments doesnt help.
 
@@ -105,6 +105,7 @@ def execute(command):
         print(f"[DRYRUN] 🔞 {command}")
     else:
         # executing for real.. no excuses!
+        #print(f"💻 Executing for real: {command}")
         os.system(command)
 
 # def get_project_number_from_wrong(project_id):
@@ -202,7 +203,7 @@ def inject_all_configs(config_data):
 
         # gcloud config ('gcloud' stanza)
         for property_name, value in properties['gcloud'].items():
-            execute(f"echo gcloud config set {property_name} {value} --configuration {config_name}")
+            execute(f"gcloud config set {property_name} {value} --configuration {config_name}")
             if property_name == 'project':
                 opinionated_properties['PROJECT_ID'] = value
                 pn = get_project_number_from(value)
