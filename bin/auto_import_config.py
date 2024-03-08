@@ -1,43 +1,66 @@
 #!/usr/bin/env python
 
-# This code allows you to:
-# 1. Define a per-folder .gcloud config (been my dream for pst 10 years - Im done waiting).
-# 2. You can have multiple versions: 'default',. 'foo', 'bar'.
-# 3. If your folder is called 'bar', it will automatically load that folder.
+"""Not too shabs this python doc thingy.
+
+This code allows you to:
+
+1. Define a per-folder `gcloud configuration` (been my dream for pst 10 years - Im done waiting).
+2. You can have multiple versions: 'default', 'personal', 'work', 'demo', ..
+3. If your folder is called 'bar', it will automatically load that folder. Caveat: folders starting with digit wont work
 
 
-# TODO make it super NON verbose and when it is auto load it on every CD in the shell :)
-# .. like direnv works. But first lets make it work :)
+TODO(ricc): make it super NON verbose and when it is auto load it on every CD in the shell :)
+            like direnv works. But first lets make it work :)
+
+If you want the shell artifact to work with `direnv`, use this snippet of code
+(courtesy of https://github.com/direnv/direnv/issues/70) Add this to ~/.direnvrc:
+
+```bash
+layout_ricc_gcloud() {
+  echo "💛 [ENVRC] Layout Riccardo operational!"
+  if [ -f "_env_gaic.sh" ]; then
+    . _env_gaic.sh
+  fi
+}
+```
+Now add to your local .envrc:
+
+
+Works like a charm! It's so automagic I need to add a yellow heart emoji to notice!
+
+"""
 
 from datetime import datetime
-import subprocess
+from collections import defaultdict
 
 import yaml
 import os
+import subprocess
 import sys
 
-ProgVersion = '1.2'
+ProgVersion = '1.3'
 ConfigFileName = '.gcloudconfig.yaml'
-DryRun = False # set trut in while loop in dev mode ;)
+# set True in while loop in dev mode ;)
+DryRun = False
 ProgName = os.path.basename(sys.argv[0])
 Now = datetime.now().strftime('%Y:%m:%d %H:%M')
 Separator = ('#' * 80)
-SampleConfig  = '''\import subprocess
-
+SampleConfig  = '''
 ########################################################
-# This is a sample from #{ProgName} v{version}
+# This is a sample from {ProgName} v{ProgVersion}
 # Code: https://github.com/palladius/sakura/blob/master/bin/auto_import_config.py
 ########################################################
 # Once done you can do: gcloud config configurations activate YOUR_VAVORITE_CONFIG
 local_config:
   auto: true
 configurations:
-  default:
-    gcloud:
-      project: my-default-personal-project
-      compute/region: us-central1
-      compute/zone: us-central1-b
-      account: your.personal.email@gmail.com
+  # You probably DONT WANT TO USE default unless you started on GCP yesterday
+  #default:
+  #  gcloud:
+  #    project: my-default-personal-project
+  #    compute/region: us-central1
+  #    compute/zone: us-central1-b
+  #    account: your.personal.email@gmail.com
   # Note: gcloud wont accept this config name if it starts with a number (#btdt)
   {this_folder}:
     gcloud:
@@ -46,16 +69,29 @@ configurations:
       compute/zone: us-central1-b
       account: your.work.email@my-job.example.com
     env:
-      # TODO(ricc): the first 2 should come for free..
-      PROJECT_ID: my-local-work-project # this could actually be autopopulated
-      REGION: us-central1
-      BUCKET: gs://my-bucket
+      # No need! It's auto imported for you. You're welcome
+      #PROJECT_ID: this is autopopulated from above
+      #GCP_REGION: this is autopopulated from above
       VERTEX_TRAINING_JOB_NAME: 'train-test-123'
       REPO_NAME: 'my-awesome-app'
-      # Not implemented yet, but who knows.. but use Pulumi/TF standard namings.
-      # Works in python
+      # These work! Just make sure you do it in ORDER. (God bless python dicts naivity)
+      BUCKET: "gs://my-unique-${PROJECT_ID}-bucket"
       IMAGE_URI: "${REGION}-docker.pkg.dev/${PROJECT_ID}/${REPO_NAME}/my_vertex_image:latest"
 '''
+# python is ugly: https://stackoverflow.com/questions/17215400/format-string-unused-named-arguments doesnt help.
+
+
+
+# Have I said I hate python? :)
+class SafeDict(dict):
+    def __missing__(self, key):
+        return '{' + key + '}'
+
+def local_dirname():
+    '''Returns the latest folder of `pwd`.'''
+    full_dir =  os.getcwd()
+    local_dir = os.path.basename(full_dir)
+    return local_dir
 
 def execute(command):
     '''Execute code but... with a cactch.'''
@@ -65,10 +101,10 @@ def execute(command):
         # executing for real.. no excuses!
         os.system(command)
 
-def get_project_number_from_wrong(project_id):
-    '''Im so happy. This is usually an inefficient computation but I can automate it!'''
-    ret = os.system(f"gcloud projects describe {project_id} --format='value(projectNumber)'")
-    return f"{ret}" #  "4242"
+# def get_project_number_from_wrong(project_id):
+#     '''Im so happy. This is usually an inefficient computation but I can automate it!'''
+#     ret = os.system(f"gcloud projects describe {project_id} --format='value(projectNumber)'")
+#     return f"{ret}" #  "4242"
 
 def get_project_number_from(project_id):
     process = subprocess.Popen(
@@ -79,7 +115,10 @@ def get_project_number_from(project_id):
     output, err = process.communicate()
 
     if process.returncode != 0:
-        raise Exception(f"gcloud command failed: {process.returncode}") # err.decode()
+        #raise Exception
+        print(f"gcloud command failed; ret_value={process.returncode}") # err.decode()
+        return None # "SOME_ERROR_42_SORRY"
+        #return output.decode('utf-8').strip()
 
     return output.decode('utf-8').strip()
 
@@ -94,7 +133,7 @@ def setup_env_stubs(config_name, env_properties):
     '''
     print(f"config_name: {config_name}")
     print(f"env_properties: {env_properties}")
-    banner = f"\n{Separator}\n# Generated by {ProgName} v{ProgVersion} on {Now}\n# Do NOT edit or it might get overwritten. Please edit the .gcloudconfig.yaml!\n{Separator}\n\n"
+    banner = f"\n{Separator}\n# Generated by {ProgName} v{ProgVersion} on {Now}\n# Do NOT edit or it might get overwritten. Please edit the .gcloudconfig.yaml (and if needed relaunch the script)!\n{Separator}\n\n"
     config = env_properties
 
     # TODO(ricc): move to a lambda which accepts the logic per language and refactor so the OPEN can be caught with if exists...
@@ -113,7 +152,9 @@ def setup_env_stubs(config_name, env_properties):
     # BASH stub
     with open('_env_gaic.sh', 'w') as f:
         f.write(banner)
-        f.write("# source '_env_gaic' \n") # TESTED
+        f.write("# [BASH]   source '_env_gaic.sh' \n") # TESTED
+        f.write("# [DIRENV] layout ricc_gcloud\n") # TESTED
+
         for key, value in config.items():
             f.write(f'export {key}="{os.path.expandvars(value)}"\n')
 
@@ -158,7 +199,9 @@ def inject_all_configs(config_data):
             execute(f"echo gcloud config set {property_name} {value} --configuration {config_name}")
             if property_name == 'project':
                 opinionated_properties['PROJECT_ID'] = value
-                opinionated_properties['PROJECT_NUMBER'] = get_project_number_from(value)
+                pn = get_project_number_from(value)
+                if pn: # could be None if we get an error
+                    opinionated_properties['PROJECT_NUMBER'] = pn
                 #opinionated_properties['GOOGLE_PROJECT'] = value # Pulumi supports: GOOGLE_PROJECT, GOOGLE_CLOUD_PROJECT, GCLOUD_PROJECT, CLOUDSDK_CORE_PROJECT https://www.pulumi.com/registry/packages/gcp/installation-configuration/
             if property_name == 'compute/region':
                 opinionated_properties['GCP_REGION'] = value
@@ -177,11 +220,7 @@ def inject_all_configs(config_data):
 
 
 
-def local_dirname():
-    '''Returns the latest folder of `pwd`.'''
-    full_dir =  os.getcwd()
-    local_dir = os.path.basename(full_dir)
-    return local_dir
+
 
 def parse_local_config(config_data):
     '''parses the autoconfig: optional stanza.'''
@@ -200,7 +239,23 @@ def parse_local_config(config_data):
 def create_sample_config_name():
     '''Create a reasonable sample filename for me.'''
     local_pwd = local_dirname()
-    ground_config = SampleConfig.format(version=ProgVersion, this_folder=local_pwd)
+
+    # from string import Template
+    # tpl = Template(SampleConfig)
+    # action = tpl.safe_substitute({'version': 'ProgVersion'})
+    # print(action)
+    ground_config = SampleConfig.format_map(SafeDict(
+        bond='bond',
+        ProgVersion=ProgVersion,
+        ProgName=ProgName,
+        this_folder=local_pwd))
+    #.format_map(SafeDict(bond='bond'))
+    # ground_config = SampleConfig.format(
+    #     version=ProgVersion,
+    #     prog_name=ProgName,
+    #     this_folder=local_pwd)
+
+
     print (f"sample_config. Try something like: \n$ cat > {ConfigFileName}\n{ground_config}\n# ... Now its time to CRL-D\n")
 
 def main():
@@ -232,6 +287,8 @@ def main():
 
     #execute(f"gcloud config list")
     execute(f"gcloud config configurations list | grep True")
+
+    print("🪄 Magic show is now over. Check via `gcloud config configurations list`")
 
 
 main()
