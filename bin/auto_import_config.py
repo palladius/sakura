@@ -39,6 +39,7 @@ Works like a charm! It's so automagic I need to add a yellow heart emoji to noti
 from datetime import datetime
 from collections import defaultdict
 
+# pip install pyyaml
 import yaml
 import os
 import subprocess
