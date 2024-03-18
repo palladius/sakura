@@ -1,0 +1,42 @@
+#!/usr/bin/env python3
+
+# copied from https://stackoverflow.com/questions/24736316/see-when-packages-were-installed-updated-using-pip
+
+# NON VA
+# import pip, os, time
+# for package in pip.get_installed_distributions():
+#      print("%s: %s" % (package, time.ctime(os.path.getctime(package.location))))
+
+
+# import pkg_resources, os, time
+# for package in pkg_resources.working_set:
+#     print("%s: %s" % (package, time.ctime(os.path.getctime(package.location))))
+
+# Better dates
+from importlib.metadata import distributions
+import os, time
+from datetime import date, timedelta
+today = date.today()
+
+HIDE_OLD_ENOUGH = True  # TODO implement
+OBSOLESCENCE_DAYS = int(os.getenv("OBSOLESCENCE_DAYS", 80))
+pkgs_to_uninstall = []
+
+print(f"Showing PIP installed packages within {OBSOLESCENCE_DAYS} days (Change with ENV[OBSOLESCENCE_DAYS])")
+for dist in distributions():
+    dist_time = time.ctime(os.path.getctime(dist._path))
+    creation_time = os.path.getctime(dist._path)
+    creation_time_int = int(creation_time)
+    # Convert creation time to date object
+    creation_date = date.fromtimestamp(creation_time_int)
+    time_delta = today - creation_date # creation_date
+    difference_in_days = time_delta.days
+
+    #print(f"Delta: {difference_in_days}")
+    if difference_in_days < OBSOLESCENCE_DAYS:
+         print("🐍 %s %s: %s (%dd ago)" % (dist.metadata["Name"], dist.version, dist_time, difference_in_days))
+         pkgs_to_uninstall.append( dist.metadata["Name"] )
+
+if len(pkgs_to_uninstall) > 0:
+     print("Command to uninstall recent packages (use at your own DANGER!):")
+     print(f"$ echo pip uninstall {' '.join(pkgs_to_uninstall)}")

@@ -104,7 +104,7 @@ end
 
 def main()
     verbose = ENV.fetch('VERBOSE', "false").downcase == 'true'
-    final_message = oauth_tokeinfo_curl(verbose: )
+    final_message = oauth_tokeinfo_curl(verbose: verbose)
     puts("|OAuthInfo| #{final_message}")
     # silently removing this silly file
     `rm .t`
