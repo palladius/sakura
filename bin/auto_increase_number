@@ -1,0 +1,52 @@
+#!/bin/bash
+
+################################################
+# This scripts gives you a consistent increment.
+# This can't guarantee atomiocity, its not a DB
+# its actually smaller and less reliable than sqlite :)
+#
+# TODO
+# add --debug
+# add --dryrun (I would increment from 42 to 43 but I wont)
+################################################
+
+#export COUNTER_FILE="${COUNTER_FILE:.counters_are_hard.txt}"
+export COUNTER_FILE=".counters_are_hard.txt"
+
+
+if [ '--dryrun' = "$1" ] ; then
+    CURRENT_COUNT=$(cat "$COUNTER_FILE")
+    echo "[DRYRUN] I would increment the number from $CURRENT_COUNT to $CURRENT_COUNT+1. But I won't."
+    exit 0
+fi
+
+set -euo pipefail
+
+####################################################
+# Created with Gemini :) This is where you ask yourself: why the hell did you choose bash?!?
+# And to quote CGB.. "NO QUESTIONS!" :)
+#
+# To reset: rm .release_counter.txt
+####################################################
+_auto_increase_release_number() {
+    #COUNTER_FILE="$1"
+
+    # Create the counter file if it doesn't exist
+    if [ ! -f "$COUNTER_FILE" ]; then
+        echo 'DEB File '$COUNTER_FILE' not existing Creating..'
+        echo "000" > "$COUNTER_FILE"
+    fi
+    # Read the current counter value
+    CURRENT_COUNT=$(cat "$COUNTER_FILE")
+    # Increment the counter
+    NEXT_COUNT=$((CURRENT_COUNT + 1))
+    # Format with leading zeros (up to 3 digits)
+    RELEASE_NUMBER=$(printf "%03d" $NEXT_COUNT)
+    # Overwrite the counter file with the new value
+    echo "$NEXT_COUNT" > "$COUNTER_FILE"
+    # 001, ...
+    echo $RELEASE_NUMBER
+}
+
+_auto_increase_release_number
+# "$COUNTER_FILE"
