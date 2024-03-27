@@ -1,0 +1,10 @@
+#!/bin/bash
+
+if gcloud auth print-access-token 1>/dev/null 2>/dev/null ; then
+    echo "OK. You are authorized"
+    exit 0
+else
+    echo "NO. You need to run: gcloud auth login"
+    exit 42
+fi
+
