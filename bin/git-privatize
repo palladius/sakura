@@ -39,12 +39,13 @@ end
 
 =end
 
-$PROG_VER = '0.2.2'
+$PROG_VER = '0.2.3'
 $DEBUG    = false
 
+# 0.2.3 15may24  Added MKDIR of the private folder if needed..
 # 0.2.2 14jun22  less verbose by default. But give me -d or -v and I will unleash hell!
 # 0.2.1 26apr22  Backfilled a GIC feature to sakura (last night i forgot to commit a local symlink to whole project DIR)
-# 0.2.0 26apr22  Ported from GIC to Sakura  
+# 0.2.0 26apr22  Ported from GIC to Sakura
 
 require 'optparse'       # http://ruby.about.com/od/advancedruby/a/optionparser.htm
 
@@ -293,7 +294,7 @@ def privatize_files(files)
     #puts "Please execute this command MANUALLY until i'm sure to do it myself (just remove echo when it works a few times):"
     local_subdir = File.dirname(filename) # finche non ho cose piu complicate..
     remote_repo_dir = $conf[:remote_repo_absolute_path]
-    command = "mv #{filename} #{remote_repo_dir}/#{local_subdir}/"
+    command = "mkdir -p '#{remote_repo_dir}/#{local_subdir}/' && mv '#{filename}' '#{remote_repo_dir}/#{local_subdir}/'"
     puts "[CMD] #{white command}"
    # `#{command}` unless $opts[:dryrun]
     execute_unless_dryrun(command)
@@ -344,7 +345,7 @@ def restore_privatized_files(files=[])
 end
 
 def verbose?
-  $opts[:verbose] rescue false 
+  $opts[:verbose] rescue false
 end
 
 def real_program

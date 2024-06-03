@@ -1,9 +1,13 @@
 #!/bin/bash
 
   # Sakura-simplified version of this amazing script
-
-(echo -en "[echodo] " ; echo "$@" | lolcat )>&2
+if which lolcat>/dev/null ; then
+  CAT=lolcat
+else
+  CAT=cat
+fi
+#(echo -en "[echodo] " ; echo "$@" | lolcat )>&2
+(echo -en "[echodo] " ; echo "$@" | "$CAT" )>&2
 (echo -en "$(date) [echodo] " ; echo "$@" | lolcat ) >> .echodo_history
-#(echo "[sak-echoDo] $@" | lolcat )>&2
 
 "$@"
