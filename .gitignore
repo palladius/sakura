@@ -30,3 +30,4 @@ bin/geo-ip-city.sh
 doc
 *.gemspec
 .echodo_history
+.ondir.was.here.touch
