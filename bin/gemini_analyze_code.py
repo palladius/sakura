@@ -29,6 +29,8 @@ DefaultModel = 'gemini-1.5-pro'
 #DefaultProject = 'ric-cccwiki'
 GEMINI_API_KEY = os.getenv('PALM_API_KEY') # os.environ["GEMINI_API_KEY"]
 #ServiceAccountPath = os.getenv('GEMINI_SERVICE_ACCOUNT', None) # 'ENV SA non datur')
+CodeFileExtensions = ('.py', '.js', '.java', '.c', '.cpp', '.cs', '.rb', '.sh', 'Dockerfile', '.yaml')
+
 
 # def gemini_api_endpoint(region='us-central1', project_id=DefaultProject, model_id=DefaultModel):
 #     '''Ref: https://cloud.google.com/vertex-ai/generative-ai/docs/model-reference/inference'''
@@ -68,24 +70,77 @@ GEMINI_API_KEY = os.getenv('PALM_API_KEY') # os.environ["GEMINI_API_KEY"]
 #     return response.json()["text"]  # Assuming the response format
 
 
-def analyze_code_with_gemini(code_content):
+def analyze_code_with_gemini(code_content, prompt=None):
     '''Copied from file.'''
 
     model = genai.GenerativeModel("gemini-1.5-flash")
     #prompt = f"""Analyze the following code and explain what it does in maximum 3 sentencesplus add a sentence at the end explaining if this file seems OBSOLETE (meaning - better to throw it all away) and why):\n\n`\n{code_content}\n`"""
     #prompt = f"Analyze the following code and explain what it does in 1 sentence. If you find any bug, please highlight it in one bullet point per bug):\n\n`\n{code_content}\n`"
-    prompt = f"Analyze the following code and explain what it does in maximum 2 sentence:\n\n`\n{code_content}\n`"
+    if prompt is None:
+        prompt = f"Analyze the following code and explain what it does in maximum 2 sentence:\n\n`\n{code_content}\n`"
     # TODO catch errors and visualize the rest of JSON if error arrives.
     # one error was:
     # ValueError: Invalid operation: The `response.text` quick accessor requires the response to contain a valid `Part`, but none were returned. Please check the `candidate.safety_ratings` to determine if the response was blocked.
-    response = model.generate_content(prompt)
-    #print(response.text)
-    return response.text
+    try:
+        response = model.generate_content(prompt)
+        return response.text
+
+    except ValueError as e:
+        if "Invalid operation: The `response.text` quick accessor requires" in str(e):
+            # Handle the specific ValueError you encountered
+            print(f"Error analyzing code: {e}")
+            if response.candidates and response.candidates[0].safety_ratings:
+                print("Safety ratings:", response.candidates[0].safety_ratings)
+            else:
+                print("No safety ratings available.")
+        else:
+            # Handle other potential ValueErrors
+            print(f"Unexpected ValueError: {e}")
+
+    except Exception as e:
+        # Handle any other unexpected exceptions
+        print(f"An error occurred while analyzing the code: {e}")
+
+    # Return a default value or None in case of an error
+    return None  # or some other default value indicating an error
+    # response = model.generate_content(prompt)
+    # #print(response.text)
+    # return response.text
 
 def yellow(s):
     return f"\033[33m{s}\033[0m"
+def green(s):
+    return f"\033[32m{s}\033[0m"
 
-def analyze_local_code_directory(directory_path):
+
+def analyze_code_in_whole_folder(folder_path):
+    """
+    Aggregates code from all supported files in a single folder and analyzes it using the Gemini API.
+
+    Args:
+        folder_path (str): The path to the folder containing the code files.
+    """
+
+    all_code_content = ""
+    for file in os.listdir(folder_path):
+        #if file.endswith(('.py', '.js', '.java', '.c', '.cpp', '.cs', '.rb')):  # Add more extensions as needed
+        if file.endswith(CodeFileExtensions):  # Add more extensions as needed
+
+            file_path = os.path.join(folder_path, file)
+            with open(file_path, 'r') as f:
+                code_content = f.read()
+                all_code_content += f"### Code from {file}:\n\n`\n{code_content}\n`\n\n"
+
+    if all_code_content:
+        analysis = analyze_code_with_gemini(
+                        all_code_content,
+                        f"Analyze the code from all these following files and explain what it does in maximum 3-4 sentences. Add the code overall purpose, and add any bug or important TODO which is left behind in the code):\n\n`\n{all_code_content}\n`"
+        )
+        print(f"🐣📂 Analysis for folder {folder_path}:\n{green(analysis)}\n")
+    else:
+        print(f"No supported code files found in folder {folder_path}")
+
+def analyze_local_code_tree(directory_path):
     """
     Reads all code files in the specified directory and analyzes them using the Gemini API.
 
@@ -97,7 +152,7 @@ def analyze_local_code_directory(directory_path):
     for root, _, files in os.walk(directory_path):
         for file in files:
             if file.endswith(('.py', '.js', '.java', '.c', '.cpp', '.cs', '.rb', '.sh', 'Dockerfile', '.yaml')):  # Add more extensions as needed
-                print(f"🧐 Analyzing file '{file}' 🧐")
+                print(f"⏳ Analyzing file '{file}'..") # 🧐
                 file_path = os.path.join(root, file)
                 with open(file_path, 'r') as f:
                     code_content = f.read()
@@ -109,7 +164,7 @@ def analyze_local_code_directory(directory_path):
 
 def main():
     genai.configure(api_key=GEMINI_API_KEY)
-    print(f"[DEB] GEMINI_API_KEY={GEMINI_API_KEY}")
+    #print(f"[DEB] GEMINI_API_KEY={GEMINI_API_KEY}")
 
     if len(sys.argv) < 2:
         print("Error: Please provide the path to the code directory as an argument.")
@@ -122,7 +177,11 @@ def main():
         print(f"Error: The provided path '{code_directory}' is not a valid directory.")
         sys.exit(1)
 
-    analyze_local_code_directory(code_directory)
+    print("1. Analysis of the whole folder:")
+    analyze_code_in_whole_folder(code_directory)
+    print("2. Analysis file by file:")
+    analyze_local_code_tree(code_directory) # funge da Dio
+    print('3. TODO(ricc): add a file annotation like `$filename}.gemini.README.md`. If found, read that.')
 
 if __name__ == "__main__":
     main()
