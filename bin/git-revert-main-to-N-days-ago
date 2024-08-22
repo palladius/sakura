@@ -1,0 +1,7 @@
+#!/bin/bash
+
+N_DAYS_AGO=${1:-7}
+
+echo "Reverting your git repo MAIN to $N_DAYS_AGO days ago.."
+
+echodo git reset --hard main@{$N_DAYS_AGO.days.ago}
