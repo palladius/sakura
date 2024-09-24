@@ -15,14 +15,14 @@ raise('Missing ENV["SERP_API_KEY"].. failing.') unless SERP_API_KEY
 
 # Note: SPy doesnt work, probably as the default Nasdaq suffix wont work for it.
 $sample_stocks = %w{ AAPL GOOG GOOGL NVDA NFLX TSLA SPY} # NYSEARCA:SPY
-$prog_version = '1.1'
+$prog_version = '1.1b'
 $default_stock = 'GOOGL'
 $stock_to_check = ARGV[0] || $default_stock
 puts("🔧 Checking Stock: #{$stock_to_check}")
 
 def cached_google_search(params, version=$prog_version)
   cache_key = Digest::MD5.hexdigest(params.to_s + $prog_version) # so it changes cache if you bump up version
-  cache_file = ".cache/google_search_#{cache_key}.json"
+  cache_file = ".cache/serp.finance.#{cache_key}.json"
 
   if File.exist?(cache_file)
     puts  Rainbow("[debug] Cache hit: #{cache_file}").green
