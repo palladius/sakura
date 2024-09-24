@@ -9,7 +9,7 @@ require 'yaml'
 require 'pry'
 require 'byebug'
 
-$prog_version = '1.0'
+$prog_version = '1.1'
 MAX_ITEMS = 10
 SERP_API_KEY = ENV.fetch 'SERP_API_KEY', nil
 raise('Missing ENV["SERP_API_KEY"].. failing.') unless SERP_API_KEY
