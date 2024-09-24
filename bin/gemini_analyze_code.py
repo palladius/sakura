@@ -7,6 +7,8 @@ Usage: virtualenv
 
 Mac:
 
+# code $SAKURABIN/gemini_analyze_code.py
+
 * brew install virtualenv, or:
 * python3 -m venv .venv
 * . .venv/
@@ -27,7 +29,7 @@ import google.auth
 
 DefaultModel = 'gemini-1.5-pro'
 #DefaultProject = 'ric-cccwiki'
-GEMINI_API_KEY = os.getenv('PALM_API_KEY') # os.environ["GEMINI_API_KEY"]
+GEMINI_API_KEY = os.getenv('GEMINI_API_KEY', None) # os.environ["GEMINI_API_KEY"]
 #ServiceAccountPath = os.getenv('GEMINI_SERVICE_ACCOUNT', None) # 'ENV SA non datur')
 CodeFileExtensions = ('.py', '.js', '.java', '.c', '.cpp', '.cs', '.rb', '.sh', 'Dockerfile', '.yaml')
 
@@ -96,10 +98,13 @@ def analyze_code_with_gemini(code_content, prompt=None):
         else:
             # Handle other potential ValueErrors
             print(f"Unexpected ValueError: {e}")
+    except google.api_core.exceptions.PermissionDenied as e:
+        print(f"🤷🏼‍♀️ Gemini PermissionDenied: try to do 'gcloud auth login' once again, or set GEMINI_API_KEY correctly. Errpr: '{e}'")
+        exit(43)
 
     except Exception as e:
         # Handle any other unexpected exceptions
-        print(f"An error occurred while analyzing the code: {e}")
+        print(f"🤷🏼‍♀️ Error occurred {e.__class__} while executin GenAI Gemini API: {e}")
 
     # Return a default value or None in case of an error
     return None  # or some other default value indicating an error
@@ -163,6 +168,9 @@ def analyze_local_code_tree(directory_path):
 
 
 def main():
+    if GEMINI_API_KEY is None:
+        print('Sorry, missing GEMINI_API_KEY. Exiting.')
+        exit(44)
     genai.configure(api_key=GEMINI_API_KEY)
     #print(f"[DEB] GEMINI_API_KEY={GEMINI_API_KEY}")
 
