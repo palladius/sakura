@@ -8,3 +8,10 @@ gcloud config list
 yellow "3. Some stats:"
 echo Projects: $(gcloud projects list |wc -l)
 echo Orgs: $(gcloud organizations list |egrep -v DISPLAY_NAME | wc -l )
+
+red "4. Evil actions. Lets look at credentials: TODO someday now im busy see comments"
+# echo 'SELECT * from credentials;' |sqlite3 /usr/local/google/home/ricc/.config/gcloud/credentials.db
+# find ~/.config/gcloud/  -name \*.json -print0 | xargs -0 fgrep _token
+# TODO(ricc): check all info you get from the ADC.json of your current config
+#             and chck config in ADC: find ~/.config/gcloud/  -name \*.json
+#             particularly /usr/local/google/home/ricc/.config/gcloud/.last_update_check.json
