@@ -32,3 +32,4 @@ doc
 .echodo_history
 .ondir.was.here.touch
 .cache
+.venv/
