@@ -49,10 +49,13 @@ def print_fancy_stock_line(x)
   currency = x.fetch 'currency', '💲'
   mov_hash =x['price_movement']
   price_02 = x['price'].round(2) rescue x['price']
-  sign =  mov_hash['movement'] == 'Up' ? '+' : '-'
+  # if mov_hash.nil?
+  #   puts "🐞🐞🐞 EMPTY Movement #{x}"
+  #print("mov_hash.keys = #{mov_hash.keys}")
+  sign =  mov_hash['movement'] == 'Up' ? '+' : '-' rescue '🤷🏼‍♀️'
 #  movement_val = mov_hash['percentage'].to_s.format('%02d', 4) rescue 4242
-  movement_val = "#{sign}#{mov_hash['percentage'].round(2)}%" # .to_s.format('%02d', 4) rescue 4242
-  colored_movement = Rainbow(movement_val).send(mov_hash['movement'] == 'Up' ? :green : :red)
+  movement_val = "#{sign}#{mov_hash['percentage'].round(2)}%" rescue '' # .to_s.format('%02d', 4) rescue 4242
+  colored_movement = Rainbow(movement_val).send(mov_hash['movement'] == 'Up' ? :green : :red) rescue '🤷🏼‍♀️'
   puts "📈 #{stock_name}:\t #{price_02}#{currency}\t#{colored_movement}"
 end
 
