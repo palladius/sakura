@@ -7,6 +7,7 @@ I potentially use:
 * **docker** images.
 * **Trash** bin, of course.
 * Check also **media** folder in ~/ , you never know.
+  * Check Pictures/ and Videos/ folders
 
 ## Memory
 
