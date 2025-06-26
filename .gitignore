@@ -33,3 +33,10 @@ doc
 .ondir.was.here.touch
 .cache
 node_modules/
+.venv/
+checklist.chk
+docz/richelp-30d/
+t.sh
+deleteme
+bin-*ago
+bin-8c/

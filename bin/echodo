@@ -6,8 +6,9 @@ if which lolcat>/dev/null ; then
 else
   CAT=cat
 fi
-#(echo -en "[echodo] " ; echo "$@" | lolcat )>&2
+# having issues with lolcat
+CAT=cat
 (echo -en "[echodo] " ; echo "$@" | "$CAT" )>&2
-(echo -en "$(date) [echodo] " ; echo "$@" | lolcat ) >> .echodo_history
+(echo -en "$(date) [echodo] " ; echo "$@" | "$CAT" ) >> .echodo_history
 
 "$@"

@@ -1,3 +1,4 @@
+#!/bin/bash
 
-gcloud auth login --update-adc
+echodo gcloud auth login --update-adc
 

@@ -8,6 +8,9 @@ require 'rainbow'
 SERP_API_KEY = ENV.fetch 'SERP_API_KEY', nil
 raise('Missing ENV["SERP_API_KEY"].. failing.') unless SERP_API_KEY
 
+DEFAULT_ARRIVAL_AIRPORT = 'OPO' # Oporto
+# "SJJ", # Sarajevo
+
 $DEBUG = false
 
 def _yellow(s)
@@ -27,7 +30,7 @@ params = {
   api_key: SERP_API_KEY,
   engine: "google_flights",
   departure_id: "ZRH",
-  arrival_id: "SJJ", # Sarajevo
+  arrival_id: DEFAULT_ARRIVAL_AIRPORT,
   outbound_date: tomorrow, #  "2024-09-12", # tomorrow
   return_date: in_8_days,
   currency: "USD",
@@ -109,6 +112,7 @@ end
 puts("💙 JSON Endpoint: #{hash_results[:search_metadata][:json_endpoint]}")
 puts("🥶 Created at: #{hash_results[:search_metadata][:created_at]}")
 
+puts("Riccardo only - created an alternative with better CLI interface in q")
 # params = {
 #   api_key: "YOUR_SERP_API_KEY",
 #   engine: "google_autocomplete",

@@ -1,0 +1,5 @@
+#!/bin/bash
+
+# https://forums.docker.com/t/detect-you-are-running-in-a-docker-container-buildx/139673/3
+ls /proc/mounts | grep overlay
+

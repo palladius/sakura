@@ -1,0 +1,7 @@
+#!/usr/bin/env python
+
+from pyricc import colors
+
+print(colors.to_red("This text is red!"))
+print(colors.to_green("This text is green!"))
+
