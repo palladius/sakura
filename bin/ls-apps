@@ -1,0 +1,22 @@
+#!/usr/bin/env python3
+
+import os
+import sys
+
+def list_applications(path):
+    if not os.path.isdir(path):
+        return []
+    apps = []
+    for item in os.listdir(path):
+        if item.endswith(".app"):
+            apps.append(item)
+    return apps
+
+if __name__ == "__main__":
+    system_apps = list_applications("/Applications")
+    user_apps = list_applications(os.path.expanduser("~/Applications"))
+
+    all_apps = sorted(list(set(system_apps + user_apps)), key=lambda s: s.lower())
+
+    for app in all_apps:
+        print(app)
