@@ -1,0 +1,4 @@
+npm install @google/gemini-cli || npx @google/gemini-cli 
+
+echo This should now be installed hopefully.
+

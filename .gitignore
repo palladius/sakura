@@ -32,6 +32,7 @@ doc
 .echodo_history
 .ondir.was.here.touch
 .cache
+node_modules/
 .venv/
 checklist.chk
 docz/richelp-30d/
