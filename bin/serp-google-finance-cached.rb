@@ -106,7 +106,7 @@ puts("3. Market TopNews:")
 # end
 # puts "📰  #{hash_results['markets']['top_news']['snippet']}"
 n = hash_results['markets']['top_news']
-print_news_snippet(n)
+print_news_snippet(n) rescue nil
 #puts("📰 #{Rainbow(n['snippet']).green} (#{n['source']}, #{n['date']})")
 
 news_results = hash_results['news_results']
