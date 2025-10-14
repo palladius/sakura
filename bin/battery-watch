@@ -1,0 +1,41 @@
+#!/bin/bash
+
+# Function to get and display battery status
+get_battery_status() {
+  battery_status=$(pmset -g batt)
+  percentage=$(echo "$battery_status" | grep -o '[0-9]*%' | tr -d '%')
+  is_charging=$(echo "$battery_status" | grep 'charging')
+  time_remaining=$(echo "$battery_status" | grep -o '[0-9]*:[0-9]* remaining' | awk '{print $1}')
+
+  color_emoji=""
+  if (( percentage > 80 )); then
+    color_emoji="🟢"
+  elif (( percentage > 50 )); then
+    color_emoji="🟡"
+  elif (( percentage > 20 )); then
+    color_emoji="🟠"
+  else
+    color_emoji="🔴"
+  fi
+
+  status_emoji=""
+  if [[ -n "$is_charging" ]]; then
+    status_emoji="🔌CHARGING "
+  fi
+
+  if [[ -n "$time_remaining" ]]; then
+    echo -e "Battery status: $status_emoji$color_emoji $percentage.0% ⏳ ($time_remaining h)"
+  else
+    echo -e "Battery status: $status_emoji$color_emoji $percentage.0%"
+  fi
+}
+
+if [[ "$1" == "--watch" ]]; then
+  while true; do
+    clear
+    get_battery_status
+    sleep 2
+  done
+else
+  get_battery_status
+fi
