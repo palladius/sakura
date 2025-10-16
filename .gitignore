@@ -40,3 +40,5 @@ t.sh
 deleteme
 bin-*ago
 bin-8c/
+.env
+nanobanana-output/
