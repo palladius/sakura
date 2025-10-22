@@ -1,3 +1,7 @@
+## About
+
+Investigating a SQLite database to find information about events and people.
+
 ## 01 SQLite demo
 
 Ext: 01 Sqlite demo

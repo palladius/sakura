@@ -7,10 +7,5 @@ list:
 open-demo01:
     cd ~/git/gemini-cli-demos/demos/sqlite-investigation && code . DEMO_SCRIPT.md
 
-## Location independent image
-
-Use Playwright MCP (or other tools like ipinfo.io) to navigate to a website which tells you WHERE we are located.
-From that information (say "San Francisco, US" or "Argenta, Italy"), use that information to create an ad-hoc
-Image generation prompt which is set in the city center and maybe around some famous thing in that city (or country, if unavailable for city).
-Place a giant Puffin eating a Banana in the middle of that scene, with a very happy expression on its face.
-Finally use Nanobanana MCP to actually GENERATE that image and rename the file to something where the title contains city/country and the overall theme.
+reconcile-readme:
+    gemini -y -p 'Fix the README.md based on existing demos under demos/. Ensure all TABLE fields are populated.'

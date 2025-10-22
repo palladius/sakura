@@ -8,4 +8,5 @@ This is my public repo for Demos since nits growing big and disperse.
 |---|---|---|
 | [01-sqlite.md](./demos/01-sqlite.md) | SQLite Investigation | Investigating a SQLite database to find information about events and people. |
 | [02-git-investigation.md](./demos/02-git-investigation.md) | Git Investigation | A use case for investigating a git repository to understand its history. |
+| [09-nanobanana-location.md](./demos/09-nanobanana-location.md) | NanoBanana Location-Aware Image Generation | A use case for generating an image based on the user's location, with a puffin in local attire. |
 

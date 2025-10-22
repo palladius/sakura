@@ -1,3 +1,7 @@
+## About
+
+A use case for investigating a git repository to understand its history.
+
 ## 02 git difficult use case
 
 $ cd git-investigation

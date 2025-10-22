@@ -8,7 +8,7 @@ I want to make sure that the local README is up to date, and very nice and easy 
 2. If you find any inconsistency/errors/missing info, prompt user (Riccardo) to fix them.
 3. Change README.md and update it to ensure there's an ordered table (01, 02, ..) with a few columns:
    1. Link: linked link to demo (eg "demos/01_sqlite.md")
-   2. topic: Short Topic, like SQLite, git
+   2. topic: Short Topic, like SQLite, git. Keep it minimal, like 1 or 2 hashtag/keywords.
    3. Short description.
 4. Keep a justfile for Riccardo to QUICKLY open the demo locally. This is usually a combination of 2 commands:
    1. code <REPO_FOLDER>
