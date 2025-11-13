@@ -1,0 +1,13 @@
+#!/bin/bash
+
+# This script runs the PastaNG application using Docker.
+# It maps port 8081 on the host to port 8080 in the Docker container.
+# The script assumes that Docker is installed and running on the host machine.
+# It also assumes that the Docker image 'palladius/pastang' is available locally or can be pulled from a registry.
+# Usage: ./run_pastang.sh
+
+echo Running PastaNG on port 8081: please wait a few seconds...
+set -x
+docker run -it -p 8081:8080 palladius/pastang rails s -p 8080 -b 0.0.0.0
+
+
