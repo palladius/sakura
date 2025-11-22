@@ -7,6 +7,12 @@
 # This should be changed by the user
 export SAKURA_BASHRC_PARSED=true
 
+if [ -z "$SAKURADIR" ]; then
+  echo "Error: SAKURADIR is not set."
+  echo "Please add 'export SAKURADIR=~/git/sakura' (or similar) to your .bashrc before sourcing this file."
+  return 1
+fi
+
 if [ -f $SAKURADIR/bashrc.local ] ; then
         . $SAKURADIR/bashrc.local
 else
