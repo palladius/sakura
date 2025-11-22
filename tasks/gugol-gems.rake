@@ -26,6 +26,6 @@ end
 
 task :default => :gemtests
 
-exit 42
+# exit 42
 
 

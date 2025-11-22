@@ -3,11 +3,11 @@
 # nothing can fail
 set -e
 
-VER=1.6
-CENTOS_PKGS='vim polygen cowsay ruby1.8-dev ruby1.8 ri1.8 rdoc1.8 irb1.8 \
- rake rubygems libxml2 libxml2-dev libxslt1-dev \
- libxslt-dev libxml2-dev libreadline-ruby1.8 libruby1.8 libopenssl-ruby git \
- googlecl make'
+VER=1.7
+CENTOS_PKGS='vim polygen cowsay ruby ruby-devel ri rdoc irb \
+ rake rubygems libxml2 libxml2-devel libxslt-devel \
+ libreadline-devel openssl-devel git \
+ make'
 GEMS='xmpp4r-simple xmpp4r ric bundler nokogiri google_drive rubygems-update'
 
 echo Please read out/err in here: .install.*
@@ -28,7 +28,7 @@ sudo gem install --no-ri --no-rdoc $GEMS
 sudo gem update --system &
 
 mkdir -p ~/git
-git clone git://github.com/palladius/sakura.git ~/git/sakura/
+git clone https://github.com/palladius/sakura.git ~/git/sakura/
 cd ~/git/sakura/ && make install
 
 sudo touch /root/sakura-installed-ver$VER.touch
