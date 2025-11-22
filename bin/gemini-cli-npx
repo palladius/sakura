@@ -1,0 +1,4 @@
+
+# Using npx (no installation required)
+npx https://github.com/google-gemini/gemini-cli
+

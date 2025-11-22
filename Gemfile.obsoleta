@@ -12,7 +12,6 @@ gem 'ric'
 gem 'google-cloud-logging'
 gem 'lolcat'
 gem 'filecache'
-#gem 'sakuric'
 
 
 group :pinger do
