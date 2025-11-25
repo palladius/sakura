@@ -1,8 +1,16 @@
-
 TODO:
 - Make this ruby1.9 compliant
 - OK make this a ruby gem (@bug see below)
 - copy the lib/ structure from Rails (sittin gon shoulders of giants)
+
+P3:
+- [ ] Create a "hollow" safe version of the 'sakuric' gem.
+      Goal: Update the gem on Rubygems with a version that contains ONLY a deprecation message and version info.
+      Reason: Ensure existing installations don't break on update, but inform users of deprecation.
+      Implementation:
+        - Create a minimal gemspec (without 'echoe' if possible, or restore minimal build).
+        - Create a simplified 'lib/sakuric.rb' (or separate build artifact) that just puts "Deprecated".
+        - Ensure this doesn't break the local 'sakura-fanculo-sakuric' repo functionality which relies on the real 'lib/sakuric.rb'.
 
 BUGS:
 - binaries built from gem are exectued with Ruby, not SH, even if they have a
