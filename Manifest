@@ -398,7 +398,6 @@ sounds/unquarto.ogg
 sounds/virgola.ogg
 sources/c/usleep.c
 spec/my_first_spec.rb
-tasks/sakuric-gem.rake
 tasks/testing.rake
 templates/bashrc.inject
 templates/happy_christmas.ascii_art

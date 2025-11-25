@@ -3,7 +3,6 @@ help:
 	@echo 'clean:         TODO cleanup'
 	@echo 'install:       Installs software'
 	@echo 'test:          Runs tests'
-	@echo 'deploy:        Creates manifest, gemspecs, .. and deploys to rubygem'
 	@echo 'autocomplete:  Fills the autocomplete scripts (eg gcutil)'
 	@echo docker-build:   Builds latest Docker image locally
 	@echo docker-push:    Pushes Docker images to palladius/sakura:latest
@@ -28,15 +27,8 @@ test:
   done
 
 test-ruby:
-	gem install echoe
 	rake test
 
-# pre deploys gem
-predeploy:
-	(rake manifest && rake build_gemspec ) | tee .predeploy.out && verde Correctly built manifests and dependencies. Now commit and run deploy
-# deploys gem
-deploy:
-	rake manifest && rake build_gemspec && rake release && rake publish_docs && verde Correctly deployed
 autocomplete:
 	make -C bashrc.d/services.d/autocomplete/gcutil.auto/
 

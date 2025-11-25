@@ -4,11 +4,6 @@ Do the following:
   cat templates/bashrc.inject  >> ~/.bashrc
   source ~/.bashrc
 
-Or simply:
-
-  # this doesnt work so well: it install everything as ruby
-  # so shell scripts are screwed.
-  sudo gem install sakuric    # sakura was already taken :-(
 
 Third chjoice (experimental):
 

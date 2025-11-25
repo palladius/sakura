@@ -1,5 +1,4 @@
 require 'rake'
-require 'echoe'
 require 'ric'
 
 Dir["#{File.dirname(__FILE__)}/tasks/*.rake"].sort.each { |ext| load ext }
