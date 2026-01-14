@@ -1,0 +1,38 @@
+#! /bin/bash
+
+_show_envs() {
+    # 1. by env
+    # also |^GEMINI_ TODO
+    env | egrep "^GOOGLE_" | egrep -v "GOOGLE_TRANSLATE_KEY|GOOGLE_AUTH_WEBAUTHN_PLUGIN|GOOGLE_KEY|GOOGLE_SECRET" | sbianca
+    # 2. by name
+    white "GOOGLE_API_KEY=$GOOGLE_API_KEY"
+    white "GOOGLE_API_KEY_DESCRIPTION=$GOOGLE_API_KEY_DESCRIPTION"
+    white "GOOGLE_GENAI_USE_VERTEXAI=$GOOGLE_GENAI_USE_VERTEXAI"
+    white "GOOGLE_CLOUD_PROJECT=$GOOGLE_CLOUD_PROJECT"
+    white "GOOGLE_CLOUD_LOCATION=$GOOGLE_CLOUD_LOCATION"
+}
+
+echo 1. Let me show you the GOOGLE_VARS vanilla.
+_show_envs
+
+
+direnv allow
+echo 2. Let me show you the GOOGLE_VARS aftyr direnv allow.
+_show_envs
+
+
+echo '3. Lets try now after sourcing .env [tentative]'
+ls -la | egrep .env
+if [ -f .env ]; then
+    echo ".env found!"
+    #cat .env | ripulisci
+    . .env
+    source .env
+    _show_envs
+else
+    echo ".env not found. Exercise is useless"
+fi
+
+
+echo '4. finally: it looks like source envs do NOT manifest through env'
+
