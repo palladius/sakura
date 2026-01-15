@@ -4,6 +4,7 @@ ricc-app:
   blueprint_schema: 0.0.3
   maturity: functional
   app_name: sakura
+  emoji: 🌸
   lang: bash
   version: 2.4.1
   owner: github.com/palladius
