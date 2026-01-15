@@ -6,7 +6,8 @@ ricc-app:
   app_name: sakura
   emoji: 🌸
   lang: bash
-  version: 2.4.1
+  version_file: VERSION
+  version: 2.4.2 # from VERSION
   owner: github.com/palladius
   app_description: "Sakura is a collection of shell tools, aliases, and scripts designed to enhance the command-line experience. It provides various utilities for tasks like text manipulation, system administration, and customization of the shell environment. 🌸"
   code_url: git@github.com:palladius/sakura.git
