@@ -480,3 +480,42 @@ end
 In pratica, con Ruby puoi costruire il tuo linguaggio personalizzato per risolvere un problema specifico (che sia configurare server con Chef o creare menu) in un pomeriggio.
 
 **Vuoi che ti mostri come Rails usa esattamente questa tecnica per gestire i database (le Migrations)?** È l'applicazione più famosa di questo concetto!
+
+
+h2 riccardo: come si va in rails?
+
+* ricc: SIIIIIIIIIIIIII grazie! keep it short pero
+
+Eccoti la versione "espresso": come Rails trasforma un database noioso in una DSL leggibile usando la stessa magia di Chef.
+
+### La Migrazione di Rails
+
+In altri linguaggi scriveresti SQL crudo (`CREATE TABLE...`). In Rails, scrivi Ruby che descrive l'intento.
+
+```ruby
+# Niente SQL, solo una DSL elegante
+class CreateUsers < ActiveRecord::Migration[7.0]
+  def change
+    create_table :users do |t|
+      t.string :name, null: false
+      t.string :email
+      t.boolean :admin, default: false
+      
+      t.timestamps # Crea magicamente le colonne created_at e updated_at
+    end
+  end
+end
+
+```
+
+### Perché è geniale?
+
+* **Agnostico:** Questo codice funziona su MySQL, PostgreSQL o SQLite senza cambiare una virgola.
+* **Leggibilità:** Il blocco `do |t|` (con i nostri amati **Pipes**) definisce l'oggetto "tabella" e tu dichiari solo cosa vuoi metterci dentro.
+* **Sintassi Pulita:** Nota l'uso dei **Simboli** (`:users`, `:name`) e l'assenza di parentesi inutili.
+
+### In sintesi per il tuo amico:
+
+Ruby non ti costringe a parlare "computerese". Ti permette di costruire un linguaggio (DSL) che parla la lingua del tuo business (utenti, menu, server, fatture).
+
+**Ti serve altro su Rails o abbiamo carne al fuoco a sufficienza per convincerlo?**
