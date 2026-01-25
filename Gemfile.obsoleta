@@ -12,7 +12,8 @@ gem 'ric'
 gem 'google-cloud-logging'
 gem 'lolcat'
 gem 'filecache'
-#gem 'sakuric'  # sembra ricorsivo :)
+#gem 'sakuric'  # removed
+
 
 
 group :pinger do

@@ -2,6 +2,9 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.4.3] - 2026-01-25
+- Removed sakuric gem dependency entirely. Replaced lib/sakuric.rb with lib/sakura.rb.
+
 ## [2.4.1] - 2025-11-25
 - Removed Sakuric with AGY and GCLI and by myself
 

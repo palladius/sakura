@@ -7,13 +7,13 @@
 
 =end
 
-require File.expand_path(File.dirname(__FILE__) + '/sakuric')
+require File.expand_path(File.dirname(__FILE__) + '/sakura')
 require File.expand_path(File.dirname(__FILE__) + '/classes/debug_ric')
 
 $DEBUG_INIT = false
 
-$SAKURADIR      = Sakuric.BASEDIR
-$RICLIB_VERSION = Sakuric.VERSION
+$SAKURADIR      = Sakura.BASEDIR
+$RICLIB_VERSION = Sakura.VERSION
 
 #DOESNT work on some machines! Nescio cur! require 'rubygems'     # necessary for other gems
 require 'digest/md5'
@@ -22,7 +22,7 @@ require 'net/smtp'
 require "socket"
 require 'yaml'
 
-if Sakuric.use_ric_gem # slow but cool
+if Sakura.use_ric_gem # slow but cool
   require 'rubygems'
   require 'ric' 
 else
@@ -49,7 +49,7 @@ end
  def load_sakura_modules!(enable_debug=false)
    debug_on("load_sakura_modules() called with debug enabled!") if enable_debug
    str = "Reloaded Riclibs v#{$RICLIB_VERSION} -- per la #{$RICLIB['nreloaded']} a volta"
-   modules_to_be_included = $RIC_LIB_MODULES + Sakuric.get_auto_files("classes/") 
+   modules_to_be_included = $RIC_LIB_MODULES + Sakura.get_auto_files("classes/") 
    modules_to_be_included.each{ |cls| 
      deb "Loading class: '#{cls}'..", :color => 'yellow'
      was_necessary = require "#{$SAKURADIR}/lib/#{cls}.rb"
@@ -76,9 +76,9 @@ def _init(explaination='no explaination given', initial_debug_state = $DEBUG_INI
   $PROG  = File.basename($0)
   case $PROG
     when 'irb'
-      print "[DEB] Welcome to Sakura within IRB! Happy playing. Try 'Sakuric.VERSION'"
+      print "[DEB] Welcome to Sakura within IRB! Happy playing. Try 'Sakura.VERSION'"
     when 'ruby'
-      print "[DEB] Welcome to Sakura within RUBY! Happy playing. Try 'Sakuric.VERSION'"
+      print "[DEB] Welcome to Sakura within RUBY! Happy playing. Try 'Sakura.VERSION'"
     default
       # do nothing
   end
@@ -103,7 +103,7 @@ BURIDONE
   $CONF = RicConf.new()
   pyellow($CONF.info()) if debug?()  
   puts "post init delle #{Time.now}" if $RELOAD_DEBUG
-  print "Sakuric.n_called(): #{ Sakuric.n_called() }"
+  print "Sakura.n_called(): #{ Sakura.n_called() }"
 end
 
 =begin

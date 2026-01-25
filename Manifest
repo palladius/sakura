@@ -210,7 +210,7 @@ lib/recipes/README.md
 lib/recipes/scripts/redis.sh
 lib/ric_colors.rb
 lib/ric_strings.rb
-lib/sakuric.rb
+lib/sakura.rb
 lib/sonice-players/itunes_mac.rb
 lib/sonice-players/itunes_win.rb
 lib/sonice-players/mpd.rb

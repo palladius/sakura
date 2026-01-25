@@ -1,6 +1,6 @@
 
-module Sakuric
-  #print "[DEBUG] Including sakura.Sakuric"
+module Sakura
+  #print "[DEBUG] Including sakura.Sakura"
   $SAKURA_DFLTDIR = '~/git/sakura/'
   $VERSION        = 'TBD_from($DIR/VERSION)'
   SCRIPT_BEGUN    = Time.now
@@ -22,7 +22,7 @@ module Sakuric
     return N_CALLED
   end
   
-      # conf files into auto/ dir (mi son rotto di aggiungerli qui uno a uno!)
+  # conf files into auto/ dir (mi son rotto di aggiungerli qui uno a uno!)
   def self.get_auto_files(subdir)
     absolute_dir = "#{$SAKURADIR}/lib/#{subdir}"
     Dir.new(absolute_dir).select{|f| f.match( /\.rb$/ )}.map{|x| subdir + File.basename(x,'.rb') }
@@ -30,4 +30,4 @@ module Sakuric
   
   N_CALLED = N_CALLED + 1
   
-end #/Module Sakuric
+end #/Module Sakura
