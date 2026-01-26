@@ -102,7 +102,7 @@ $TEMPLATE_VER = '2.0.1' # This template from scripta.rb, useful with -V in libau
 def get_repo_path()
   ret = $myconf.fetch(
     :repo_path,
-    ENV['PRIVATIZE_REPO_DIR']
+    ENV['PRIVATIZE_REPO_DIR'] || '~/git/gic'
   )
   deb "get_repo_path(): '#{ret}'"
   return File.expand_path(ret) rescue ''
