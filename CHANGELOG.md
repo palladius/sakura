@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.5.0] - 2026-03-06
+- :musical_note: Added salsa_ridge.ogg and converted from salsa_ridge.wav -- made with Gemini CLI 🍝
+
+
 ## [2.4.3] - 2026-01-25
 - Removed sakuric gem dependency entirely. Replaced lib/sakuric.rb with lib/sakura.rb.
 
