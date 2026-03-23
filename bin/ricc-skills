@@ -1,0 +1,156 @@
+#!/usr/bin/env ruby
+
+=begin
+✨ Ricc's Skills Listing (Ruby Refactoring) ✨
+
+A simple, colorful, emoji-ful CLI to list skills from various folders.
+Now supports per-folder comments and searching!
+=end
+
+require 'pathname'
+require 'socket'
+require 'digest'
+
+# --- CONFIGURATION ---
+# TODO: change to your favorite folders
+SKILL_FOLDERS = [
+  { path: '~/.gemini/skills', comment: 'User-specific skills' },
+  { path: '~/.gemini/antigravity/skills', comment: 'Antigravity core skills' },
+  { path: '~/git/gemini-cli-palladius-public-goodies/skills', comment: 'Publicly shared skills' },
+  { path: '~/git/gemini-cli-custom-commands/skills', comment: 'Standard custom command skills' },
+  { path: './.gemini/skills', comment: 'Local repo skills' }
+]
+
+# --- COLORS & EMOJIS ---
+C_FOLDER  = "\e[1;34m" # Bold Blue
+C_SKILL   = "\e[0;32m" # Green
+C_SYMLINK = "\e[0;36m" # Cyan
+C_MATCH   = "\e[1;33m" # Bold Yellow for match
+C_COMMENT = "\e[0;90m" # Grey
+C_VERSION = "\e[1;33m" # Bold Yellow for version
+C_SIZE    = "\e[0;90m" # Grey for line count
+C_HASH    = "\e[0;35m" # Purple for hash
+C_WHITE   = "\e[1;37m" # White
+C_RESET   = "\e[0m"
+
+E_FOLDER   = "📁"
+E_SYMLINK  = "🔗"
+E_SEARCH   = "🔎"
+E_SPARKLE  = "✨"
+E_SHELL    = "💻"
+E_PYTHON   = "🐍"
+E_RUBY     = "💎"
+E_SHRUG    = "🤷"
+
+# --- SCRIPT ---
+# Simple argument parsing
+options = { all: false }
+remaining_args = []
+ARGV.each do |arg|
+  if arg == '--all' || arg == '-a'
+    options[:all] = true
+  else
+    remaining_args << arg
+  end
+end
+
+search_term = remaining_args[0]
+
+if search_term
+  puts "#{E_SEARCH} Searching for skills matching '#{C_MATCH}#{search_term}#{C_RESET}'... (use -a to show hidden)\n\n"
+else
+  puts "#{E_SPARKLE} Ricc's Skills Listing #{E_SPARKLE} (use -a to show hidden)\n\n"
+end
+
+SKILL_FOLDERS.each do |config|
+  expanded_path = File.expand_path(config[:path])
+  folder = Pathname.new(expanded_path)
+
+  next unless folder.directory?
+
+  # Find skills (directories or symlinks pointing to directories)
+  # Pathname#children followed by select for directory or symlink
+  skills = folder.children.select { |c| c.directory? || c.symlink? }.sort_by(&:basename)
+
+  # Filter by search term if provided
+  if search_term
+    skills = skills.select { |s| s.basename.to_s.downcase.include?(search_term.downcase) }
+  end
+
+  next if skills.empty?
+
+  # Display the folder header and comment
+  header = "#{C_FOLDER}#{E_FOLDER} #{config[:path]}/#{C_RESET}"
+  if config[:comment]
+    comment_text = config[:comment]
+    if config[:path] == './.gemini/skills'
+      pwd = Dir.pwd.gsub(ENV['HOME'], '~')
+      comment_text += " #{C_WHITE}on#{C_RESET} #{C_SYMLINK}#{pwd}#{C_COMMENT}"
+    end
+    header += " #{C_COMMENT}# #{comment_text}#{C_RESET}"
+  end
+  puts header
+
+  skills.each do |skill|
+    skill_name = skill.basename.to_s
+    is_link = skill.symlink?
+    
+    # Metadata extraction
+    skill_md = skill.join("SKILL.md")
+    version = nil
+    line_count = 0
+    shrug = false
+    content = ""
+    if skill_md.exist?
+      content = skill_md.read
+      line_count = content.lines.count
+      if content =~ /^version:\s*(.*)$/
+        version = $1.strip
+      end
+    else
+      shrug = true
+    end
+
+    color = shrug ? C_COMMENT : (is_link ? C_SYMLINK : C_SKILL)
+    emoji = is_link ? E_SYMLINK : E_FOLDER
+
+    # Hash generation (experimental, only in --all mode)
+    hash_str = ""
+    if options[:all]
+      # Use SKILL.md content if available, otherwise skill name
+      seed = content.empty? ? skill_name : content
+      hash_val = Digest::MD5.hexdigest(seed)[0..4]
+      hash_str = "#{C_HASH}##{hash_val}#{C_RESET} "
+    end
+
+    # Script detection
+    lang_emojis = ""
+    files = []
+    begin
+      # If it's a symlink, we want to look inside the target
+      target = is_link ? skill.realpath : skill
+      files = target.children if target.directory?
+    rescue
+      files = []
+    end
+    
+    lang_emojis += E_SHELL  if files.any? { |f| f.extname == '.sh' || f.extname == '.bash' }
+    lang_emojis += E_PYTHON if files.any? { |f| f.extname == '.py' }
+    lang_emojis += E_RUBY   if files.any? { |f| f.extname == '.rb' }
+
+    metadata = ""
+    metadata += " #{C_SIZE}#{line_count}L#{C_RESET}" if line_count > 0
+    metadata += " #{C_VERSION}v#{version}#{C_RESET}" if version
+    metadata += " #{E_SHRUG}" if shrug
+    metadata += " #{lang_emojis}" if lang_emojis != ""
+
+    if search_term
+      # Highlight the match (case-insensitive)
+      highlighted = skill_name.gsub(/(#{Regexp.escape(search_term)})/i, "#{C_MATCH}\\1#{color}")
+      puts "  #{emoji} #{hash_str}#{color}#{highlighted}#{C_RESET}#{metadata}"
+    else
+      puts "  #{emoji} #{hash_str}#{color}#{skill_name}#{C_RESET}#{metadata}"
+    end
+  end
+  puts "" # Newline for spacing
+end

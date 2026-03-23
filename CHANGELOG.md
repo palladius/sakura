@@ -2,9 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.6.0] - 2026-03-23
+- :sparkles: Renamed `skills` to `ricc-skills`.
+- :ghost: Removed "specific workspace" folder and related rejection logic.
+- :rocket: Renamed "Gemini Skills Listing" to "Ricc's Skills Listing".
+- :package: Removed private and corporate skill paths.
+- :wrench: Removed machine-specific identification logic.
+
 ## [2.5.0] - 2026-03-06
 - :musical_note: Added salsa_ridge.ogg and converted from salsa_ridge.wav -- made with Gemini CLI 🍝
-
 
 ## [2.4.3] - 2026-01-25
 - Removed sakuric gem dependency entirely. Replaced lib/sakuric.rb with lib/sakura.rb.
@@ -17,30 +23,3 @@ All notable changes to this project will be documented in this file.
 
 ## [2.3.0] - 2019-05-04
 - Better travis test
-
-## [2.2.2]
-- Accepted my second push request from TWO people! Thanks lucmult@ and davidn@
-
-## [2.2.1]
-- Added Dockerfile and finalizing the package to go docker!
-
-## [2.0.2]
-- Signed the gem!
-
-## [2.0.0a]
-- Made a ruby gem called 'sakuric'
-
-## [1.0.5]
-- facter libs available!
-
-## [1.0.4]
-- make install is now possible!
-
-## [1.0.0]
-- Added ruby library to support my "richelp"
-
-## [0.9.7]
-- Silented the debug phrase
-
-## [0.9.3]
-- Changed heavily the bashrc!
