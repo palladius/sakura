@@ -13,14 +13,31 @@ usage() {
 	echo "  With --delete option, it'll also delete them"
 }
 
+# Collect broken symlinks
+BROKEN_LINKS=$(find "$WHERE" -type l ! -exec test -r {} \; -print)
+if [ -z "$BROKEN_LINKS" ]; then
+    COUNT=0
+else
+    COUNT=$(echo "$BROKEN_LINKS" | wc -l | tr -d ' ')
+fi
+
 if echo $2 | egrep -q '^--delete$' ; then
-	blue "# I DELETE symlinks from '$WHERE' in giu:" >&2
-	find $WHERE -type l ! -exec test -r {} \; -print0 | xargs -0 rm
+	blue "# I DELETE $COUNT symlinks from '$WHERE' downwards:" >&2
+	find "$WHERE" -type l ! -exec test -r {} \; -print0 | xargs -0 rm
 	green "Done"
 else
-	yellow "# I look for symlinks from '$WHERE' downwards:" >&2
-	find $WHERE -type l ! -exec test -r {} \; -print
+	yellow "# I look for $COUNT symlinks from '$WHERE' downwards:" >&2
+	if [ $COUNT -gt 0 ]; then
+		echo "$BROKEN_LINKS"
+	fi
 	usage
 #	echo "+ If you want to delete em, please type: '$0 $WHERE --delete'"
+fi
+
+# Exit with the number of broken symlinks found (capped at 255 for exit code safety)
+if [ $COUNT -gt 255 ]; then
+    exit 255
+else
+    exit $COUNT
 fi
 
