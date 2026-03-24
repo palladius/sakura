@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.6.1] - 2026-03-24
+- :bug: FIXED(GITHUB-ACTIONS): Fix YAML indentation and syntax error in `.github/workflows/repostats-for-nice-project.yml`.
+- :rocket: Updated repository reference from `bob/nice-project` to `palladius/sakura`.
+
 ## [2.6.0] - 2026-03-23
 - :sparkles: Renamed `skills` to `ricc-skills`.
 - :ghost: Removed "specific workspace" folder and related rejection logic.
