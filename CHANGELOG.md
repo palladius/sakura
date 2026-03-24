@@ -2,8 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.7.0] - 2026-03-24
+- :fire: REMOVED(GITHUB-ACTIONS): Removed failing and unused `.github/workflows/repostats-for-nice-project.yml` workflow.
+
 ## [2.6.1] - 2026-03-24
-- :bug: FIXED(GITHUB-ACTIONS): Fix YAML indentation and syntax error in `.github/workflows/repostats-for-nice-project.yml`.
+- :bug: FIXED(GITHUB-ACTIONS): Fix YAML indentation and syntax error in `.github/workflows/repostats-for-nice-project.yml`. (Reverted by removal in 2.7.0)
 - :rocket: Updated repository reference from `bob/nice-project` to `palladius/sakura`.
 
 ## [2.6.0] - 2026-03-23
