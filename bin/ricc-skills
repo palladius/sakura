@@ -5,6 +5,9 @@
 
 A simple, colorful, emoji-ful CLI to list skills from various folders.
 Now supports per-folder comments and searching!
+
+Note: https://github.com/vercel-labs/skills supports more than just AGY and GC
+
 =end
 
 require 'pathname'
