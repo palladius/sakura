@@ -1,107 +1,178 @@
-#!/bin/bash
+#!/usr/bin/env python3
 
-# gcp-mcp-pinger: A script to ping GCP MCP servers and list their tools. 🤌
-# Author: Riccardo (via Gemini CLI) 🍕
-# License: Apache 2.0
+import sys
+import json
+import subprocess
+import urllib.request
+import urllib.error
+import textwrap
+import shutil
+import re
 
-set -e
+# Color codes 🎨
+RESET = "\033[0m"
+BOLD_GREEN = "\033[1;32m"
+CYAN = "\033[36m"
+YELLOW = "\033[33m"
+BOLD_BLUE = "\033[1;34m"
+BOLD = "\033[1m"
 
-# Supported MCP Products (hardcoded for quick listing)
-# Based on https://docs.cloud.google.com/mcp/supported-products
-declare -A MCP_SERVERS
-MCP_SERVERS["alloydb"]="https://alloydb.REGION.rep.googleapis.com/mcp"
-MCP_SERVERS["bigquery"]="https://bigquery.googleapis.com/mcp"
-MCP_SERVERS["bigquerydatatransfer"]="https://bigquerydatatransfer.googleapis.com/mcp"
-MCP_SERVERS["bigquerymigration"]="https://bigquerymigration.googleapis.com/mcp"
-MCP_SERVERS["bigtable"]="https://bigtableadmin.googleapis.com/mcp"
-MCP_SERVERS["run"]="https://run.googleapis.com/mcp"
-MCP_SERVERS["ces"]="https://ces.us.rep.googleapis.com/mcp"
-MCP_SERVERS["sqladmin"]="https://sqladmin.googleapis.com/mcp"
-MCP_SERVERS["logging"]="https://logging.googleapis.com/mcp"
-MCP_SERVERS["monitoring"]="https://monitoring.googleapis.com/mcp"
-MCP_SERVERS["compute"]="https://compute.googleapis.com/mcp"
-MCP_SERVERS["clouderrorreporting"]="https://clouderrorreporting.googleapis.com/mcp"
-MCP_SERVERS["firestore"]="https://firestore.googleapis.com/mcp"
-MCP_SERVERS["container"]="https://container.googleapis.com/mcp"
-MCP_SERVERS["chronicle"]="https://chronicle.REGION.rep.googleapis.com/mcp"
-MCP_SERVERS["managedkafka"]="https://managedkafka.REGION.rep.googleapis.com/mcp"
-MCP_SERVERS["pubsub"]="https://pubsub.googleapis.com/mcp"
-MCP_SERVERS["cloudresourcemanager"]="https://cloudresourcemanager.googleapis.com/mcp"
-MCP_SERVERS["spanner"]="https://spanner.googleapis.com/mcp"
-MCP_SERVERS["aiplatform"]="https://aiplatform.googleapis.com/mcp"
-MCP_SERVERS["discoveryengine"]="https://discoveryengine.googleapis.com/mcp"
-MCP_SERVERS["androidmanagement"]="https://androidmanagement.googleapis.com/mcp"
-MCP_SERVERS["developerknowledge"]="https://developerknowledge.googleapis.com/mcp"
-MCP_SERVERS["mapstools"]="https://mapstools.googleapis.com/mcp"
-MCP_SERVERS["stitch"]="https://stitch.googleapis.com/mcp"
-
-function list_supported() {
-    echo "🤌 Mamma mia! Here are the supported MCP products (from https://docs.cloud.google.com/mcp/supported-products):"
-    echo "----------------------------------------------------------------------------------------------------------"
-    printf "   %-25s %s\n" "Product ID" "Endpoint (Use 'https://...' for others)"
-    echo "----------------------------------------------------------------------------------------------------------"
-    for key in "${!MCP_SERVERS[@]}"; do
-        printf "🟢 %-25s %s\n" "$key" "${MCP_SERVERS[$key]}"
-    done | sort
-    echo ""
-    echo "Usage: gcp-mcp-pinger <product_id|endpoint_url>"
+MCP_SERVERS = {
+    "alloydb": "https://alloydb.REGION.rep.googleapis.com/mcp",
+    "bigquery": "https://bigquery.googleapis.com/mcp",
+    "bigquerydatatransfer": "https://bigquerydatatransfer.googleapis.com/mcp",
+    "bigquerymigration": "https://bigquerymigration.googleapis.com/mcp",
+    "bigtable": "https://bigtableadmin.googleapis.com/mcp",
+    "run": "https://run.googleapis.com/mcp",
+    "ces": "https://ces.us.rep.googleapis.com/mcp",
+    "sqladmin": "https://sqladmin.googleapis.com/mcp",
+    "logging": "https://logging.googleapis.com/mcp",
+    "monitoring": "https://monitoring.googleapis.com/mcp",
+    "compute": "https://compute.googleapis.com/mcp",
+    "clouderrorreporting": "https://clouderrorreporting.googleapis.com/mcp",
+    "firestore": "https://firestore.googleapis.com/mcp",
+    "container": "https://container.googleapis.com/mcp",
+    "chronicle": "https://chronicle.REGION.rep.googleapis.com/mcp",
+    "managedkafka": "https://managedkafka.REGION.rep.googleapis.com/mcp",
+    "pubsub": "https://pubsub.googleapis.com/mcp",
+    "cloudresourcemanager": "https://cloudresourcemanager.googleapis.com/mcp",
+    "spanner": "https://spanner.googleapis.com/mcp",
+    "aiplatform": "https://aiplatform.googleapis.com/mcp",
+    "discoveryengine": "https://discoveryengine.googleapis.com/mcp",
+    "androidmanagement": "https://androidmanagement.googleapis.com/mcp",
+    "developerknowledge": "https://developerknowledge.googleapis.com/mcp",
+    "mapstools": "https://mapstools.googleapis.com/mcp",
+    "stitch": "https://stitch.googleapis.com/mcp",
 }
 
-if [ -z "$1" ]; then
-    list_supported
-    exit 0
-fi
+def get_terminal_width():
+    return shutil.get_terminal_size((100, 20)).columns
 
-INPUT_SERVER="$1"
-SERVER="$INPUT_SERVER"
+def print_supported():
+    print("🤌 Mamma mia! Here are the supported MCP products (from https://docs.cloud.google.com/mcp/supported-products):")
+    print("-" * 106)
+    print(f"   {'Product ID':<25} Endpoint (Use 'https://...' for others)")
+    print("-" * 106)
+    for key in sorted(MCP_SERVERS.keys()):
+        print(f"🟢 {key:<25} {MCP_SERVERS[key]}")
+    print("\nUsage: gcp-mcp-pinger <product_id|endpoint_url> [tool_name]")
 
-# Normalize server URL
-if [[ ! "$SERVER" =~ ^https?:// ]]; then
-    # Check if it's one of our known aliases
-    if [[ -n "${MCP_SERVERS[$SERVER]}" ]]; then
-        SERVER="${MCP_SERVERS[$SERVER]}"
-    else
-        # Try to guess it's a googleapis service
-        SERVER="https://${SERVER}.googleapis.com/mcp"
-    fi
-fi
+def get_access_token():
+    try:
+        result = subprocess.run(["gcloud", "auth", "print-access-token"], capture_output=True, text=True, check=True)
+        return result.stdout.strip()
+    except subprocess.CalledProcessError:
+        return None
 
-# Replace REGION placeholder if present and not specified
-if [[ "$SERVER" == *"REGION"* ]]; then
-    REGION="${REGION:-us-central1}"
-    echo "🤌 No region specified, using default: $REGION"
-    SERVER="${SERVER/REGION/$REGION}"
-fi
+def fetch_mcp_tools(server_url, token):
+    req = urllib.request.Request(server_url, method="POST")
+    req.add_header("Content-Type", "application/json")
+    req.add_header("Accept", "application/json")
+    if token:
+        req.add_header("Authorization", f"Bearer {token}")
+    
+    data = json.dumps({ "method": "tools/list", "jsonrpc": "2.0", "id": 1 }).encode("utf-8")
+    
+    try:
+        with urllib.request.urlopen(req, data=data) as response:
+            return json.loads(response.read().decode("utf-8"))
+    except urllib.error.URLError as e:
+        body = e.read().decode("utf-8") if hasattr(e, 'read') else str(e)
+        print(f"❌ MCP Error: {e.reason}\n{body}")
+        sys.exit(1)
+    except Exception as e:
+        print(f"❌ Error: {e}")
+        sys.exit(1)
 
-echo "🚀 Pinging MCP Server: $SERVER ..."
+def main():
+    if len(sys.argv) < 2:
+        print_supported()
+        sys.exit(0)
 
-# Get access token from gcloud
-TOKEN=$(gcloud auth print-access-token 2>/dev/null || echo "NO_TOKEN")
+    input_server = sys.argv[1]
+    tool_name = sys.argv[2] if len(sys.argv) > 2 else None
 
-if [ "$TOKEN" == "NO_TOKEN" ]; then
-    echo "⚠️ Warning: No gcloud token found. Request might fail if server requires auth."
-    AUTH_HEADER=""
-else
-    AUTH_HEADER="Authorization: Bearer $TOKEN"
-fi
+    server = input_server
+    if not server.startswith("http"):
+        server = MCP_SERVERS.get(server, f"https://{server}.googleapis.com/mcp")
 
-RESPONSE=$(curl -s --location "$SERVER" \
-    --header "content-type: application/json" \
-    --header "accept: application/json, text/event-stream" \
-    ${AUTH_HEADER:+--header "$AUTH_HEADER"} \
-    --data '{ "method": "tools/list", "jsonrpc": "2.0", "id": 1 }')
+    if "REGION" in server:
+        server = server.replace("REGION", "us-central1")
+        print(f"🤌 No region specified, using default: us-central1")
 
-if echo "$RESPONSE" | jq -e '.result' > /dev/null 2>&1; then
-    echo "✅ Success! Found the following tools in $INPUT_SERVER:"
-    echo "----------------------------------------------------"
-    echo "$RESPONSE" | jq -r '.result.tools[].name'
-else
-    # Check if there's an error in the response
-    ERROR=$(echo "$RESPONSE" | jq -r '.error.message // empty')
-    if [ -n "$ERROR" ]; then
-        echo "❌ MCP Error: $ERROR"
-    else
-        echo "❌ Error or no tools found. Response:"
-        echo "$RESPONSE" | jq .
-    fi
-fi
+    print(f"🚀 Pinging MCP Server: {server} ...\n")
+    
+    token = get_access_token()
+    if not token:
+        print("⚠️ Warning: No gcloud token found. Request might fail if server requires auth.")
+
+    response = fetch_mcp_tools(server, token)
+    
+    if "result" not in response or "tools" not in response["result"]:
+        print("❌ Error or no tools found. Response:")
+        print(json.dumps(response, indent=2))
+        sys.exit(1)
+
+    tools = response["result"]["tools"]
+
+    if not tool_name:
+        print(f"✅ Success! Found tools in {input_server}:")
+        
+        name_width = 30
+        term_width = get_terminal_width()
+        desc_width = max(20, term_width - name_width - 10)
+
+        print(f"   {'TOOL NAME':<{name_width}} DESCRIPTION")
+        print("   " + "-" * (term_width - 4))
+
+        for tool in tools:
+            name = tool.get("name", "Unknown")
+            desc = tool.get("description", "No description provided.").replace("\n", " ")
+            desc = re.sub(r'\s+', ' ', desc)
+
+            if len(desc) > desc_width:
+                desc = desc[:desc_width-3] + "..."
+            
+            print(f"🟢 {BOLD_GREEN}{name:<{name_width}}{RESET} {CYAN}{desc}{RESET}")
+            
+        print(f"\n💡 Tip: Run './gcp-mcp-pinger {input_server} <tool_name>' for the full deep dive!")
+        
+    else:
+        # Detailed view! Beautiful formatting incoming 🎨
+        tool = next((t for t in tools if t.get("name") == tool_name), None)
+        if not tool:
+            print(f"❌ Tool '{tool_name}' not found in {input_server}.")
+            sys.exit(1)
+
+        print(f"💎 Tool Details: {BOLD}{tool_name}{RESET}")
+        print("=" * 80)
+        
+        print("📝 Full Description:")
+        desc = tool.get("description", "No description provided.")
+        for line in textwrap.wrap(desc, width=80):
+            print(f"   {CYAN}{line}{RESET}")
+        print()
+        
+        print("📥 Input Schema (Properties):")
+        schema = tool.get("inputSchema", {})
+        properties = schema.get("properties", {})
+        
+        if not properties:
+            print("   (No input properties defined)")
+        else:
+            for prop_name, prop_details in properties.items():
+                prop_type = prop_details.get("type", "unknown")
+                print(f"   🔹 {BOLD_BLUE}{prop_name}{RESET} ({YELLOW}{prop_type}{RESET})")
+                
+                prop_desc = prop_details.get("description", "No description")
+                wrapped_desc = textwrap.wrap(prop_desc, width=76)
+                for line in wrapped_desc:
+                    print(f"      {line}")
+                print()
+                
+        output_schema = tool.get("outputSchema", {})
+        output_type = output_schema.get("type", "unknown")
+        print(f"📤 Output Type: {YELLOW}{output_type}{RESET}")
+
+if __name__ == "__main__":
+    main()

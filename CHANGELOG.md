@@ -2,6 +2,9 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.8.0] - 2026-04-01
+- :sparkles: Added `gcp-mcp-pinger` with detailed tool inspection and green bullets. 🟢🤌
+
 ## [2.7.0] - 2026-03-24
 - :fire: REMOVED(GITHUB-ACTIONS): Removed failing and unused `.github/workflows/repostats-for-nice-project.yml` workflow.
 
