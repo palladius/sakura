@@ -1,0 +1,107 @@
+#!/bin/bash
+
+# gcp-mcp-pinger: A script to ping GCP MCP servers and list their tools. 🤌
+# Author: Riccardo (via Gemini CLI) 🍕
+# License: Apache 2.0
+
+set -e
+
+# Supported MCP Products (hardcoded for quick listing)
+# Based on https://docs.cloud.google.com/mcp/supported-products
+declare -A MCP_SERVERS
+MCP_SERVERS["alloydb"]="https://alloydb.REGION.rep.googleapis.com/mcp"
+MCP_SERVERS["bigquery"]="https://bigquery.googleapis.com/mcp"
+MCP_SERVERS["bigquerydatatransfer"]="https://bigquerydatatransfer.googleapis.com/mcp"
+MCP_SERVERS["bigquerymigration"]="https://bigquerymigration.googleapis.com/mcp"
+MCP_SERVERS["bigtable"]="https://bigtableadmin.googleapis.com/mcp"
+MCP_SERVERS["run"]="https://run.googleapis.com/mcp"
+MCP_SERVERS["ces"]="https://ces.us.rep.googleapis.com/mcp"
+MCP_SERVERS["sqladmin"]="https://sqladmin.googleapis.com/mcp"
+MCP_SERVERS["logging"]="https://logging.googleapis.com/mcp"
+MCP_SERVERS["monitoring"]="https://monitoring.googleapis.com/mcp"
+MCP_SERVERS["compute"]="https://compute.googleapis.com/mcp"
+MCP_SERVERS["clouderrorreporting"]="https://clouderrorreporting.googleapis.com/mcp"
+MCP_SERVERS["firestore"]="https://firestore.googleapis.com/mcp"
+MCP_SERVERS["container"]="https://container.googleapis.com/mcp"
+MCP_SERVERS["chronicle"]="https://chronicle.REGION.rep.googleapis.com/mcp"
+MCP_SERVERS["managedkafka"]="https://managedkafka.REGION.rep.googleapis.com/mcp"
+MCP_SERVERS["pubsub"]="https://pubsub.googleapis.com/mcp"
+MCP_SERVERS["cloudresourcemanager"]="https://cloudresourcemanager.googleapis.com/mcp"
+MCP_SERVERS["spanner"]="https://spanner.googleapis.com/mcp"
+MCP_SERVERS["aiplatform"]="https://aiplatform.googleapis.com/mcp"
+MCP_SERVERS["discoveryengine"]="https://discoveryengine.googleapis.com/mcp"
+MCP_SERVERS["androidmanagement"]="https://androidmanagement.googleapis.com/mcp"
+MCP_SERVERS["developerknowledge"]="https://developerknowledge.googleapis.com/mcp"
+MCP_SERVERS["mapstools"]="https://mapstools.googleapis.com/mcp"
+MCP_SERVERS["stitch"]="https://stitch.googleapis.com/mcp"
+
+function list_supported() {
+    echo "🤌 Mamma mia! Here are the supported MCP products (from https://docs.cloud.google.com/mcp/supported-products):"
+    echo "----------------------------------------------------------------------------------------------------------"
+    printf "   %-25s %s\n" "Product ID" "Endpoint (Use 'https://...' for others)"
+    echo "----------------------------------------------------------------------------------------------------------"
+    for key in "${!MCP_SERVERS[@]}"; do
+        printf "🟢 %-25s %s\n" "$key" "${MCP_SERVERS[$key]}"
+    done | sort
+    echo ""
+    echo "Usage: gcp-mcp-pinger <product_id|endpoint_url>"
+}
+
+if [ -z "$1" ]; then
+    list_supported
+    exit 0
+fi
+
+INPUT_SERVER="$1"
+SERVER="$INPUT_SERVER"
+
+# Normalize server URL
+if [[ ! "$SERVER" =~ ^https?:// ]]; then
+    # Check if it's one of our known aliases
+    if [[ -n "${MCP_SERVERS[$SERVER]}" ]]; then
+        SERVER="${MCP_SERVERS[$SERVER]}"
+    else
+        # Try to guess it's a googleapis service
+        SERVER="https://${SERVER}.googleapis.com/mcp"
+    fi
+fi
+
+# Replace REGION placeholder if present and not specified
+if [[ "$SERVER" == *"REGION"* ]]; then
+    REGION="${REGION:-us-central1}"
+    echo "🤌 No region specified, using default: $REGION"
+    SERVER="${SERVER/REGION/$REGION}"
+fi
+
+echo "🚀 Pinging MCP Server: $SERVER ..."
+
+# Get access token from gcloud
+TOKEN=$(gcloud auth print-access-token 2>/dev/null || echo "NO_TOKEN")
+
+if [ "$TOKEN" == "NO_TOKEN" ]; then
+    echo "⚠️ Warning: No gcloud token found. Request might fail if server requires auth."
+    AUTH_HEADER=""
+else
+    AUTH_HEADER="Authorization: Bearer $TOKEN"
+fi
+
+RESPONSE=$(curl -s --location "$SERVER" \
+    --header "content-type: application/json" \
+    --header "accept: application/json, text/event-stream" \
+    ${AUTH_HEADER:+--header "$AUTH_HEADER"} \
+    --data '{ "method": "tools/list", "jsonrpc": "2.0", "id": 1 }')
+
+if echo "$RESPONSE" | jq -e '.result' > /dev/null 2>&1; then
+    echo "✅ Success! Found the following tools in $INPUT_SERVER:"
+    echo "----------------------------------------------------"
+    echo "$RESPONSE" | jq -r '.result.tools[].name'
+else
+    # Check if there's an error in the response
+    ERROR=$(echo "$RESPONSE" | jq -r '.error.message // empty')
+    if [ -n "$ERROR" ]; then
+        echo "❌ MCP Error: $ERROR"
+    else
+        echo "❌ Error or no tools found. Response:"
+        echo "$RESPONSE" | jq .
+    fi
+fi
