@@ -2,6 +2,63 @@
 # gemini-session-sbobinator - Unspool your Gemini sessions with style! 🍝
 # "Non tutte le ciambelle escono col buco, ma questo script sì!" 🍩
 
+=begin
+  
+  GEMINI SESSION SBOBINATOR - USER GUIDE 📖
+  =========================================
+
+  This script transforms Gemini CLI session JSON files into a clean, human-readable
+  chronological timeline. It supports merging multiple sessions, searching through
+  your history, and filtering for slow tool calls.
+
+  BASIC USAGE:
+  ------------
+  - List all local workspaces:
+      $ gemini-session-sbobinator
+  
+  - Process a specific workspace (auto-resolves from ~/.gemini/tmp/):
+      $ gemini-session-sbobinator sre-extension
+  
+  - Process a specific JSON file:
+      $ gemini-session-sbobinator ~/path/to/session-XYZ.json
+
+  SEARCHING & SORTING:
+  --------------------
+  - Search for a term in workspace names or session content:
+      $ gemini-session-sbobinator --search "sre-extension"
+  
+  - Sort the workspace list by name (alphabetical) or date:
+      $ gemini-session-sbobinator --sort name
+      $ gemini-session-sbobinator --sort date (default)
+
+  INDEXING & MERGING:
+  -------------------
+  - Select a specific session from a workspace (1=latest, 2=older, etc.):
+      $ gemini-session-sbobinator -i 2 my-workspace
+  
+  - Merge ALL sessions in a workspace chronologically into one giant timeline:
+      $ gemini-session-sbobinator --all my-workspace
+
+  PERFORMANCE & FILTERING:
+  ------------------------
+  - Show only tool calls taking more than 10 seconds:
+      $ gemini-session-sbobinator --slow my-workspace
+  
+  - Custom threshold for slow tool calls:
+      $ gemini-session-sbobinator --slower-than 5 my-workspace
+
+  VISUALS:
+  --------
+  - 👤 User messages in GREEN
+  - ♊ Gemini messages and Zodiac symbols
+  - 🐚 Shell commands in GREEN with # description
+  - 👀 read_file paths in YELLOW
+  - 📅 Date headers for clean daily logging
+  - --no-crop: Disable the 80-character limit for long text.
+
+  "Chi dorme non piglia pesci!" 🐟
+=end
+
 require 'json'
 require 'time'
 require 'optparse'
@@ -11,7 +68,9 @@ $options = {
   search_term: nil,
   sort: 'date',
   session_index: nil,
-  all_sessions: false
+  all_sessions: false,
+  min_tool_time: 10.0, # Default to 10 seconds for --slow
+  slow_only: false
 }
 
 OptionParser.new do |opts|
@@ -26,6 +85,7 @@ OptionParser.new do |opts|
     puts "  gemini-session-sbobinator --sort name"
     puts "  gemini-session-sbobinator -i 2 sre-gemini-cli-extension"
     puts "  gemini-session-sbobinator -a sre-gemini-cli-extension"
+    puts "  gemini-session-sbobinator --slow sre-gemini-cli-extension"
     exit
   end
 
@@ -43,6 +103,15 @@ OptionParser.new do |opts|
 
   opts.on("-a", "--all", "Merge all sessions in the workspace chronologically") do
     $options[:all_sessions] = true
+  end
+
+  opts.on("--slow", "Only show tools slower than #{$options[:min_tool_time]}s (default)") do
+    $options[:slow_only] = true
+  end
+
+  opts.on("--slower-than N", Float, "Only show tools slower than N seconds") do |n|
+    $options[:slow_only] = true
+    $options[:min_tool_time] = n
   end
 
   opts.on("--no-crop", "Do not crop long lines") do
@@ -198,8 +267,8 @@ def process_files(file_paths)
   end
   puts "─" * 100
 
-  # Sort all messages chronologically
-  all_messages.sort_by! { |msg| Time.parse(msg['timestamp']).to_i }
+  # Sort all messages chronologically (using to_f for millisecond precision)
+  all_messages.sort_by! { |msg| Time.parse(msg['timestamp']).to_f }
   last_printed_date = nil
   
   all_messages.each do |msg|
@@ -221,41 +290,54 @@ def process_files(file_paths)
     
     case type
     when 'user'
-      content = msg['content'].is_a?(Array) ? msg['content'].map{|c| c['text']}.join(" ") : msg['content']
-      puts "  \033[1;32m#{ts}\033[0m 👤 #{crop(content)}"
+      unless $options[:slow_only]
+        content = msg['content'].is_a?(Array) ? msg['content'].map{|c| c['text']}.join(" ") : msg['content']
+        puts "  \033[1;32m#{ts}\033[0m 👤 #{crop(content)}"
+      end
     when 'gemini'
       content = msg['content']
-      if content && !content.empty?
+      
+      # Filter tool calls by time
+      relevant_tool_calls = (msg['toolCalls'] || []).select do |tc|
+        if tc['timestamp']
+          tool_ts = Time.parse(tc['timestamp'])
+          duration = tool_ts - msg_time
+          !$options[:slow_only] || duration >= $options[:min_tool_time]
+        else
+          !$options[:slow_only]
+        end
+      end
+
+      # Print text content only if not in slow_only mode
+      if content && !content.empty? && !$options[:slow_only]
         puts "  \033[1;35m#{ts}\033[0m ♊ #{crop(content)}"
       end
       
-      if msg['toolCalls'] && !msg['toolCalls'].empty?
-        msg['toolCalls'].each do |tc|
-          tool_name = tc['name']
-          duration_str = ""
-          
-          # Try to find a finish timestamp
-          finish_ts_str = tc['timestamp']
-          if finish_ts_str
-            tool_ts = Time.parse(finish_ts_str)
-            duration = tool_ts - msg_time
-            duration_str = " [\033[1;33mtook #{format_duration(duration)}\033[0m]"
-          end
-          
-          args = tc['args'] || {}
-          
-          # Optimization for specific tools
-          if tool_name == 'run_shell_command'
-            cmd = args['command'] || args['cmd'] || ''
-            desc = args['description'] || args['desc']
-            display_str = desc ? "#{cmd} # #{desc}" : cmd
-            puts "  \033[1;35m#{ts}\033[0m ♊ 🐚 \033[1;32m#{crop(display_str)}\033[0m#{duration_str}"
-          elsif tool_name == 'read_file'
-            file = args['file_path'] || args['path'] || ''
-            puts "  \033[1;35m#{ts}\033[0m ♊ 👀 🛠️  \033[1mread_file\033[0m(\033[1;33m#{crop(file, 55)}\033[0m)#{duration_str}"
-          else
-            puts "  \033[1;35m#{ts}\033[0m ♊ 🛠️  \033[1m#{tool_name}\033[0m(#{crop(args.inspect, $options[:crop_length] ? 55 : nil)})#{duration_str}"
-          end
+      relevant_tool_calls.each do |tc|
+        tool_name = tc['name']
+        duration_str = ""
+        
+        # Calculate duration
+        finish_ts_str = tc['timestamp']
+        if finish_ts_str
+          tool_ts = Time.parse(finish_ts_str)
+          duration = tool_ts - msg_time
+          duration_str = " [\033[1;33mtook #{format_duration(duration)}\033[0m]"
+        end
+        
+        args = tc['args'] || {}
+        
+        # Optimization for specific tools
+        if tool_name == 'run_shell_command'
+          cmd = args['command'] || args['cmd'] || ''
+          desc = args['description'] || args['desc']
+          display_str = desc ? "#{cmd} # #{desc}" : cmd
+          puts "  \033[1;35m#{ts}\033[0m ♊ 🐚 \033[1;32m#{crop(display_str)}\033[0m#{duration_str}"
+        elsif tool_name == 'read_file'
+          file = args['file_path'] || args['path'] || ''
+          puts "  \033[1;35m#{ts}\033[0m ♊ 👀 🛠️  \033[1mread_file\033[0m(\033[1;33m#{crop(file, 55)}\033[0m)#{duration_str}"
+        else
+          puts "  \033[1;35m#{ts}\033[0m ♊ 🛠️  \033[1m#{tool_name}\033[0m(#{crop(args.inspect, $options[:crop_length] ? 55 : nil)})#{duration_str}"
         end
       end
     end
@@ -278,8 +360,6 @@ def process_files(file_paths)
     puts "   \033[1;36m#{File.expand_path(fp)}\033[0m"
   end
   puts ""
-  puts "✨ Fine della sbobinatura! (In un batter d'occhio! 😉)"
-  puts "   \"Chi dorme non piglia pesci!\" 🐟\n\n"
 end
 
 # Main logic
