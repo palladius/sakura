@@ -48,8 +48,18 @@ end
 def format_duration(seconds)
   if seconds < 1
     "#{(seconds * 1000).round}ms"
-  else
+  elsif seconds < 60
     "#{seconds.round(2)}s"
+  else
+    h = (seconds / 3600).to_i
+    m = ((seconds % 3600) / 60).to_i
+    s = (seconds % 60).round
+    
+    parts = []
+    parts << "#{h} hours" if h > 0
+    parts << "#{m} min" if m > 0
+    parts << "#{s} sec" if s > 0 || parts.empty?
+    parts.join(", ")
   end
 end
 
@@ -205,12 +215,15 @@ def process_file(file_path)
           
           args = tc['args'] || {}
           
-          # Optimization for run_shell_command
+          # Optimization for specific tools
           if tool_name == 'run_shell_command'
             cmd = args['command'] || args['cmd'] || ''
             desc = args['description'] || args['desc']
             display_str = desc ? "#{cmd} # #{desc}" : cmd
-            puts "  \033[1;35m#{ts}\033[0m ♊ 🐚 🛠️  \033[1m#{tool_name}\033[0m: #{crop(display_str)}#{duration_str}"
+            puts "  \033[1;35m#{ts}\033[0m ♊ 🐚 \033[1;32m#{crop(display_str)}\033[0m#{duration_str}"
+          elsif tool_name == 'read_file'
+            file = args['file_path'] || args['path'] || ''
+            puts "  \033[1;35m#{ts}\033[0m ♊ 👀 🛠️  \033[1mread_file\033[0m(\033[1;33m#{crop(file, 55)}\033[0m)#{duration_str}"
           else
             puts "  \033[1;35m#{ts}\033[0m ♊ 🛠️  \033[1m#{tool_name}\033[0m(#{crop(args.inspect, $options[:crop_length] ? 55 : nil)})#{duration_str}"
           end
