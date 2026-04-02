@@ -226,12 +226,101 @@ def list_sessions
   puts "\n💡 Run \033[1mgemini-session-sbobinator <folder_name>\033[0m to view the latest session inside a workspace."
 end
 
+def resilient_json_parse(file_path)
+  raw_content = File.read(file_path)
+  
+  # Try 1: The standard way (If it ain't broke, don't fix it!)
+  begin
+    return JSON.parse(raw_content)
+  rescue JSON::ParserError
+    # Okay, it's broken. Let's start the surgery.
+  end
+
+  # Layer 1: Encoding and Escape fixes
+  content = raw_content.encode("UTF-8", invalid: :replace, undef: :replace, replace: "?")
+  
+  # Even more robust regex for backslashes:
+  # We look for a backslash that is NOT followed by a valid JSON escape char.
+  # Valid: [bfnrt"\/] or uXXXX. 
+  # Note: in Ruby regex, \\\\ is one literal backslash.
+  content = content.gsub(/\\(?![bfnrt"\\\/]|u[0-9a-fA-F]{4})/, "")
+
+  # Fix incomplete surrogate pairs
+  content = content.gsub(/\\u[dD][89aAbB][0-9a-fA-F]{2}(?!\\u[dD][c-fC-F][0-9a-fA-F]{2})/, "?")
+  content = content.gsub(/(?<!\\u[dD][89aAbB][0-9a-fA-F]{2})\\u[dD][c-fC-F][0-9a-fA-F]{2}/, "?")
+
+  begin
+    return JSON.parse(content)
+  rescue JSON::ParserError
+    # Still broken? Maybe it's truncated.
+  end
+
+  # Layer 2: Truncated JSON fix
+  puts "⚠️  JSON in #{File.basename(file_path)} is badly malformed. Attempting emergency repairs... 🩹"
+  
+  fixed_content = content.strip
+  if fixed_content.count('"').odd? && !fixed_content.end_with?('\\"')
+    fixed_content += '"'
+  end
+
+  10.times do
+    begin
+      return JSON.parse(fixed_content)
+    rescue JSON::ParserError
+      if fixed_content =~ /,\s*$/
+        fixed_content = fixed_content.sub(/,\s*$/, "")
+        retry
+      end
+
+      last_open_brace = fixed_content.rindex('{')
+      last_open_bracket = fixed_content.rindex('[')
+      
+      if (last_open_brace || -1) > (last_open_bracket || -1)
+        fixed_content += '}'
+      else
+        fixed_content += ']'
+      end
+    end
+  end
+
+  # Layer 3: LAST RESORT SALVAGE 🛶
+  # If we are here, the JSON is truly trash. Let's try to extract messages via regex.
+  puts "🆘 Critical failure on #{File.basename(file_path)}. Entering SALVAGE MODE... (Si salvi chi può! 🛶)"
+  
+  salvaged_messages = []
+  # This regex tries to find things that look like message objects: {"type":"...", ...}
+  # It's not perfect but for recovery it's better than nothing.
+  content.scan(/\{[^{}]*"type"\s*:\s*"(user|gemini)"[^{}]*\}/m).each do |match|
+    begin
+      # Try to parse the potential message object
+      msg_obj = JSON.parse(match[0])
+      salvaged_messages << msg_obj if msg_obj['type'] && msg_obj['timestamp']
+    rescue
+      # If this specific block is also trash, skip it.
+    end
+  end
+  
+  if salvaged_messages.any?
+    puts "✅ Salvaged #{salvaged_messages.size} messages from the wreckage! 💎"
+    # Create a fake session object to return
+    return {
+      'sessionId' => "SALVAGED-#{File.basename(file_path)}",
+      'startTime' => (salvaged_messages.first['timestamp'] rescue Time.now.to_s),
+      'messages' => salvaged_messages
+    }
+  end
+  
+  # Final attempt failed
+  raise "Unrecoverable JSON error in #{file_path}"
+end
+
 def process_files(file_paths)
   all_messages = []
   models_used = []
   session_ids = []
   start_times = []
   end_times = []
+  skipped_files = []
 
   file_paths.each do |file_path|
     unless File.exist?(file_path)
@@ -240,18 +329,23 @@ def process_files(file_paths)
     end
 
     begin
-      data = JSON.parse(File.read(file_path))
-    rescue => e
-      puts "❌ Errore durante la lettura del JSON: #{e.message} 🤌"
-      exit 1
-    end
-    
-    session_ids << (data['sessionId'] || 'Unknown')
-    start_times << Time.parse(data['startTime']) if data['startTime']
-    end_times << Time.parse(data['lastUpdated']) if data['lastUpdated']
+      data = resilient_json_parse(file_path)
+      
+      session_ids << (data['sessionId'] || 'Unknown')
+      start_times << Time.parse(data['startTime']) if data['startTime']
+      end_times << Time.parse(data['lastUpdated']) if data['lastUpdated']
 
-    (data['messages'] || []).each do |msg|
-      all_messages << msg
+      (data['messages'] || []).each do |msg|
+        all_messages << msg
+      end
+    rescue => e
+      if $options[:all_sessions]
+        puts "⚠️  Skipping #{File.basename(file_path)}: #{e.message} 🤌"
+        skipped_files << file_path
+      else
+        puts "❌ Errore durante la lettura del JSON: #{e.message} 🤌"
+        exit 1
+      end
     end
   end
 
