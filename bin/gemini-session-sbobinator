@@ -1,0 +1,273 @@
+#!/usr/bin/env ruby
+# gemini-session-sbobinator - Unspool your Gemini sessions with style! 🍝
+# "Non tutte le ciambelle escono col buco, ma questo script sì!" 🍩
+
+require 'json'
+require 'time'
+require 'optparse'
+
+$options = {
+  crop_length: 80,
+  search_term: nil,
+  sort: 'date'
+}
+
+OptionParser.new do |opts|
+  opts.banner = "Usage: gemini-session-sbobinator [options] [file_or_folder]"
+
+  opts.on("-h", "--help", "Prints this help (Aiutati che il ciel ti aiuta! 👼)") do
+    puts opts
+    puts "\nExamples:"
+    puts "  gemini-session-sbobinator /path/to/session.json"
+    puts "  gemini-session-sbobinator --no-crop /path/to/session.json"
+    puts "  gemini-session-sbobinator --search 'sre-extension'"
+    puts "  gemini-session-sbobinator --sort name"
+    exit
+  end
+
+  opts.on("-s", "--search TERM", "Aggressive grep in folder names and JSON content") do |term|
+    $options[:search_term] = term
+  end
+
+  opts.on("-o", "--sort OPTION", "Sort list by 'date' (default) or 'name'") do |opt|
+    $options[:sort] = opt.downcase
+  end
+
+  opts.on("--no-crop", "Do not crop long lines") do
+    $options[:crop_length] = nil
+  end
+end.parse!
+
+def crop(text, length = $options[:crop_length])
+  return "" if text.nil?
+  text = text.gsub("\n", " ").strip
+  return text if length.nil? || text.length <= length
+  text[0...length-3] + "..."
+end
+
+def format_duration(seconds)
+  if seconds < 1
+    "#{(seconds * 1000).round}ms"
+  else
+    "#{seconds.round(2)}s"
+  end
+end
+
+def search_sessions(term)
+  base_dir = File.expand_path("~/.gemini/tmp")
+  puts "🔍 Searching for '#{term}' in #{base_dir}... (Chi cerca trova! 🧐)"
+  matched_folders = []
+  
+  Dir.glob(File.join(base_dir, "*")).each do |folder|
+    next unless File.directory?(folder)
+    
+    # Match folder name
+    if File.basename(folder).downcase.include?(term.downcase)
+      matched_folders << folder
+      next
+    end
+    
+    # Match content
+    chats_dir = File.join(folder, "chats")
+    next unless File.directory?(chats_dir)
+    
+    Dir.glob(File.join(chats_dir, "*.json")).each do |json_file|
+      begin
+        content = File.read(json_file)
+        if content.downcase.include?(term.downcase)
+          matched_folders << folder
+          break # Only need one match per folder
+        end
+      rescue
+        # Skip unreadable files
+      end
+    end
+  end
+  
+  if matched_folders.empty?
+    puts "❌ Nessun risultato trovato. (Acqua in bocca! 🤐)"
+  else
+    puts "✅ \033[1;32mFound matching folders:\033[0m"
+    matched_folders.uniq.each { |f| puts "📁 #{f}" }
+  end
+end
+
+def list_sessions
+  base_dir = File.expand_path("~/.gemini/tmp")
+  sort_msg = $options[:sort] == 'name' ? "alphabetically by folder name" : "chronologically by date"
+  puts "🔍 Listing local sessions from #{base_dir} (#{sort_msg})... (Faccio da solo! 🛠️)\n\n"
+  
+  unless Dir.exist?(base_dir)
+    puts "❌ Folder not found: #{base_dir}"
+    return
+  end
+  
+  sessions = []
+  Dir.glob(File.join(base_dir, "*")).each do |folder|
+    next unless File.directory?(folder)
+    
+    chat_files = Dir.glob(File.join(folder, "chats", "*.json"))
+    last_modified = chat_files.map { |f| File.mtime(f) }.max || File.mtime(folder)
+    
+    sessions << {
+      folder_name: File.basename(folder),
+      last_modified: last_modified,
+      chat_count: chat_files.size
+    }
+  end
+  
+  max_name_len = sessions.map { |s| s[:folder_name].length }.max || 20
+  
+  if $options[:sort] == 'name'
+    sessions.sort_by! { |s| s[:folder_name].downcase }
+    sessions.each do |s|
+      date_str = s[:last_modified].strftime("%Y-%m-%d %H:%M")
+      puts "  \033[1;36m#{s[:folder_name].ljust(max_name_len)}\033[0m   (Last activity: #{date_str} | Chats: #{s[:chat_count]})"
+    end
+  else
+    sessions.sort_by! { |s| -s[:last_modified].to_i }
+    sessions.each do |s|
+      date_str = s[:last_modified].strftime("%Y-%m-%d %H:%M")
+      puts "  #{date_str}   \033[1;36m#{s[:folder_name].ljust(max_name_len)}\033[0m   (Chats: #{s[:chat_count]})"
+    end
+  end
+  
+  puts "\n💡 Run \033[1mgemini-session-sbobinator <folder_name>\033[0m to view the latest session inside a workspace."
+end
+
+def process_file(file_path)
+  unless File.exist?(file_path)
+    puts "❌ Mamma mia! File not found: #{file_path}"
+    exit 1
+  end
+
+  begin
+    data = JSON.parse(File.read(file_path))
+  rescue => e
+    puts "❌ Errore durante la lettura del JSON: #{e.message} 🤌"
+    exit 1
+  end
+  
+  session_id = data['sessionId'] || 'Unknown'
+  start_time_raw = data['startTime']
+  end_time_raw = data['lastUpdated']
+  
+  start_time = start_time_raw ? Time.parse(start_time_raw).localtime : Time.now
+  end_time = end_time_raw ? Time.parse(end_time_raw).localtime : start_time
+  
+  puts "\n"
+  puts "🎬 Session: \033[1;34m#{session_id}\033[0m (Started at: #{start_time})"
+  puts "─" * 100
+
+  messages = data['messages'] || []
+  models_used = []
+  last_printed_date = nil
+  
+  messages.each do |msg|
+    msg_time = Time.parse(msg['timestamp']).localtime
+    current_date = msg_time.strftime("%Y-%m-%d")
+    ts = msg_time.strftime("%H:%M:%S")
+    
+    # Print Date Header if it's a new day
+    if current_date != last_printed_date
+      puts "\n📅 \033[1;36m#{current_date}\033[0m :"
+      last_printed_date = current_date
+    end
+    
+    type = msg['type']
+    
+    if type == 'gemini' && msg['model']
+      models_used << msg['model']
+    end
+    
+    case type
+    when 'user'
+      content = msg['content'].is_a?(Array) ? msg['content'].map{|c| c['text']}.join(" ") : msg['content']
+      puts "  \033[1;32m#{ts}\033[0m 👤 #{crop(content)}"
+    when 'gemini'
+      content = msg['content']
+      if content && !content.empty?
+        puts "  \033[1;35m#{ts}\033[0m ♊ #{crop(content)}"
+      end
+      
+      if msg['toolCalls'] && !msg['toolCalls'].empty?
+        msg['toolCalls'].each do |tc|
+          tool_name = tc['name']
+          duration_str = ""
+          
+          # Try to find a finish timestamp
+          finish_ts_str = tc['timestamp']
+          if finish_ts_str
+            tool_ts = Time.parse(finish_ts_str)
+            duration = tool_ts - msg_time
+            duration_str = " [\033[1;33mtook #{format_duration(duration)}\033[0m]"
+          end
+          
+          args = tc['args'] || {}
+          
+          # Optimization for run_shell_command
+          if tool_name == 'run_shell_command'
+            cmd = args['command'] || args['cmd'] || ''
+            desc = args['description'] || args['desc']
+            display_str = desc ? "#{cmd} # #{desc}" : cmd
+            puts "  \033[1;35m#{ts}\033[0m ♊ 🐚 🛠️  \033[1m#{tool_name}\033[0m: #{crop(display_str)}#{duration_str}"
+          else
+            puts "  \033[1;35m#{ts}\033[0m ♊ 🛠️  \033[1m#{tool_name}\033[0m(#{crop(args.inspect, $options[:crop_length] ? 55 : nil)})#{duration_str}"
+          end
+        end
+      end
+    end
+  end
+  puts "─" * 100
+  
+  # One-off Stats at the end
+  chat_duration = format_duration(end_time - start_time)
+  unique_models = models_used.uniq.join(", ")
+  unique_models = "Unknown" if unique_models.empty?
+  
+  puts "📊 \033[1mStats della Sessione:\033[0m"
+  puts "   🤖 Models:    \033[1;33m#{unique_models}\033[0m"
+  puts "   ⏱️  Duration:  \033[1;32m#{chat_duration}\033[0m"
+  puts "   🏁 Start:     #{start_time}"
+  puts "   🛑 End:       #{end_time}"
+  puts ""
+  puts "✨ Fine della sbobinatura! (In un batter d'occhio! 😉)"
+  puts "   \"Chi dorme non piglia pesci!\" 🐟\n\n"
+end
+
+# Main logic
+if $options[:search_term]
+  search_sessions($options[:search_term])
+  exit
+end
+
+input = ARGV[0]
+
+if input.nil?
+  list_sessions
+else
+  base_dir = File.expand_path("~/.gemini/tmp")
+  target_path = input
+  
+  # Auto-resolve workspace name if it's not a local path
+  if !File.exist?(input) && Dir.exist?(File.join(base_dir, input))
+    target_path = File.join(base_dir, input)
+  end
+
+  if File.directory?(target_path)
+    json_files = Dir.glob(File.join(target_path, "*.json"))
+    json_files += Dir.glob(File.join(target_path, "chats", "*.json"))
+    
+    if json_files.empty?
+      puts "❌ No JSON files found in #{target_path}. Che peccato! 🤌"
+      exit 1
+    end
+    
+    latest_file = json_files.max_by { |f| File.mtime(f) }
+    workspace_name = File.basename(target_path)
+    puts "📂 Processing latest session in workspace \033[1;36m#{workspace_name}\033[0m: #{File.basename(latest_file)}"
+    process_file(latest_file)
+  else
+    process_file(target_path)
+  end
+end
