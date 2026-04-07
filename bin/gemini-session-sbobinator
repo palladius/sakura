@@ -1,6 +1,16 @@
 #!/usr/bin/env ruby
 # gemini-session-sbobinator - Unspool your Gemini sessions with style! 🍝
 # "Non tutte le ciambelle escono col buco, ma questo script sì!" 🍩
+#
+# VERSION: 1.1.1
+# CHANGELOG:
+# - 1.1.1: Polished single session header: cropped UUID and added filename in ().
+# - 1.1.0: Added "Superior" resilient parsing:
+#          - Automatic handling of invalid escape characters (like \? or \').
+#          - Emergency repairs for truncated JSON (closing brackets/quotes).
+#          - SALVAGE MODE: Regex-based extraction for severely broken files.
+#          - Detailed file status reporting (Healthy, Repaired, Salvaged, Failed).
+# - 1.0.0: Initial release of the "Sbobinator".
 
 =begin
   
@@ -229,52 +239,39 @@ end
 def resilient_json_parse(file_path)
   raw_content = File.read(file_path)
   
-  # Try 1: The standard way (If it ain't broke, don't fix it!)
+  # Try 1: The standard way
   begin
-    return JSON.parse(raw_content)
+    return [JSON.parse(raw_content), "\033[1;32m✅ Healthy\033[0m"]
   rescue JSON::ParserError
-    # Okay, it's broken. Let's start the surgery.
   end
 
   # Layer 1: Encoding and Escape fixes
   content = raw_content.encode("UTF-8", invalid: :replace, undef: :replace, replace: "?")
-  
-  # Even more robust regex for backslashes:
-  # We look for a backslash that is NOT followed by a valid JSON escape char.
-  # Valid: [bfnrt"\/] or uXXXX. 
-  # Note: in Ruby regex, \\\\ is one literal backslash.
   content = content.gsub(/\\(?![bfnrt"\\\/]|u[0-9a-fA-F]{4})/, "")
-
-  # Fix incomplete surrogate pairs
   content = content.gsub(/\\u[dD][89aAbB][0-9a-fA-F]{2}(?!\\u[dD][c-fC-F][0-9a-fA-F]{2})/, "?")
   content = content.gsub(/(?<!\\u[dD][89aAbB][0-9a-fA-F]{2})\\u[dD][c-fC-F][0-9a-fA-F]{2}/, "?")
 
   begin
-    return JSON.parse(content)
+    return [JSON.parse(content), "\033[1;33m🩹 Repaired\033[0m (Escapes/Encoding)"]
   rescue JSON::ParserError
-    # Still broken? Maybe it's truncated.
   end
 
   # Layer 2: Truncated JSON fix
   puts "⚠️  JSON in #{File.basename(file_path)} is badly malformed. Attempting emergency repairs... 🩹"
   
   fixed_content = content.strip
-  if fixed_content.count('"').odd? && !fixed_content.end_with?('\\"')
-    fixed_content += '"'
-  end
+  fixed_content += '"' if fixed_content.count('"').odd? && !fixed_content.end_with?('\\"')
 
   10.times do
     begin
-      return JSON.parse(fixed_content)
+      return [JSON.parse(fixed_content), "\033[1;33m🩹 Repaired\033[0m (Truncated/Braces)"]
     rescue JSON::ParserError
       if fixed_content =~ /,\s*$/
         fixed_content = fixed_content.sub(/,\s*$/, "")
         retry
       end
-
       last_open_brace = fixed_content.rindex('{')
       last_open_bracket = fixed_content.rindex('[')
-      
       if (last_open_brace || -1) > (last_open_bracket || -1)
         fixed_content += '}'
       else
@@ -284,33 +281,26 @@ def resilient_json_parse(file_path)
   end
 
   # Layer 3: LAST RESORT SALVAGE 🛶
-  # If we are here, the JSON is truly trash. Let's try to extract messages via regex.
   puts "🆘 Critical failure on #{File.basename(file_path)}. Entering SALVAGE MODE... (Si salvi chi può! 🛶)"
-  
   salvaged_messages = []
-  # This regex tries to find things that look like message objects: {"type":"...", ...}
-  # It's not perfect but for recovery it's better than nothing.
   content.scan(/\{[^{}]*"type"\s*:\s*"(user|gemini)"[^{}]*\}/m).each do |match|
     begin
-      # Try to parse the potential message object
       msg_obj = JSON.parse(match[0])
       salvaged_messages << msg_obj if msg_obj['type'] && msg_obj['timestamp']
     rescue
-      # If this specific block is also trash, skip it.
     end
   end
   
   if salvaged_messages.any?
     puts "✅ Salvaged #{salvaged_messages.size} messages from the wreckage! 💎"
-    # Create a fake session object to return
-    return {
+    data = {
       'sessionId' => "SALVAGED-#{File.basename(file_path)}",
       'startTime' => (salvaged_messages.first['timestamp'] rescue Time.now.to_s),
       'messages' => salvaged_messages
     }
+    return [data, "\033[1;35m🛶 Salvaged\033[0m (Regex extraction)"]
   end
   
-  # Final attempt failed
   raise "Unrecoverable JSON error in #{file_path}"
 end
 
@@ -320,7 +310,7 @@ def process_files(file_paths)
   session_ids = []
   start_times = []
   end_times = []
-  skipped_files = []
+  file_statuses = {}
 
   file_paths.each do |file_path|
     unless File.exist?(file_path)
@@ -329,7 +319,8 @@ def process_files(file_paths)
     end
 
     begin
-      data = resilient_json_parse(file_path)
+      data, status = resilient_json_parse(file_path)
+      file_statuses[file_path] = status
       
       session_ids << (data['sessionId'] || 'Unknown')
       start_times << Time.parse(data['startTime']) if data['startTime']
@@ -341,7 +332,7 @@ def process_files(file_paths)
     rescue => e
       if $options[:all_sessions]
         puts "⚠️  Skipping #{File.basename(file_path)}: #{e.message} 🤌"
-        skipped_files << file_path
+        file_statuses[file_path] = "\033[1;31m❌ Failed\033[0m: #{e.message}"
       else
         puts "❌ Errore durante la lettura del JSON: #{e.message} 🤌"
         exit 1
@@ -355,7 +346,9 @@ def process_files(file_paths)
 
   puts "\n"
   if file_paths.size == 1
-    puts "🎬 Session: \033[1;34m#{session_ids.first}\033[0m (Started at: #{start_time})"
+    short_id = session_ids.first.to_s[0..7]
+    filename = File.basename(file_paths.first)
+    puts "🎬 Session: \033[1;34m#{short_id}...\033[0m (\033[1;36m#{filename}\033[0m) - Started at: #{start_time}"
   else
     puts "🎬 Merged \033[1;34m#{file_paths.size} Sessions\033[0m (Started at: #{start_time})"
   end
@@ -451,7 +444,8 @@ def process_files(file_paths)
   puts ""
   puts "📁 \033[1mParsed Files:\033[0m"
   file_paths.each do |fp|
-    puts "   \033[1;36m#{File.expand_path(fp)}\033[0m"
+    status = file_statuses[fp] || "❓ Unknown"
+    puts "   #{status.ljust(30)} \033[1;36m#{File.basename(fp)}\033[0m"
   end
   puts ""
 end
