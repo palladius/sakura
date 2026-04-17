@@ -9,7 +9,12 @@ end
 class String
   # "first second".remove_from_beginning("first") => " second"
   def remove_from_beginning(s)
-    self.split(s)[1]
+    return self if s.nil? || s.empty?
+    if self.start_with?(s)
+      self[s.length..-1]
+    else
+      self
+    end
   end
 
   def remove_double_slashes
@@ -191,9 +196,8 @@ def init()    # see lib_autoinit in lib/util.rb
   $conf[:remote_repo_relative_path] = determine_folder_by_repo_url($conf[:local_repo_url]).cleanup_folder
   $conf[:remote_repo_absolute_path] = ($conf[:env_repopath] + "/" + $conf[:remote_repo_relative_path]).cleanup_folder
   $conf[:local_untracked_files] = `git ls-files . --exclude-standard --others`.chomp.split("\n")
-  $conf[:remote_privatized_files_abs] = `find  #{$conf[:remote_repo_absolute_path]} -type f`.chomp.split("\n")
+  $conf[:remote_privatized_files_abs] = `find '#{$conf[:remote_repo_absolute_path]}' -type f 2>/dev/null`.chomp.split("\n")
   $conf[:remote_privatized_files_rel] = $conf[:remote_privatized_files_abs].map{|longfile|
-    # deb "shortning: #{longfile}"
     longfile.remove_from_beginning( $conf[:remote_repo_absolute_path])
   }
   $conf[:local_untracked_files_ohne_symlinks] = $conf[:local_untracked_files].select{|file|
@@ -207,11 +211,11 @@ def init()    # see lib_autoinit in lib/util.rb
   end
 
   unless File.exist?( $conf[:remote_repo_absolute_path] )
-    execute_unless_dryrun("mkdir -p #{ $conf[:remote_repo_absolute_path]}")
+    execute_unless_dryrun("mkdir -p '#{ $conf[:remote_repo_absolute_path]}'")
   end
-  unless File.exist?( $conf[:local_repo_root_dir] + "/.git-privatize")
+  unless File.exist?("#{$conf[:local_repo_root_dir]}/.git-privatize")
     puts ".git-privatize not found: symlinking remote repo locally for convenience.."
-    command = "ln -s #{ $conf[:remote_repo_absolute_path]} #{$conf[:local_repo_root_dir] + "/.git-privatize"}"
+    command = "ln -s '#{$conf[:remote_repo_absolute_path]}' '#{$conf[:local_repo_root_dir]}/.git-privatize'"
     execute_unless_dryrun(command)
   end
 
@@ -227,24 +231,20 @@ def print_status
   puts "+ TIPS:"
   unless $conf[:local_untracked_files].empty?
     puts white("(1) #{yellow $conf[:local_untracked_files].count} untracked LOCAL files found. Try this command to privatize [some of] those:")
-    puts azure(" git-privatize pr '#{ $conf[:local_untracked_files].join("' '")}'")
+    puts azure(" git-privatize add '#{ $conf[:local_untracked_files].join("' '")}'")
   end
   unless $conf[:remote_privatized_files_abs].empty?
     puts white("(2) Some possibly unsynced REMOTE files found (#{yellow  $conf[:remote_privatized_files_abs].count}). Try this command to privatize [some of] those:")
-    puts azure(" git-privatize pull '#{ $conf[:remote_privatized_files_rel].join("' '") }'")
+    puts azure(" git-privatize sync '#{ $conf[:remote_privatized_files_rel].join("' '") }'")
     puts ".. or simply .. "
-    puts azure(" git-privatize restore")
+    puts azure(" git-privatize sync")
   end
 
   puts "+ REMOTE vs LOCAL"
   puts " # Mamote(TM):"
   $conf[:remote_privatized_files_rel].each{|f|
     puts("- [REM] #{green f}")
-    #puts("- [REM1] #{green f} => #{azure File.realpath(f)}")
   }
-  # $conf[:remote_privatized_files_abs].each{|f|
-  #   puts("- [REM2] #{green f} => #{azure File.realpath(f)}")
-  # }
 
   puts "- Lokaal(TM):"
   $conf[:local_untracked_files_ohne_symlinks].each{|f|
@@ -254,7 +254,6 @@ def print_status
     puts("- [#{ 'LOK-syml'}] #{f} -> #{azure File.readlink(f)}")
   }
   puts "====== print_status(END) ======"
- # puts " ~-~ {End of Status} ~-~"
   puts ''
 end
 
@@ -275,73 +274,95 @@ def execute_unless_dryrun(command)
 end
 
 def privatize_files(files)
-  puts white "WARNING: for now the script ONLY works from LOCAL root dir. i cant be bothered to implement a sync ../dir/blah"
   files.each do |filename|
     deb "privatizing LOCAL file: #{white filename}"
     if ! File.exist?(filename)
-      puts red("File doesnt existsm skipping: #{filename}")
+      puts red("File doesnt exists skipping: #{filename}")
       next
     end
     if File.symlink?(filename)
-      puts red("File is a symlink - I wont move symlinks Im not crazy: #{filename}")
+      puts red("File is a symlink - I wont move symlinks: #{filename}")
       next
     end
     if File.directory?(filename)
-      puts red("File is a DIRECTORY - are you out of your mind?!? Skipping: #{filename}")
+      puts red("File is a DIRECTORY - skipping: #{filename}")
       next
     end
-    puts "OK now Im convinced to privatize this! Berlusconi would be proud of this commie :P"
-    #puts "Please execute this command MANUALLY until i'm sure to do it myself (just remove echo when it works a few times):"
-    local_subdir = File.dirname(filename) # finche non ho cose piu complicate..
+    
+    abs_filename = File.expand_path(filename)
+    rel_filename = abs_filename.remove_from_beginning($conf[:local_repo_root_dir])
+    
+    if rel_filename == abs_filename
+      puts red("File is NOT inside the git repo: #{filename}")
+      next
+    end
+
+    puts "OK now Im convinced to privatize this! rel_filename=#{rel_filename}"
+    rel_subdir = File.dirname(rel_filename)
     remote_repo_dir = $conf[:remote_repo_absolute_path]
-    command = "mkdir -p '#{remote_repo_dir}/#{local_subdir}/' && mv '#{filename}' '#{remote_repo_dir}/#{local_subdir}/'"
-    puts "[CMD] #{white command}"
-   # `#{command}` unless $opts[:dryrun]
+    
+    # Ensure remote directory exists and move file there
+    command = "mkdir -p '#{remote_repo_dir}/#{rel_subdir}/' && mv '#{abs_filename}' '#{remote_repo_dir}/#{rel_subdir}/'"
     execute_unless_dryrun(command)
   end
-  puts green "NOTE: Once moved everything a simple sync (action = '$0 restore') should synlink them back :)"
+  puts yellow("To symlink the file(s) back to your local repo, run: ") + azure("#{File.basename($0)} sync")
 end
 
 def restore_privatized_files(files=[])
-  if $conf[:remote_privatized_files_abs].empty?
-    puts red("No files to restore, you silly sausage!")
-    exit(42)
-  end
-  puts yellow("IMPORTANT: Now symlinking from REMOTE repo to local repo - remember NOT to touch .gitignore :)")
-  commands_to_issue = [] #  "cd #{$conf[:local_repo_root_dir]}" ]
-  comments = []
-  $conf[:remote_privatized_files_abs].each do |remote_file|
-    local_file_wouldbe = remote_file.gsub(
-        $conf[:remote_repo_absolute_path],
-        $conf[:local_repo_root_dir]+"/")
-    relative_remote_file =  remote_file.remove_from_beginning( $conf[:remote_repo_absolute_path])
-    deb "remote_file: '#{remote_file}' -> '#{relative_remote_file}'"
-    local_dir_wouldbe = File.dirname(relative_remote_file)
-    # if file exists..
-    remotedir = "#{$conf[:local_repo_root_dir]}/#{local_dir_wouldbe}/"
-    deb "Remote: #{green remote_file}"
-    deb "RemoteDir:  #{green remotedir}"
-    deb "Local:  #{orange local_file_wouldbe}"
-    deb "LocalDir:  #{yellow local_dir_wouldbe}"
-    #      puts green("ALSO DO git add #{remote_file}")
-    #execute_unless_dryrun("git add #{remote_file}")
-    if File.exist?(local_file_wouldbe)
-      #commands_to_issue << "echo File '#{local_file_wouldbe}' exists already: skipping."
-      if File.symlink?(local_file_wouldbe)
-        comments << green("File #{local_file_wouldbe} exists and is a symlink. I could be paranoid and check correct link but this is for another day..")
+  # If files are provided, we only sync those.
+  # Otherwise, we sync EVERYTHING in the remote repo.
+  
+  remote_files_to_sync = []
+  if files.any?
+    files.each do |f|
+      abs_f = File.expand_path(f)
+      rel_f = abs_f.remove_from_beginning($conf[:local_repo_root_dir])
+      remote_f = File.join($conf[:remote_repo_absolute_path], rel_f).remove_double_slashes
+      
+      if File.exist?(remote_f)
+        if File.directory?(remote_f)
+          remote_files_to_sync += `find '#{remote_f}' -type f`.split("\n").map(&:chomp)
+        else
+          remote_files_to_sync << remote_f
+        end
       else
-        comments << red("File #{local_file_wouldbe} exists but is NOT a symlink. please MANUALLY resolve this by either removing local or remote file!")
+        puts red("Remote file does not exist for #{f}: checked #{remote_f}")
+      end
+    end
+  else
+    remote_files_to_sync = $conf[:remote_privatized_files_abs]
+  end
+
+  if remote_files_to_sync.empty?
+    puts red("No files to restore, you silly sausage!")
+    return
+  end
+
+  puts yellow("IMPORTANT: Now symlinking from REMOTE repo to local repo - remember NOT to touch .gitignore :)")
+  commands_to_issue = [] 
+  comments = []
+  
+  remote_files_to_sync.uniq.each do |remote_file|
+    # Map remote absolute path back to local absolute path
+    rel_path = remote_file.remove_from_beginning($conf[:remote_repo_absolute_path])
+    local_file_wouldbe = File.join($conf[:local_repo_root_dir], rel_path).remove_double_slashes
+    
+    if File.exist?(local_file_wouldbe)
+      if File.symlink?(local_file_wouldbe)
+        comments << green("File #{local_file_wouldbe} exists and is a symlink.")
+      else
+        comments << red("File #{local_file_wouldbe} exists but is NOT a symlink. Please manually resolve.")
       end
     else
       # file doesnt exist locally I need to create it via symlink
       comments << white("File #{local_file_wouldbe} does NOT exist: creating it now")
-      command = "ln -s #{remote_file} #{$conf[:local_repo_root_dir]}/#{local_dir_wouldbe}/"
+      command = "mkdir -p '#{File.dirname(local_file_wouldbe)}' && ln -s '#{remote_file}' '#{local_file_wouldbe}'"
       commands_to_issue << command
       execute_unless_dryrun(command)
     end
   end
-  puts yellow(commands_to_issue.join("\n - "))
-  puts "Comments: #{comments.join("\n - ")}"
+  puts yellow(commands_to_issue.join("\n - ")) unless commands_to_issue.empty?
+  puts "Comments: #{comments.join("\n - ")}" unless comments.empty?
 end
 
 def verbose?
@@ -387,7 +408,14 @@ def real_program
       print_status if  $opts[:verbose]
       unprivatize_files(ARGV.drop(1))
     else
-      usage red( "Unknown action: #{action}")
+      if File.exist?(action)
+        puts red("Unknown action: #{action}")
+        all_args_quoted = ARGV.map { |arg| arg.include?(' ') ? "'#{arg}'" : arg }.join(' ')
+        puts yellow("Did you mean... ") + azure("#{File.basename($0)} add #{all_args_quoted}")
+        exit 14
+      else
+        usage red( "Unknown action: #{action}")
+      end
   end
 end
 
