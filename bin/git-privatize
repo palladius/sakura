@@ -354,20 +354,20 @@ def restore_privatized_files(files=[])
     
     if File.exist?(local_file_wouldbe)
       if File.symlink?(local_file_wouldbe)
-        comments << green("File #{local_file_wouldbe} exists and is a symlink.")
+        comments << white("File #{local_file_wouldbe} exists and is a symlink.")
       else
         comments << red("File #{local_file_wouldbe} exists but is NOT a symlink. Please manually resolve.")
       end
     else
       # file doesnt exist locally I need to create it via symlink
-      comments << white("File #{local_file_wouldbe} does NOT exist: creating it now")
+      comments << green("File #{local_file_wouldbe} does NOT exist: creating it now")
       command = "mkdir -p '#{File.dirname(local_file_wouldbe)}' && ln -s '#{remote_file}' '#{local_file_wouldbe}'"
       commands_to_issue << command
       execute_unless_dryrun(command)
     end
   end
   puts yellow(commands_to_issue.join("\n - ")) unless commands_to_issue.empty?
-  puts "Comments: #{comments.join("\n - ")}" unless comments.empty?
+  puts comments.join("\n - ") unless comments.empty?
 end
 
 def verbose?
