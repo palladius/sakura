@@ -366,8 +366,10 @@ def restore_privatized_files(files=[])
       execute_unless_dryrun(command)
     end
   end
-  puts yellow(commands_to_issue.join("\n - ")) unless commands_to_issue.empty?
-  puts comments.join("\n - ") unless comments.empty?
+  unless commands_to_issue.empty?
+    commands_to_issue.each { |cmd| puts " - #{yellow cmd}" }
+  end
+  comments.each { |comment| puts " - #{comment}" } unless comments.empty?
 end
 
 def verbose?
