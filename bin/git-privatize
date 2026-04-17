@@ -243,15 +243,19 @@ def print_status
   puts "+ REMOTE vs LOCAL"
   puts " # Mamote(TM):"
   $conf[:remote_privatized_files_rel].each{|f|
-    puts("- [REM] #{green f}")
+    abs_f = File.join($conf[:remote_repo_absolute_path], f)
+    emoji = File.directory?(abs_f) ? '📁' : '📄'
+    puts("  #{emoji} [REM] #{green f}")
   }
 
   puts "- Lokaal(TM):"
   $conf[:local_untracked_files_ohne_symlinks].each{|f|
-    puts("- [#{red 'LOK-real'}] #{red f}")
+    emoji = File.directory?(f) ? '📁' : '📄'
+    puts("  #{emoji} [#{red 'LOK-real'}] #{red f}")
   }
   $conf[:local_untracked_files].select{|f| File.symlink?(f)}.each{|f|
-    puts("- [#{ 'LOK-syml'}] #{f} -> #{azure File.readlink(f)}")
+    emoji = File.directory?(f) ? '📁' : '📄'
+    puts("  #{emoji} [#{ 'LOK-syml'}] #{f} -> #{azure File.readlink(f)}")
   }
   puts "====== print_status(END) ======"
   puts ''
@@ -352,24 +356,25 @@ def restore_privatized_files(files=[])
     rel_path = remote_file.remove_from_beginning($conf[:remote_repo_absolute_path])
     local_file_wouldbe = File.join($conf[:local_repo_root_dir], rel_path).remove_double_slashes
     
+    emoji = File.directory?(remote_file) ? '📁' : '📄'
     if File.exist?(local_file_wouldbe)
       if File.symlink?(local_file_wouldbe)
-        comments << white("File #{local_file_wouldbe} exists and is a symlink.")
+        comments << "#{emoji} " + white("File #{local_file_wouldbe} exists and is a symlink.")
       else
-        comments << red("File #{local_file_wouldbe} exists but is NOT a symlink. Please manually resolve.")
+        comments << "#{emoji} " + red("File #{local_file_wouldbe} exists but is NOT a symlink. Please manually resolve.")
       end
     else
       # file doesnt exist locally I need to create it via symlink
-      comments << green("File #{local_file_wouldbe} does NOT exist: creating it now")
+      comments << "#{emoji} " + green("File #{local_file_wouldbe} does NOT exist: creating it now")
       command = "mkdir -p '#{File.dirname(local_file_wouldbe)}' && ln -s '#{remote_file}' '#{local_file_wouldbe}'"
       commands_to_issue << command
       execute_unless_dryrun(command)
     end
   end
   unless commands_to_issue.empty?
-    commands_to_issue.each { |cmd| puts " - #{yellow cmd}" }
+    commands_to_issue.each { |cmd| puts " ⚙️  #{yellow cmd}" }
   end
-  comments.each { |comment| puts " - #{comment}" } unless comments.empty?
+  comments.each { |comment| puts " #{comment}" } unless comments.empty?
 end
 
 def verbose?
