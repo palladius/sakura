@@ -274,7 +274,16 @@ def execute_unless_dryrun(command)
 end
 
 def privatize_files(files)
-  files.each do |filename|
+  expanded_files = []
+  files.each do |f|
+    if File.directory?(f)
+      expanded_files += `find '#{f}' -type f`.split("\n").map(&:chomp)
+    else
+      expanded_files << f
+    end
+  end
+
+  expanded_files.uniq.each do |filename|
     deb "privatizing LOCAL file: #{white filename}"
     if ! File.exist?(filename)
       puts red("File doesnt exists skipping: #{filename}")
@@ -282,10 +291,6 @@ def privatize_files(files)
     end
     if File.symlink?(filename)
       puts red("File is a symlink - I wont move symlinks: #{filename}")
-      next
-    end
-    if File.directory?(filename)
-      puts red("File is a DIRECTORY - skipping: #{filename}")
       next
     end
     
