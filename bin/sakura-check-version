@@ -20,7 +20,7 @@
     :sakura_version_online            => 'https://raw.github.com/palladius/sakura/master/VERSION',
   }
 
-  $PROG_VER = '0.9.2'
+  $PROG_VER = '2.8.1'
   $DEBUG    = false
 
   def usage(comment=nil)
@@ -33,7 +33,9 @@
 
   def main
     debug_on 'Just created script, presuming u need some debug. TODO REMOVE ME when everything works!' if $DEBUG
-    current_version = File.open(ENV['SAKURADIR'] + "VERSION").read.to_s.chomp
+    # Mamma mia, mancava uno slash! Corretto ora. 🤌
+    sakura_dir = ENV['SAKURADIR'] || File.expand_path('../..', __FILE__)
+    current_version = File.read(File.join(sakura_dir, "VERSION")).chomp
     online_version = URI.open($myconf[:sakura_version_online]).read.chomp rescue "InternetUnavailable: #{$!}" # "1.2.3 err(#{$!})"
     if (online_version =~ /^InternetUnavailableItSeems/ )
       #$stderr.puts "Internet seems unavailable: #{online_version.split('$')[1]}"  # ugly seprator... TODO make it better
