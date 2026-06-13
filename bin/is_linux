@@ -1,3 +1,3 @@
 #!/bin/bash
 
-facter kernel | grep -qi linux
+uname -s | grep -qi Linux

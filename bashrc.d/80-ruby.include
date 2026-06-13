@@ -1,4 +1,4 @@
 
-export FACTERLIB="$FACTERLIB:$SAKURALIB/facter/"
+#export FACTERLIB="$FACTERLIB:$SAKURALIB/facter/" # removed: facter no longer a dependency
 
 alias irb-sakura="echodo irb -r $SAKURALIB/init.rb"
