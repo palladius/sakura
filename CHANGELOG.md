@@ -44,3 +44,7 @@ All notable changes to this project will be documented in this file.
 ## 2.8.3
 - 🌸 Added `git-bloat-analyzer` script to analyze local repository bloat and size.
 
+
+## 2.8.4
+- 🖥️ Increased HTML report container `max-width` to `1500px` to fit all columns including buttons.
+
