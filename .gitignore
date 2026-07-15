@@ -42,3 +42,4 @@ bin-*ago
 bin-8c/
 .env
 nanobanana-output/
+.agents/

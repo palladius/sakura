@@ -2,6 +2,9 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.8.2] - 2026-07-15
+- :wrench: CHORE: Ignore local `.agents` folder in `.gitignore`.
+
 ## [2.8.1] - 2026-05-29
 - :bug: FIXED: Fix missing slash in `sakura-check-version` when `SAKURADIR` has no trailing slash. 🤌 (fixes #12)
 - :bug: FIXED: Fix `SAKURA_VER` export in `bashrc`.
