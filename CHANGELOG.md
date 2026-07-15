@@ -40,3 +40,7 @@ All notable changes to this project will be documented in this file.
 
 ## [2.3.0] - 2019-05-04
 - Better travis test
+
+## 2.8.3
+- 🌸 Added `git-bloat-analyzer` script to analyze local repository bloat and size.
+

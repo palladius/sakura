@@ -1,0 +1,418 @@
+#!/usr/bin/env ruby
+
+require 'json'
+require 'fileutils'
+require 'cgi'
+require 'webrick'
+
+GIT_DIR = ARGV[0] ? File.expand_path(ARGV[0]) : File.expand_path("~/git")
+HTML_OUTPUT = "/tmp/git-repos-size-report.html"
+PORT = 8989
+
+$repos = []
+
+def format_size(kb)
+  if kb > 1024 * 1024
+    "%.2f GB" % (kb.to_f / (1024 * 1024))
+  elsif kb > 1024
+    "%.2f MB" % (kb.to_f / 1024)
+  else
+    "#{kb} KB"
+  end
+end
+
+def calculate_repo_size(dir)
+  repo_name = File.basename(dir)
+  total_kb = `du -sk "#{dir}" 2>/dev/null`.split("\t").first.to_i
+  git_kb = `du -sk "#{dir}/.git" 2>/dev/null`.split("\t").first.to_i
+  
+  tracked_bytes = `git -C "#{dir}" ls-tree -rl HEAD 2>/dev/null | awk '{s+=$4} END {print s}'`.strip.to_i
+  tracked_kb = tracked_bytes / 1024
+
+  bloat_kb = total_kb - git_kb - tracked_kb
+  bloat_kb = 0 if bloat_kb < 0
+  
+  total_for_pct = total_kb == 0 ? 1 : total_kb
+  bloat_pct = (bloat_kb.to_f / total_for_pct * 100).round(1)
+
+  # Check for clean commands
+  clean_cmd = nil
+  begin
+    if File.exist?("#{dir}/justfile") && File.read("#{dir}/justfile").match?(/^clean:/)
+      clean_cmd = "just clean"
+    elsif File.exist?("#{dir}/Makefile") && File.read("#{dir}/Makefile").match?(/^clean:/)
+      clean_cmd = "make clean"
+    end
+  rescue => e
+    # Ignore read errors
+  end
+  
+  # Get last commit info
+  last_commit_ts = `git -C "#{dir}" log -1 --format="%ct" 2>/dev/null`.strip.to_i
+  last_commit_date = `git -C "#{dir}" log -1 --format="%cd" --date=short 2>/dev/null`.strip
+  last_commit_date = "N/A" if last_commit_date.empty?
+
+  {
+    name: repo_name,
+    path: dir,
+    total_kb: total_kb,
+    git_kb: git_kb,
+    tracked_kb: tracked_kb,
+    bloat_kb: bloat_kb,
+    bloat_pct: bloat_pct,
+    clean_cmd: clean_cmd,
+    last_commit_ts: last_commit_ts,
+    last_commit_date: last_commit_date
+  }
+end
+
+def calculate_all_sizes
+  $repos = []
+  dirs = Dir.glob("#{GIT_DIR}/*").select { |f| File.directory?(f) && File.directory?("#{f}/.git") }
+  puts "🔍 Found #{dirs.size} git repositories in #{GIT_DIR}. Calculating sizes..."
+
+  mutex = Mutex.new
+  threads = dirs.map do |dir|
+    Thread.new do
+      data = calculate_repo_size(dir)
+      mutex.synchronize do
+        $repos << data
+        print "."
+        $stdout.flush
+      end
+    end
+  end
+  threads.each(&:join)
+  puts "\n✅ Done!"
+  $repos.sort_by! { |r| -r[:total_kb] }
+end
+
+def generate_html
+  html = <<-HTML
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Git Repositories Size Report</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --text-color: #f8fafc;
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --border-color: rgba(255, 255, 255, 0.1);
+            --accent-color: #38bdf8;
+            --hover-color: rgba(56, 189, 248, 0.1);
+            --btn-bg: #475569;
+            --btn-hover: #334155;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 40px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        h1 {
+            font-weight: 600;
+            margin-bottom: 5px;
+            background: -webkit-linear-gradient(45deg, #38bdf8, #818cf8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        p { margin-top: 0; color: #94a3b8; }
+        .container {
+            width: 100%;
+            max-width: 1100px;
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+            padding: 20px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            min-width: 900px;
+        }
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+        th {
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--accent-color);
+            transition: background 0.3s;
+            user-select: none;
+            position: sticky;
+            top: 0;
+            background: rgba(30, 41, 59, 0.95);
+            white-space: nowrap;
+        }
+        th:hover {
+            background: var(--hover-color);
+            border-radius: 8px;
+        }
+        tr:hover td {
+            background: var(--hover-color);
+        }
+        .sort-icon {
+            margin-left: 5px;
+            font-size: 0.8em;
+            opacity: 0.5;
+        }
+        .bloat-bar-container {
+            width: 100%;
+            background: rgba(255,255,255,0.1);
+            border-radius: 6px;
+            height: 10px;
+            overflow: hidden;
+            display: flex;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.3);
+        }
+        .bloat-bar-tracked { background: #4ade80; height: 100%; }
+        .bloat-bar-git { background: #818cf8; height: 100%; }
+        .bloat-bar-bloat { background: #f87171; height: 100%; }
+        .legend {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+            font-size: 0.9em;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .legend-item { display: flex; align-items: center; gap: 8px; }
+        .legend-color { width: 14px; height: 14px; border-radius: 4px; }
+        .clean-btn {
+            background-color: var(--btn-bg);
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85em;
+            transition: background 0.2s;
+            text-decoration: none;
+            display: inline-block;
+            white-space: nowrap;
+        }
+        .clean-btn:hover {
+            background-color: var(--btn-hover);
+        }
+        .clean-btn.action {
+            background-color: #ef4444;
+        }
+        .clean-btn.action:hover {
+            background-color: #dc2626;
+        }
+    </style>
+</head>
+<body>
+    <h1>Git Repositories Size Report</h1>
+    <p>Located in: #{CGI.escapeHTML(GIT_DIR)} | <a href="/" style="color:var(--accent-color);">Refresh Data</a></p>
+    
+    <div class="container">
+        <div class="legend">
+            <div class="legend-item"><div class="legend-color" style="background:#4ade80"></div>Tracked Files</div>
+            <div class="legend-item"><div class="legend-color" style="background:#818cf8"></div>.git History</div>
+            <div class="legend-item"><div class="legend-color" style="background:#f87171"></div>Untracked / Bloat</div>
+        </div>
+        <table id="repoTable">
+            <thead>
+                <tr>
+                    <th onclick="sortTable(0, 'string')">Repository <span class="sort-icon">↕</span></th>
+                    <th onclick="sortTable(1, 'number')">Total Size <span class="sort-icon">↕</span></th>
+                    <th onclick="sortTable(2, 'number')">Tracked <span class="sort-icon">↕</span></th>
+                    <th onclick="sortTable(3, 'number')">.git Size <span class="sort-icon">↕</span></th>
+                    <th onclick="sortTable(4, 'number')">Bloat <span class="sort-icon">↕</span></th>
+                    <th onclick="sortTable(5, 'number')">Bloat % <span class="sort-icon">↕</span></th>
+                    <th onclick="sortTable(6, 'number')">Last Updated <span class="sort-icon">↕</span></th>
+                    <th>Composition</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+  HTML
+
+  now_ts = Time.now.to_i
+  one_year_ago = now_ts - (365 * 24 * 60 * 60)
+
+  $repos.each do |r|
+    total = r[:total_kb] == 0 ? 1 : r[:total_kb]
+    tracked_pct = (r[:tracked_kb].to_f / total * 100).round(1)
+    git_pct = (r[:git_kb].to_f / total * 100).round(1)
+    bloat_pct = r[:bloat_pct]
+    
+    clean_action = ""
+    if r[:clean_cmd]
+      clean_action = "<a href='/clean?repo=#{CGI.escape(r[:name])}' class='clean-btn action' onclick='this.innerText=\"Cleaning...\";'>#{CGI.escapeHTML(r[:clean_cmd])}</a>"
+    end
+    
+    vscode_link = "<a href='vscode://file#{r[:path]}' class='vscode-btn' title='Open with VSCode' style='text-decoration: none; font-size: 1.2em; margin-right: 10px;'>💻</a>"
+    terminal_link = "<a href='/terminal?repo=#{CGI.escape(r[:name])}' target='_blank' class='term-btn' title='Open in Terminal' style='text-decoration: none; font-family: monospace; font-weight: bold; font-size: 1.1em; color: var(--text-color); margin-right: 12px;'>&gt;_</a>"
+    
+    actions_html = vscode_link + terminal_link + clean_action
+    
+    is_stale = (r[:last_commit_ts] > 0 && r[:last_commit_ts] < one_year_ago)
+    date_style = is_stale ? "color: #f87171; font-weight: bold;" : ""
+    date_icon = is_stale ? "⚠️ " : ""
+
+    html += <<-ROW
+                <tr>
+                    <td><a href="file://#{CGI.escapeHTML(r[:path])}" style="color: var(--text-color); text-decoration: none; border-bottom: 1px dashed var(--accent-color);">#{CGI.escapeHTML(r[:name])}</a></td>
+                    <td data-value="#{r[:total_kb]}">#{format_size(r[:total_kb])}</td>
+                    <td data-value="#{r[:tracked_kb]}">#{format_size(r[:tracked_kb])}</td>
+                    <td data-value="#{r[:git_kb]}">#{format_size(r[:git_kb])}</td>
+                    <td data-value="#{r[:bloat_kb]}">#{format_size(r[:bloat_kb])}</td>
+                    <td data-value="#{r[:bloat_pct]}">#{r[:bloat_pct]}%</td>
+                    <td data-value="#{r[:last_commit_ts]}" style="#{date_style}">#{date_icon}#{r[:last_commit_date]}</td>
+                    <td style="width: 120px;">
+                        <div class="bloat-bar-container" title="Tracked: #{tracked_pct}%, .git: #{git_pct}%, Bloat: #{bloat_pct}%">
+                            <div class="bloat-bar-tracked" style="width: #{tracked_pct}%"></div>
+                            <div class="bloat-bar-git" style="width: #{git_pct}%"></div>
+                            <div class="bloat-bar-bloat" style="width: #{bloat_pct}%"></div>
+                        </div>
+                    </td>
+                    <td style="white-space: nowrap;">#{actions_html}</td>
+                </tr>
+    ROW
+  end
+
+  html += <<-HTML
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        let sortColumn = 1; 
+        let sortDirection = false; 
+
+        function sortTable(columnIndex, type) {
+            const table = document.getElementById("repoTable");
+            const tbody = table.tBodies[0];
+            const rows = Array.from(tbody.querySelectorAll("tr"));
+            
+            if (sortColumn === columnIndex) {
+                sortDirection = !sortDirection;
+            } else {
+                sortColumn = columnIndex;
+                sortDirection = type === 'number' ? false : true; 
+            }
+
+            rows.sort((a, b) => {
+                const aCell = a.cells[columnIndex];
+                const bCell = b.cells[columnIndex];
+                
+                let aVal, bVal;
+                
+                if (type === 'number') {
+                    aVal = parseFloat(aCell.getAttribute('data-value') || 0);
+                    bVal = parseFloat(bCell.getAttribute('data-value') || 0);
+                } else {
+                    aVal = aCell.textContent.trim().toLowerCase();
+                    bVal = bCell.textContent.trim().toLowerCase();
+                }
+
+                if (aVal < bVal) return sortDirection ? -1 : 1;
+                if (aVal > bVal) return sortDirection ? 1 : -1;
+                return 0;
+            });
+
+            tbody.append(...rows);
+        }
+    </script>
+</body>
+</html>
+  HTML
+  html
+end
+
+# Main Execution
+
+calculate_all_sizes
+
+puts "\n📊 Repository Size Report (Top 15 chubby):"
+puts "-" * 115
+printf "%-30s | %-10s | %-10s | %-10s | %-10s | %-8s | %-12s\n", "Repo Name", "Total", "Tracked", ".git", "Bloat", "Bloat %", "Updated"
+puts "-" * 115
+$repos.first(15).each do |r|
+  printf "%-30s | %-10s | %-10s | %-10s | %-10s | %-8s | %-12s\n", 
+    r[:name][0...30], format_size(r[:total_kb]), format_size(r[:tracked_kb]), 
+    format_size(r[:git_kb]), format_size(r[:bloat_kb]), "#{r[:bloat_pct]}%", r[:last_commit_date]
+end
+
+File.write(HTML_OUTPUT, generate_html)
+puts "\n🚀 Static HTML report saved to: #{HTML_OUTPUT}"
+
+puts "\n🌐 Starting local web server to enable 'Clean' buttons..."
+puts "Press Ctrl+C to stop the server."
+
+server = nil
+port = PORT
+loop do
+  begin
+    server = WEBrick::HTTPServer.new(Port: port, AccessLog: [], Logger: WEBrick::Log.new(File::NULL))
+    break
+  rescue Errno::EADDRINUSE
+    port += 1
+    if port > PORT + 100
+      puts "❌ Could not find an open port."
+      exit 1
+    end
+  end
+end
+
+puts "✅ Server started on http://localhost:#{port}"
+
+server.mount_proc '/' do |req, res|
+  res.body = generate_html
+  res['Content-Type'] = 'text/html'
+end
+
+server.mount_proc '/clean' do |req, res|
+  repo_name = req.query['repo']
+  repo = $repos.find { |r| r[:name] == repo_name }
+  
+  if repo && repo[:clean_cmd]
+    puts "\n🧹 Running '#{repo[:clean_cmd]}' in #{repo[:path]}..."
+    system("cd \"#{repo[:path]}\" && #{repo[:clean_cmd]}")
+    
+    # Recalculate size after cleaning
+    puts "♻️  Recalculating size for #{repo_name}..."
+    new_data = calculate_repo_size(repo[:path])
+    repo.merge!(new_data)
+    
+    # Resort
+    $repos.sort_by! { |r| -r[:total_kb] }
+  end
+  
+  res.set_redirect(WEBrick::HTTPStatus::Found, '/')
+end
+
+server.mount_proc '/terminal' do |req, res|
+  repo_name = req.query['repo']
+  repo = $repos.find { |r| r[:name] == repo_name }
+  
+  if repo
+    puts "\n🐚 Opening #{repo[:path]} in Terminal..."
+    system("open -a Terminal \"#{repo[:path]}\"")
+  end
+  
+  # Return a 204 No Content so the page doesn't reload/navigate
+  res.status = 204
+end
+
+trap('INT') { server.shutdown }
+
+# Open the URL in the background
+Thread.new { sleep 0.5; system("open http://localhost:#{port}") }
+server.start
