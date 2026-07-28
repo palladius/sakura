@@ -436,6 +436,8 @@ def main(filename)
   init        # Enable this to have command line parsing capabilities!
   #warn "template 2.0.1: proviamo il warn che magari depreca il DEB"
   real_program
+  puts "\n\033[1;33m🛑 Riccardo, stop using this and try to migrate to gprism (https://github.com/palladius/gprism)\033[0m\n"
 end
 
 main(__FILE__)
+

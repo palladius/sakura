@@ -48,3 +48,6 @@ All notable changes to this project will be documented in this file.
 ## 2.8.4
 - 🖥️ Increased HTML report container `max-width` to `1500px` to fit all columns including buttons.
 
+
+## 2.8.5
+- :warning: Deprecated `git-privatize` in favor of `gprism`.

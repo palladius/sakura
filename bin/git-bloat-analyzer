@@ -87,6 +87,157 @@ def calculate_all_sizes
   $repos.sort_by! { |r| -r[:total_kb] }
 end
 
+def gather_disk_info
+  git_folder_kb = `du -sk "#{GIT_DIR}" 2>/dev/null`.split("\t").first.to_i
+  $total_git_kb = git_folder_kb
+
+  $disks = []
+  
+  git_disk_line = `df -k "#{GIT_DIR}"`.split("\n").last
+  parts = git_disk_line.split(/\s+/)
+  if parts.length >= 9
+    fs = parts[0]
+    total_kb = parts[1].to_i
+    capacity_pct = parts[4].to_i
+    mount = parts[8..-1].join(" ")
+    $disks << {name: "🏠 ~", fs: fs, total_kb: total_kb, mount: mount, is_root: true, capacity: capacity_pct}
+  end
+  
+  df_lines = `df -k`.split("\n")[1..-1]
+  df_lines.each do |line|
+    parts = line.split(/\s+/)
+    next if parts.length < 9
+    fs = parts[0]
+    total_kb = parts[1].to_i
+    capacity_pct = parts[4].to_i
+    mount = parts[8..-1].join(" ")
+    
+    if existing_disk = $disks.find { |d| d[:fs] == fs || d[:total_kb] == total_kb }
+      existing_disk[:capacity] = capacity_pct if mount == "/"
+      next
+    end
+    next unless fs.start_with?("/dev/")
+    next if mount.match?(%r{^/System/Volumes/(VM|Preboot|Update|xarts|iSCPreboot|Hardware)$})
+    next if total_kb < 50 * 1024 * 1024 # Only > 50GB
+    
+    $disks << {name: mount == "/" ? "🌱 /" : "💿 #{File.basename(mount)}", fs: fs, total_kb: total_kb, mount: mount, is_root: false, capacity: capacity_pct}
+  end
+end
+
+def gather_trash_info
+  trash_kb = `du -sk ~/.Trash 2>/dev/null`.split("\t").first.to_i
+  $trash_kb = trash_kb
+end
+
+def generate_disk_html
+  total_bloat_kb = $repos.sum { |r| r[:bloat_kb] }
+  root_disk = $disks.find { |d| d[:is_root] } || $disks.first || {total_kb: 100000000000}
+  trash_pct = $trash_kb ? ($trash_kb.to_f / root_disk[:total_kb] * 100).round(1) : 0
+  has_actions = $trash_kb && (trash_pct >= 1.0 || $trash_kb > 1024 * 1024)
+  action_html = has_actions ? "<a href='/empty-trash' class='clean-btn action' onclick='this.innerText=\"Emptying...\";' style='padding: 4px 8px; font-size: 0.8em;'>Empty Trash</a>" : ""
+
+  html = <<-HTML
+    <table id="diskTable" style="min-width: 400px; margin-top: 0; font-size: 0.85em;">
+      <thead>
+        <tr>
+          <th onclick="sortTable('diskTable', 0, 'string')" style="padding: 8px;">Disk <span class="sort-icon">↕</span></th>
+          <th style="padding: 8px;">Usage</th>
+          <th onclick="sortTable('diskTable', 2, 'number')" style="padding: 8px; text-align: right;">Git Size <span class="sort-icon">↕</span></th>
+          <th onclick="sortTable('diskTable', 3, 'number')" style="padding: 8px; text-align: right;">Total <span class="sort-icon">↕</span></th>
+          <th onclick="sortTable('diskTable', 4, 'number')" style="padding: 8px; text-align: right;">% Used <span class="sort-icon">↕</span></th>
+          #{has_actions ? '<th style="padding: 8px;">Actions</th>' : ''}
+        </tr>
+      </thead>
+      <tbody>
+  HTML
+
+  $disks.each do |disk|
+    is_root = disk[:is_root]
+    name = disk[:name]
+    capacity = disk[:capacity]
+    git_pct = is_root ? ($total_git_kb.to_f / disk[:total_kb] * 100).round(1) : 0
+    pct_color = (capacity < 50 || capacity > 85) ? "#ef4444" : "#94a3b8"
+    
+    if is_root
+      other_used_pct = [capacity - git_pct, 0].max
+      bloat_pct = (total_bloat_kb.to_f / disk[:total_kb] * 100).round(1)
+      clean_git_pct = [git_pct - bloat_pct, 0].max
+      html += <<-ROW
+        <tr>
+          <td data-value="#{name}"><strong>#{name}</strong></td>
+          <td style="width: 100px;">
+            <div class="disk-bar-container" style="background: #475569; border-radius: 6px; height: 12px; overflow: hidden; display: flex; width: 100%;" title="Used: #{capacity}%">
+              <div class="disk-bar-git" style="width: #{capacity}%; background: #3b82f6; height: 100%;"></div>
+            </div>
+          </td>
+          <td data-value="0" style="text-align: right;">-</td>
+          <td data-value="#{disk[:total_kb]}" style="text-align: right;">#{format_size(disk[:total_kb])}</td>
+          <td data-value="#{capacity}" style="color:#{pct_color}; text-align: right;">#{capacity}%</td>
+          #{has_actions ? '<td></td>' : ''}
+        </tr>
+        <tr style="background: rgba(0,0,0,0.15);">
+          <td data-value="Git" style="padding-left: 25px;">↳ 👨‍💻 Git Repos</td>
+          <td style="width: 100px;">
+            <div class="disk-bar-container" style="background: #475569; border-radius: 6px; height: 12px; overflow: hidden; display: flex; width: 100%;" title="Git: #{git_pct}% | Other Used: #{other_used_pct}%">
+              <div class="disk-bar-git" style="width: #{git_pct}%; background: #22c55e; height: 100%;"></div>
+              <div class="disk-bar-other" style="width: #{other_used_pct}%; background: #3b82f6; height: 100%; opacity: 0.5;"></div>
+            </div>
+          </td>
+          <td data-value="#{$total_git_kb}" style="text-align: right; color: #22c55e;">#{format_size($total_git_kb)}</td>
+          <td data-value="0" style="text-align: right;">-</td>
+          <td data-value="#{git_pct}" style="text-align: right; color: #22c55e;">#{git_pct}%</td>
+          #{has_actions ? '<td></td>' : ''}
+        </tr>
+        <tr style="background: rgba(0,0,0,0.25);">
+          <td data-value="Bloat" style="padding-left: 45px; font-size: 0.9em;">↳ 🦠 Git Bloat</td>
+          <td style="width: 100px;">
+            <div class="disk-bar-container" style="background: #475569; border-radius: 6px; height: 12px; overflow: hidden; display: flex; width: 100%;" title="Clean Git: #{clean_git_pct}% | Bloat: #{bloat_pct}% | Other Used: #{other_used_pct}%">
+              <div class="disk-bar-git" style="width: #{clean_git_pct}%; background: #22c55e; height: 100%;"></div>
+              <div class="disk-bar-bloat" style="width: #{bloat_pct}%; background: #ef4444; height: 100%;"></div>
+              <div class="disk-bar-other" style="width: #{other_used_pct}%; background: #3b82f6; height: 100%; opacity: 0.5;"></div>
+            </div>
+          </td>
+          <td data-value="#{total_bloat_kb}" style="text-align: right; color: #ef4444;">#{format_size(total_bloat_kb)}</td>
+          <td data-value="0" style="text-align: right;">-</td>
+          <td data-value="#{bloat_pct}" style="text-align: right; color: #ef4444;">#{bloat_pct}%</td>
+          #{has_actions ? '<td></td>' : ''}
+        </tr>
+      ROW
+    else
+      html += <<-ROW
+        <tr>
+          <td data-value="#{name}"><strong>#{name}</strong></td>
+          <td style="width: 100px;">
+            <div class="disk-bar-container" style="background: #475569; border-radius: 6px; height: 12px; overflow: hidden; display: flex; width: 100%;" title="Used: #{capacity}%">
+              <div class="disk-bar-git" style="width: #{capacity}%; background: #3b82f6; height: 100%;"></div>
+            </div>
+          </td>
+          <td data-value="0" style="text-align: right;">-</td>
+          <td data-value="#{disk[:total_kb]}" style="text-align: right;">#{format_size(disk[:total_kb])}</td>
+          <td data-value="#{capacity}" style="color:#{pct_color}; text-align: right;">#{capacity}%</td>
+          #{has_actions ? '<td></td>' : ''}
+        </tr>
+      ROW
+    end
+  end
+  
+  if $trash_kb
+    html += <<-ROW
+        <tr>
+          <td data-value="Trash"><strong>🗑️ Trash</strong></td>
+          <td></td>
+          <td data-value="#{$trash_kb}" style="text-align: right;">#{format_size($trash_kb)}</td>
+          <td data-value="0" style="text-align: right;">-</td>
+          <td data-value="#{trash_pct}" style="text-align: right;">#{trash_pct}%</td>
+          #{has_actions ? "<td>#{action_html}</td>" : ""}
+        </tr>
+    ROW
+  end
+
+  html += "</tbody></table>"
+  html
+end
+
 def generate_html
   html = <<-HTML
 <!DOCTYPE html>
@@ -116,6 +267,51 @@ def generate_html
             display: flex;
             flex-direction: column;
             align-items: center;
+        }
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            width: 98%;
+            max-width: 1500px;
+            margin-bottom: 20px;
+        }
+        .header-title {
+            text-align: left;
+        }
+        .disk-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            padding: 15px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+            min-width: 350px;
+        }
+        .disk-card h3 {
+            margin: 0 0 10px 0;
+            font-size: 1em;
+            color: #f8fafc;
+        }
+        .disk-item {
+            margin-bottom: 12px;
+        }
+        .disk-name {
+            font-size: 0.9em;
+            margin-bottom: 5px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .disk-bar-container {
+            width: 100%;
+            border-radius: 6px;
+            height: 12px;
+            overflow: hidden;
+            display: flex;
+        }
+        .disk-bar-git {
+            background: #ef4444; /* Red for git */
+            height: 100%;
         }
         h1 {
             font-weight: 600;
@@ -217,8 +413,17 @@ def generate_html
     </style>
 </head>
 <body>
-    <h1>Git Repositories Size Report</h1>
-    <p>Located in: #{CGI.escapeHTML(GIT_DIR)} | <a href="/" style="color:var(--accent-color);">Refresh Data</a></p>
+    <div class="header-container">
+        <div class="header-title">
+            <h1>Git Repositories Size Report</h1>
+            <p>Located in: #{CGI.escapeHTML(GIT_DIR)} | <a href="/" style="color:var(--accent-color);">Refresh Data</a></p>
+            <h2 style="margin-top: 15px; font-weight: normal; font-size: 1.6em; color: var(--text-color);">Total size: <span style="font-weight: bold; color: var(--accent-color); text-shadow: 0 2px 10px rgba(56, 189, 248, 0.3);">#{format_size($total_git_kb)}</span></h2>
+        </div>
+        <div class="disk-card">
+            <h3>System Disks</h3>
+            #{generate_disk_html}
+        </div>
+    </div>
     
     <div class="container">
         <div class="legend">
@@ -229,13 +434,13 @@ def generate_html
         <table id="repoTable">
             <thead>
                 <tr>
-                    <th onclick="sortTable(0, 'string')">Repository <span class="sort-icon">↕</span></th>
-                    <th onclick="sortTable(1, 'number')">Total Size <span class="sort-icon">↕</span></th>
-                    <th onclick="sortTable(2, 'number')">Tracked <span class="sort-icon">↕</span></th>
-                    <th onclick="sortTable(3, 'number')">.git Size <span class="sort-icon">↕</span></th>
-                    <th onclick="sortTable(4, 'number')">Bloat <span class="sort-icon">↕</span></th>
-                    <th onclick="sortTable(5, 'number')">Bloat % <span class="sort-icon">↕</span></th>
-                    <th onclick="sortTable(6, 'number')">Last Updated <span class="sort-icon">↕</span></th>
+                    <th onclick="sortTable('repoTable', 0, 'string')">Repository <span class="sort-icon">↕</span></th>
+                    <th onclick="sortTable('repoTable', 1, 'number')">Total Size <span class="sort-icon">↕</span></th>
+                    <th onclick="sortTable('repoTable', 2, 'number')">Tracked <span class="sort-icon">↕</span></th>
+                    <th onclick="sortTable('repoTable', 3, 'number')">.git Size <span class="sort-icon">↕</span></th>
+                    <th onclick="sortTable('repoTable', 4, 'number')">Bloat <span class="sort-icon">↕</span></th>
+                    <th onclick="sortTable('repoTable', 5, 'number')">Bloat % <span class="sort-icon">↕</span></th>
+                    <th onclick="sortTable('repoTable', 6, 'number')">Last Updated <span class="sort-icon">↕</span></th>
                     <th>Composition</th>
                     <th>Actions</th>
                 </tr>
@@ -289,24 +494,40 @@ def generate_html
 
   html += <<-HTML
             </tbody>
+            <tfoot>
+                <tr style="font-weight: bold; background-color: rgba(255, 255, 255, 0.05); border-top: 2px solid var(--accent-color);">
+                    <td>Total (#{$repos.length} repos)</td>
+                    <td>#{format_size($total_git_kb)}</td>
+                    <td>#{format_size($repos.sum { |r| r[:tracked_kb] })}</td>
+                    <td>#{format_size($repos.sum { |r| r[:git_kb] })}</td>
+                    <td>#{format_size($repos.sum { |r| r[:bloat_kb] })}</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+            </tfoot>
         </table>
     </div>
 
     <script>
-        let sortColumn = 1; 
-        let sortDirection = false; 
+        let sortStates = {}; 
 
-        function sortTable(columnIndex, type) {
-            const table = document.getElementById("repoTable");
+        function sortTable(tableId, columnIndex, type) {
+            const table = document.getElementById(tableId);
             const tbody = table.tBodies[0];
             const rows = Array.from(tbody.querySelectorAll("tr"));
             
-            if (sortColumn === columnIndex) {
-                sortDirection = !sortDirection;
+            if (!sortStates[tableId]) { sortStates[tableId] = { col: -1, dir: false }; }
+            
+            if (sortStates[tableId].col === columnIndex) {
+                sortStates[tableId].dir = !sortStates[tableId].dir;
             } else {
-                sortColumn = columnIndex;
-                sortDirection = type === 'number' ? false : true; 
+                sortStates[tableId].col = columnIndex;
+                sortStates[tableId].dir = type === 'number' ? false : true; 
             }
+
+            const sortDirection = sortStates[tableId].dir;
 
             rows.sort((a, b) => {
                 const aCell = a.cells[columnIndex];
@@ -338,6 +559,8 @@ end
 
 # Main Execution
 
+gather_disk_info
+gather_trash_info
 calculate_all_sizes
 
 puts "\n📊 Repository Size Report (Top 15 chubby):"
@@ -395,6 +618,13 @@ server.mount_proc '/clean' do |req, res|
     $repos.sort_by! { |r| -r[:total_kb] }
   end
   
+  res.set_redirect(WEBrick::HTTPStatus::Found, '/')
+end
+
+server.mount_proc '/empty-trash' do |req, res|
+  puts "\n🗑️ Emptying trash..."
+  system("rm -rf ~/.Trash/* ~/.Trash/.* 2>/dev/null")
+  $trash_kb = `du -sk ~/.Trash 2>/dev/null`.split("\t").first.to_i
   res.set_redirect(WEBrick::HTTPStatus::Found, '/')
 end
 
