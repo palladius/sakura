@@ -43,3 +43,4 @@ bin-8c/
 .env
 nanobanana-output/
 .agents/
+.env.readme
