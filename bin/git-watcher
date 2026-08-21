@@ -1,0 +1,105 @@
+#!/usr/bin/env bash
+# git-watcher — announces git repo status via dimmi (audio)
+# Usage: git-watcher [--with-audio|-a] [--with-gh|-g]
+#
+# Checks (from inside a git repo):
+#   1. Worktrees   : ls GITROOT/.worktrees/ | wc -l
+#   2. Branches    : git branch | wc -l
+#   3. GH issues   : issues updated in the last 5 min (opt-in: --with-gh)
+#
+# Calls: dimmi <N> <word>   e.g. "dimmi 3 worktrees"
+# Missing .ogg words fall back to boh.ogg (already in sakura).
+
+set -euo pipefail
+
+DIMMI="${SAKURADIR:-$(dirname "$0")/..}/bin/dimmi"
+AUDIO=false
+WITH_GH=false
+
+# ── flags ────────────────────────────────────────────────────────────────────
+for arg in "$@"; do
+  case "$arg" in
+    --with-audio|-a) AUDIO=true   ;;
+    --with-gh|-g)    WITH_GH=true ;;
+  esac
+done
+
+say() {
+  # say <word1> [word2 …]  — plays via dimmi only with --with-audio
+  if [[ "$AUDIO" == true ]]; then
+    echo "🔊 dimmi $*"
+    "$DIMMI" "$@" 2>/dev/null || true
+  fi
+}
+
+# ── git repo check ────────────────────────────────────────────────────────────
+if ! GIT_ROOT=$(git rev-parse --show-toplevel 2>/dev/null); then
+  echo "🤷 not a git repo"
+  say "boh"
+  exit 0
+fi
+
+REPO_NAME=$(basename "$GIT_ROOT")
+echo "📁 repo: $REPO_NAME  ($GIT_ROOT)"
+# 'riccardo' greeting fires later, only if something interesting is found
+
+# ── 1. WORKTREES ─────────────────────────────────────────────────────────────
+WORKTREE_DIR="$GIT_ROOT/.worktrees"
+if [[ -d "$WORKTREE_DIR" ]]; then
+  N_WORKTREES=$(ls -1 "$WORKTREE_DIR" 2>/dev/null | wc -l | tr -d ' ')
+  echo "🗂  worktrees: $N_WORKTREES  (in .worktrees/)"
+else
+  # Fallback: git worktree list (always shows at least 1 = main)
+  N_WORKTREES=$(git -C "$GIT_ROOT" worktree list 2>/dev/null | wc -l | tr -d ' ')
+  N_WORKTREES=$(( N_WORKTREES - 1 ))  # subtract main
+  [[ $N_WORKTREES -lt 0 ]] && N_WORKTREES=0
+  echo "🗂  worktrees: $N_WORKTREES  (via git worktree list, excl. main)"
+fi
+# ── 2. BRANCHES ──────────────────────────────────────────────────────────────
+N_BRANCHES=$(git -C "$GIT_ROOT" branch 2>/dev/null | wc -l | tr -d ' ')
+echo "🌿 branches:  $N_BRANCHES"
+
+# ── Announce only if something interesting ───────────────────────────────────
+INTERESTING=false
+[[ $N_WORKTREES -gt 0 ]] && INTERESTING=true
+[[ $N_BRANCHES  -gt 1 ]] && INTERESTING=true
+
+if [[ "$INTERESTING" == true ]]; then
+  say riccardo
+  [[ $N_WORKTREES -gt 0 ]] && say "$N_WORKTREES" worktrees || true
+  [[ $N_BRANCHES  -gt 1 ]] && say "$N_BRANCHES"  branches  || true
+fi
+
+# ── 3. GH ISSUES (last 5 min) — opt-in via --with-gh ────────────────────────
+if [[ "$WITH_GH" == false ]]; then
+  echo "✅ done (use --with-gh to check issues)"
+  exit 0
+fi
+
+if ! command -v gh &>/dev/null; then
+  echo "⚠️  gh not found"
+  exit 0
+fi
+
+GH_JSON=$(gh issue list \
+  --json number,title,updatedAt,state \
+  --limit 50 \
+  2>/dev/null || echo "[]")
+
+N_RECENT=$(echo "$GH_JSON" | python3 -c "
+import sys, json
+from datetime import datetime, timezone, timedelta
+cutoff = datetime.now(timezone.utc) - timedelta(minutes=5)
+issues = json.load(sys.stdin)
+recent = [i for i in issues if datetime.fromisoformat(i['updatedAt'].replace('Z','+00:00')) >= cutoff]
+print(len(recent))
+for i in recent:
+    print(f\"  #{i['number']} [{i['state']}] {i['title'][:60]}\")
+" 2>/dev/null || echo "0")
+
+N_ISSUES=$(echo "$N_RECENT" | head -1 | tr -d ' ')
+echo "💬 gh issues (last 5min): $N_ISSUES"
+echo "$N_RECENT" | tail -n +2
+say "$N_ISSUES" issue replies
+
+echo "✅ done"
