@@ -51,3 +51,8 @@ For any comments, please subscribe to this User Group: <sakura-users@googlegroup
 - <https://groups.google.com/forum/#!forum/sakura-users>
 
 For borrow code and friends and thanks and some love, please see `CREDITS`.
+
+## Architecture Diagram
+
+![Architecture Diagram](architecture_diagram.png)
+
