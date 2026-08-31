@@ -210,13 +210,20 @@ def init()    # see lib_autoinit in lib/util.rb
     deb green("You're IN luck: you're OUT of GIC")
   end
 
-  unless File.exist?( $conf[:remote_repo_absolute_path] )
-    execute_unless_dryrun("mkdir -p '#{ $conf[:remote_repo_absolute_path]}'")
-  end
-  unless File.exist?("#{$conf[:local_repo_root_dir]}/.git-privatize")
-    puts ".git-privatize not found: symlinking remote repo locally for convenience.."
-    command = "ln -s '#{$conf[:remote_repo_absolute_path]}' '#{$conf[:local_repo_root_dir]}/.git-privatize'"
-    execute_unless_dryrun(command)
+  remote_has_files = File.exist?($conf[:remote_repo_absolute_path]) && Dir.exist?($conf[:remote_repo_absolute_path]) && !Dir.empty?($conf[:remote_repo_absolute_path]) rescue false
+  is_adding = ARGV.any? && ['add', 'privatize', 'push', 'pr'].include?(ARGV[0])
+
+  if is_adding || remote_has_files
+    unless File.exist?( $conf[:remote_repo_absolute_path] )
+      execute_unless_dryrun("mkdir -p '#{ $conf[:remote_repo_absolute_path]}'")
+    end
+    unless File.exist?("#{$conf[:local_repo_root_dir]}/.git-privatize")
+      puts ".git-privatize not found: symlinking remote repo locally for convenience.."
+      command = "ln -s '#{$conf[:remote_repo_absolute_path]}' '#{$conf[:local_repo_root_dir]}/.git-privatize'"
+      execute_unless_dryrun(command)
+    end
+  else
+    deb "Repo has no legacy privatize files and is not adding any. Skipping auto-mkdir and auto-symlink."
   end
 
 end
@@ -238,6 +245,10 @@ def print_status
     puts azure(" git-privatize sync '#{ $conf[:remote_privatized_files_rel].join("' '") }'")
     puts ".. or simply .. "
     puts azure(" git-privatize sync")
+  end
+
+  if $conf[:remote_privatized_files_abs].empty? && !File.exist?("#{$conf[:local_repo_root_dir]}/.git-privatize")
+    puts green("✨ This repository is NOT covered by legacy git-privatize and this is a GOOD thing! Use gprism instead: https://github.com/palladius/gprism")
   end
 
   puts "+ REMOTE vs LOCAL"

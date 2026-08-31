@@ -2,6 +2,9 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.8.6] - 2026-08-31
+- :sparkles: FEAT(`git-privatize`): Skip creating empty directories and symlinks when repository has no privatized files, and recommend `gprism`.
+
 ## [2.8.2] - 2026-07-15
 - :wrench: CHORE: Ignore local `.agents` folder in `.gitignore`.
 
