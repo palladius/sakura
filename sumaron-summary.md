@@ -1,68 +1,58 @@
 ---
-sumaron_version: 0.1.0
-date: 2026-06-25
-path: /usr/local/google/home/ricc/bin/sumaron
-hostname: derek.zrh.corp.google.com
-timestamp: 2026-06-25T13:53:27+02:00
+sumaron_version: 0.3.0
+date: 2026-09-07
+path: /Users/riccardo/.gemini/antigravity/worktrees/sumaron/sumaron_repo_analysis_skills/bin/sumaron
+hostname: mini-lobby
+timestamp: 2026-09-07T08:20:16+02:00
 model: gemini-flash-latest
 files:
   - CHANGELOG.md
   - GEMINI.md
   - README.md
-  - broken-session.json
+  - docs/sumaron/AGGREGATED_TODOS.md
+  - docs/sumaron/HOW_TO_MAKE_THIS_BETTER.md
+  - docs/sumaron/about.md
   - docz/gemini-cli/GEMINI.md
   - docz/gemini-cli/README.md
   - index.html
   - lib/recipes/README.md
+  - skills/how-to-use-sakura/SKILL.md
   - tasklis/reclaim-disk-space/.talk-script.md
   - tasklis/reclaim-disk-space/GEMINI.md
   - tasklis/reclaim-disk-space/README.md
 ---
 
-*Ciao a tutti!* 🇮🇹 Welcome to **Sakura** 🌸, the repository that proves you can never have too many command-line tools (or too many emojis). 
+# 🌸 Sakura (*Swiss Army Knife Unnecessary Repository yet Awesome*) 🇨🇭🔪🍕
 
-As the name implies, **Sakura** stands for:
-**S**wiss **A**rmy **K**nife **U**nnecessary **R**epository yet **A**wesome (🇨🇭🔪🍍🍕📦😆)
-
-Here is a high-level, fun-filled tour of what this repository is all about! *Andiamo!* 🤌
+**Sakura** is a modular, personal productivity monorepo and "dotfiles on steroids" created by Riccardo (`@palladius`). Accumulating decades of personal dev tools, it brings color, humor, and rich POSIX utilities to shell environments, containerized workspaces, and LLM-assisted workflows.
 
 ---
 
-### 🌟 Project Purpose & Vibe
-Sakura is a public, lightweight playground of shell utilities, custom aliases, configuration helpers, and Gemini CLI automations designed to color your terminal life. If you love customizing your terminal's `PS1` prompt to look like the Italian flag 🇮🇹 (or Irish 🇮🇪 / Argentinian 🇦🇷), this is your home. 
+### 📂 Repository Structure & Key Components
+
+* 🚀 **CLI Utilities (`bin/`)**:
+  * Single-purpose executable scripts and shell utilities.
+  * Notable tools include `git-bloat-analyzer`, `gcp-mcp-pinger`, `richelp` (cheatsheet runner), `minicook`, and text/visual mappers (`rainbow`, `act`).
+
+* 💎 **Ruby Core & System Recipes (`lib/`)**:
+  * **`lib/sakura.rb`**: Core Ruby support library (modern replacement for the retired `sakuric` gem).
+  * **`lib/recipes/` (MiniCook)**: A minimalist, experimental Chef/Puppet-style configuration management engine based on `facter`.
+
+* 🤖 **AI Agents, Skills, and Gemini CLI Demos (`skills/`, `ricc-skills/`, `docz/gemini-cli/`)**:
+  * Contains structured agent operational skills (e.g., `skills/how-to-use-sakura/SKILL.md`).
+  * Catalog of interactive LLM demos (`sqlite-investigation`, `git-investigation`, `nanobanana`).
+  * Automation tasks under `tasklis/` (such as disk space reclamation and node_modules bloat cleanup scoped by `${HOSTNAME}`).
+
+* 🐚 **Shell Integration & Templates (`templates/`)**:
+  * **`templates/bashrc.inject`**: Shell bootstrapping template to inject `SAKURADIR`, PATH additions, aliases, and custom multi-national PS1 prompt colorings.
+
+* 📊 **Repository Health & Audit Reports (`docs/sumaron/`)**:
+  * Generated reports tracking technical debt, open issues, and a prioritized security/defect audit (`HOW_TO_MAKE_THIS_BETTER.md`).
 
 ---
 
-### 🗺️ Repository Structure & Key Components
+### ⚙️ Key Configuration & Meta Files
 
-This codebase is a wonderful mix of old-school shell magic and modern AI-driven agent scripts:
-
-*   🐚 **The Classic Shell Toolbelt (The "Swiss Army Knife")**:
-    *   Provides colorful scripts and wrapper tools to make your terminal experience less boring.
-    *   Features utilities like `rainbow` (colors terminal output line-by-line), `act` (randomly scrambles lines of text), and the handy `richelp` (a customized cheatsheet retriever).
-    *   Includes a versioning script `sakura-check-version`.
-*   🤖 **Gemini CLI Demos & Automations (`/docz/gemini-cli/` & `/tasklis/`)**:
-    *   Contains configuration guides, demo scripts, and READMEs for driving terminal-based AI tasks.
-    *   **Disk Reclamation (`/tasklis/reclaim-disk-space/`)**: A structured use case to safely clean bloated `node_modules`, `Camtasia` temp files, and Docker images with user verification and a visual feedback loop.
-    *   **SRE Investigation Sessions (`broken-session.json`)**: Real-world logs tracking Gemini agent-assisted GKE Kubernetes debugging sessions, utilizing safe read-only commands (`safe-sre-investigator`).
-*   🍳 **MiniCook (`/lib/recipes/`)**:
-    *   A miniature, highly agile Chef/Puppet-like configuration management tool that helps you install, test, and cleanly uninstall software. It runs atop Facter.
-*   🐳 **Docker & Web Landing (`index.html`)**:
-    *   A simple HTML portal designed to accompany Sakura's Docker packaging, proudly showing off its current history and version.
-
----
-
-### ⚙️ Important Configurations & Meta-Files
-
-*   **`GEMINI.md` (The Repository Law) 📜**:
-    *   Dictates that all git commits must use **Gitmoji** 😜.
-    *   Mandates updating both `CHANGELOG.md` and the `VERSION` file for non-trivial changes.
-    *   Requires a funny, emoji-rich, and slightly Italian-influenced developer interaction style. *Mamma mia, we must adhere!* 🤌
-*   **`CHANGELOG.md` ⏳**:
-    *   Documents the repo's evolution up to **v2.8.1** (fixing path slash edge-cases and removing obsolete `.github` actions workflows). 
-    *   Highlights the transition away from Ruby 2.x and deprecated dependencies (like the `sakuric` gem).
-
----
-
-### 🍝 *Un'Ultima Parola* (A Final Word)
-As we say in Italy, *"A tavola non si invecchia"* (One does not grow old at the dinner table)... and the same goes for a beautiful terminal workspace! Grab a slice of pizza 🍕, inject `sakura/templates/bashrc.inject` into your `.bashrc`, and start printing your process trees in beautiful rainbows! 🌈
+* 🏷️ **`VERSION` & `CHANGELOG.md`**: Tracks semantic releases (currently `v2.8.6`) using strict [Gitmoji](https://gitmoji.dev/) conventions.
+* 🤖 **`GEMINI.md`**: Behavioral rules for AI assistants (mandates Italian humor/proverbs 🤌, Gitmoji commits, semver increments, and filing GitHub issues before non-trivial changes).
+* 🐳 **`Dockerfile` & `Makefile` & `index.html`**: Container packaging files and a lightweight static landing page showing the current version and history.
