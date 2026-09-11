@@ -1,0 +1,33 @@
+{
+  "id": "sakura",
+  "title": "🌸 Sakura (Swiss Army Knife)",
+  "audience": "tools",
+  "kind": "tool",
+  "category": "tools",
+  "version": "1.0.0",
+  "score": 70,
+  "created_at": "2024",
+  "tagline": "Swiss Army Knife Unnecessary Repository yet Awesome shell scripts!",
+  "description": "Riccardo's open-source shell scripts, cheatsheets, PS1 coloring, and CLI productivity swiss-army-knife with prompt coloring and act scrambler.",
+  "screenshot_url": "https://raw.githubusercontent.com/palladius/sakura/master/images/sakura2.jpg",
+  "repo_url": "https://github.com/palladius/sakura",
+  "play_url": "",
+  "can_embed": false,
+  "tech": [
+    "Bash",
+    "Shell",
+    "CLI",
+    "Linux",
+    "macOS"
+  ],
+  "tags": [
+    "shell",
+    "tools",
+    "bash",
+    "cli",
+    "sakura",
+    "productivity"
+  ],
+  "badge": "🌸 Shell Tool",
+  "target": "Shell Lovers & SREs"
+}
