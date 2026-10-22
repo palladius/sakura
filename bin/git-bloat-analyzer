@@ -5,9 +5,47 @@ require 'fileutils'
 require 'cgi'
 require 'webrick'
 
-GIT_DIR = ARGV[0] ? File.expand_path(ARGV[0]) : File.expand_path("~/git")
-HTML_OUTPUT = "/tmp/git-repos-size-report.html"
-PORT = 8989
+require 'optparse'
+
+$options = {
+  git_dir: File.expand_path("~/git"),
+  html_output: "/tmp/git-repos-size-report.html",
+  json_output: "/tmp/git-repos-size-report.json",
+  port: 8989,
+  json: false,
+  server: true,
+  open_browser: true,
+  refresh: false
+}
+
+$optparse = OptionParser.new do |opts|
+  opts.banner = "Usage: repos-ricc-size [options] [git_dir]"
+  opts.on('-j', '--json', 'Output results as JSON to stdout and exit') do
+    $options[:json] = true
+    $options[:server] = false
+  end
+  opts.on('-n', '--no-server', '--batch', 'Do not start the web server') { $options[:server] = false }
+  opts.on('--no-browser', 'Do not open browser automatically') { $options[:open_browser] = false }
+  opts.on('-o', '--html FILE', 'Path to save HTML report') { |v| $options[:html_output] = v }
+  opts.on('-f', '--json-file FILE', 'Path to save JSON report') { |v| $options[:json_output] = v }
+  opts.on('-d', '--dir DIR', 'Directory containing git repositories') { |v| $options[:git_dir] = File.expand_path(v) }
+  opts.on('-p', '--port PORT', Integer, 'Port for web server (default 8989)') { |v| $options[:port] = v }
+  opts.on('-r', '--refresh', 'Refresh calculation') { $options[:refresh] = true }
+  opts.on('-h', '--help', 'Show this help screen') do
+    puts opts
+    exit 0
+  end
+end
+$optparse.parse!
+
+if ARGV[0] && !ARGV[0].start_with?('-')
+  $options[:git_dir] = File.expand_path(ARGV[0])
+end
+
+GIT_DIR = $options[:git_dir]
+HTML_OUTPUT = $options[:html_output]
+JSON_OUTPUT = $options[:json_output]
+PORT = $options[:port]
 
 $repos = []
 
@@ -69,7 +107,7 @@ end
 def calculate_all_sizes
   $repos = []
   dirs = Dir.glob("#{GIT_DIR}/*").select { |f| File.directory?(f) && File.directory?("#{f}/.git") }
-  puts "🔍 Found #{dirs.size} git repositories in #{GIT_DIR}. Calculating sizes..."
+  $stderr.puts "🔍 Found #{dirs.size} git repositories in #{GIT_DIR}. Calculating sizes..." unless $options[:json]
 
   mutex = Mutex.new
   threads = dirs.map do |dir|
@@ -77,13 +115,13 @@ def calculate_all_sizes
       data = calculate_repo_size(dir)
       mutex.synchronize do
         $repos << data
-        print "."
-        $stdout.flush
+        $stderr.print "." unless $options[:json]
+        $stderr.flush unless $options[:json]
       end
     end
   end
   threads.each(&:join)
-  puts "\n✅ Done!"
+  $stderr.puts "\n✅ Done!" unless $options[:json]
   $repos.sort_by! { |r| -r[:total_kb] }
 end
 
@@ -563,6 +601,24 @@ gather_disk_info
 gather_trash_info
 calculate_all_sizes
 
+json_data = {
+  git_dir: GIT_DIR,
+  calculated_at: Time.now.iso8601,
+  total_git_kb: $total_git_kb,
+  total_git_formatted: format_size($total_git_kb),
+  disks: $disks,
+  trash_kb: $trash_kb,
+  repos_count: $repos.size,
+  repos: $repos
+}
+
+File.write(JSON_OUTPUT, JSON.pretty_generate(json_data))
+
+if $options[:json]
+  puts JSON.pretty_generate(json_data)
+  exit 0
+end
+
 puts "\n📊 Repository Size Report (Top 15 chubby):"
 puts "-" * 115
 printf "%-30s | %-10s | %-10s | %-10s | %-10s | %-8s | %-12s\n", "Repo Name", "Total", "Tracked", ".git", "Bloat", "Bloat %", "Updated"
@@ -575,6 +631,12 @@ end
 
 File.write(HTML_OUTPUT, generate_html)
 puts "\n🚀 Static HTML report saved to: #{HTML_OUTPUT}"
+puts "📄 JSON report saved to: #{JSON_OUTPUT}"
+
+unless $options[:server]
+  puts "\n✅ Batch report complete. Server skipped (--no-server)."
+  exit 0
+end
 
 puts "\n🌐 Starting local web server to enable 'Clean' buttons..."
 puts "Press Ctrl+C to stop the server."
@@ -599,6 +661,11 @@ puts "✅ Server started on http://localhost:#{port}"
 server.mount_proc '/' do |req, res|
   res.body = generate_html
   res['Content-Type'] = 'text/html'
+end
+
+server.mount_proc '/json' do |req, res|
+  res.body = JSON.pretty_generate(json_data)
+  res['Content-Type'] = 'application/json'
 end
 
 server.mount_proc '/clean' do |req, res|
@@ -644,5 +711,7 @@ end
 trap('INT') { server.shutdown }
 
 # Open the URL in the background
-Thread.new { sleep 0.5; system("open http://localhost:#{port}") }
+if $options[:open_browser]
+  Thread.new { sleep 0.5; system("open http://localhost:#{port} 2>/dev/null || xdg-open http://localhost:#{port} 2>/dev/null") }
+end
 server.start
