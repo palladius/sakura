@@ -13,18 +13,33 @@ $options = {
   json_output: "/tmp/git-repos-size-report.json",
   port: 8989,
   json: false,
-  server: true,
+  quiet: false,
+  server: $stdout.tty?,
   open_browser: true,
   refresh: false
 }
 
 $optparse = OptionParser.new do |opts|
-  opts.banner = "Usage: repos-ricc-size [options] [git_dir]"
+  opts.banner = "Usage: #{File.basename($0)} [options] [git_dir]"
   opts.on('-j', '--json', 'Output results as JSON to stdout and exit') do
     $options[:json] = true
     $options[:server] = false
+    $options[:quiet] = true
   end
-  opts.on('-n', '--no-server', '--batch', 'Do not start the web server') { $options[:server] = false }
+  opts.on('-q', '--quiet', 'Suppress progress and status output') { $options[:quiet] = true }
+  opts.on('-v', '--version', 'Show version') do
+    puts "#{File.basename($0)} v1.0.1"
+    exit 0
+  end
+  opts.on('--ai-help', 'Show AI-specific instructions') do
+    puts "# AI Help"
+    puts "Pass `--json` (-j) to parse output programmatically."
+    puts "Pass `-q` or `--quiet` to suppress progress output. `--json` implies `-q`."
+    puts "The web server automatically disables itself in non-TTY environments. You can force it off with `-n` or `--no-server`."
+    exit 0
+  end
+  opts.on('-n', '--no-server', '--no-web-server', '--batch', 'Do not start the web server') { $options[:server] = false }
+  opts.on('--server', '--web-server', 'Force the web server to start') { $options[:server] = true }
   opts.on('--no-browser', 'Do not open browser automatically') { $options[:open_browser] = false }
   opts.on('-o', '--html FILE', 'Path to save HTML report') { |v| $options[:html_output] = v }
   opts.on('-f', '--json-file FILE', 'Path to save JSON report') { |v| $options[:json_output] = v }
@@ -107,7 +122,7 @@ end
 def calculate_all_sizes
   $repos = []
   dirs = Dir.glob("#{GIT_DIR}/*").select { |f| File.directory?(f) && File.directory?("#{f}/.git") }
-  $stderr.puts "🔍 Found #{dirs.size} git repositories in #{GIT_DIR}. Calculating sizes..." unless $options[:json]
+  $stderr.puts "🔍 Found #{dirs.size} git repositories in #{GIT_DIR}. Calculating sizes..." unless $options[:quiet] || $options[:json]
 
   mutex = Mutex.new
   threads = dirs.map do |dir|
@@ -115,13 +130,13 @@ def calculate_all_sizes
       data = calculate_repo_size(dir)
       mutex.synchronize do
         $repos << data
-        $stderr.print "." unless $options[:json]
-        $stderr.flush unless $options[:json]
+        $stderr.print "." unless $options[:quiet] || $options[:json]
+        $stderr.flush unless $options[:quiet] || $options[:json]
       end
     end
   end
   threads.each(&:join)
-  $stderr.puts "\n✅ Done!" unless $options[:json]
+  $stderr.puts "\n✅ Done!" unless $options[:quiet] || $options[:json]
   $repos.sort_by! { |r| -r[:total_kb] }
 end
 
@@ -619,27 +634,31 @@ if $options[:json]
   exit 0
 end
 
-puts "\n📊 Repository Size Report (Top 15 chubby):"
-puts "-" * 115
-printf "%-30s | %-10s | %-10s | %-10s | %-10s | %-8s | %-12s\n", "Repo Name", "Total", "Tracked", ".git", "Bloat", "Bloat %", "Updated"
-puts "-" * 115
-$repos.first(15).each do |r|
-  printf "%-30s | %-10s | %-10s | %-10s | %-10s | %-8s | %-12s\n", 
-    r[:name][0...30], format_size(r[:total_kb]), format_size(r[:tracked_kb]), 
-    format_size(r[:git_kb]), format_size(r[:bloat_kb]), "#{r[:bloat_pct]}%", r[:last_commit_date]
+unless $options[:quiet]
+  puts "\n📊 Repository Size Report (Top 15 chubby):"
+  puts "-" * 115
+  printf "%-30s | %-10s | %-10s | %-10s | %-10s | %-8s | %-12s\n", "Repo Name", "Total", "Tracked", ".git", "Bloat", "Bloat %", "Updated"
+  puts "-" * 115
+  $repos.first(15).each do |r|
+    printf "%-30s | %-10s | %-10s | %-10s | %-10s | %-8s | %-12s\n", 
+      r[:name][0...30], format_size(r[:total_kb]), format_size(r[:tracked_kb]), 
+      format_size(r[:git_kb]), format_size(r[:bloat_kb]), "#{r[:bloat_pct]}%", r[:last_commit_date]
+  end
 end
 
 File.write(HTML_OUTPUT, generate_html)
-puts "\n🚀 Static HTML report saved to: #{HTML_OUTPUT}"
-puts "📄 JSON report saved to: #{JSON_OUTPUT}"
+puts "\n🚀 Static HTML report saved to: #{HTML_OUTPUT}" unless $options[:quiet]
+puts "📄 JSON report saved to: #{JSON_OUTPUT}" unless $options[:quiet]
 
 unless $options[:server]
-  puts "\n✅ Batch report complete. Server skipped (--no-server)."
+  puts "\n✅ Batch report complete. Server skipped (--no-server)." unless $options[:quiet]
   exit 0
 end
 
-puts "\n🌐 Starting local web server to enable 'Clean' buttons..."
-puts "Press Ctrl+C to stop the server."
+unless $options[:quiet]
+  puts "\n🌐 Starting local web server to enable 'Clean' buttons..."
+  puts "Press Ctrl+C to stop the server."
+end
 
 server = nil
 port = PORT
