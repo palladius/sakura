@@ -2,6 +2,9 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.8.8] - 2026-11-07
+- :sparkles: FEAT: Port `Makefile` to modern `Justfile` with `list`, `version`, `clean`, `install`, `test`, `test-ruby`, `autocomplete`, and `docker-*` targets (fixes #9).
+
 ## [2.8.7] - 2026-09-07
 - :brain: Sumaron Intelligence v0.3.0 analysis:
   - :shield: Added defect & vulnerability scanner report (`docs/sumaron/HOW_TO_MAKE_THIS_BETTER.md` & `docs/sumaron/about.md`).
